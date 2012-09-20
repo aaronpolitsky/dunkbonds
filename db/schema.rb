@@ -10,14 +10,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120920144113) do
+ActiveRecord::Schema.define(:version => 20120920144952) do
 
   create_table "goals", :force => true do |t|
     t.string   "title"
     t.text     "description"
     t.datetime "starts_at"
     t.datetime "ends_at"
-    t.time     "period"
+    t.string   "period"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
