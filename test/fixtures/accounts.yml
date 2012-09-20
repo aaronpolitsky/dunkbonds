@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  goal_id: 1
+  is_treasury: false
+  balance: 9.99
+
+two:
+  goal_id: 1
+  is_treasury: false
+  balance: 9.99

@@ -10,7 +10,15 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120920144952) do
+ActiveRecord::Schema.define(:version => 20120920150703) do
+
+  create_table "accounts", :force => true do |t|
+    t.integer  "goal_id"
+    t.boolean  "is_treasury"
+    t.decimal  "balance",     :precision => 8, :scale => 2
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "goals", :force => true do |t|
     t.string   "title"

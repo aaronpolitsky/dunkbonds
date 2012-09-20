@@ -1,4 +1,6 @@
 TwoODunkbonds::Application.routes.draw do
+  resources :accounts
+
   resources :goals
 
   # The priority is based upon order of creation:
