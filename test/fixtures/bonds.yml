@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  creditor_id: 1
+  debtor_id: 1
+  qty: 1
+  goal_id: 1
+
+two:
+  creditor_id: 1
+  debtor_id: 1
+  qty: 1
+  goal_id: 1

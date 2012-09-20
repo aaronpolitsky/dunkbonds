@@ -1,0 +1,18 @@
+class CreateBonds < ActiveRecord::Migration
+  def self.up
+    create_table :bonds do |t|
+      t.integer :creditor_id
+      t.integer :debtor_id
+      t.integer :qty
+      t.integer :goal_id
+
+      t.timestamps
+    end
+  end
+
+  add_index :bonds, [:creditor_id, :debtor_id, :goal_id], :unique => true
+
+  def self.down
+    drop_table :bonds
+  end
+end
