@@ -14,7 +14,7 @@ class Account < ActiveRecord::Base
     swap.save!
   end
 
-  def sell_bond(buyer)
+  def sell_bond!(buyer)
     Account.transaction do
       if Bond.exists?(:creditor_id => buyer.id,
                       :debtor_id => self.id, 
@@ -29,6 +29,8 @@ class Account < ActiveRecord::Base
       end
       self.balance += 10.0
       buyer.balance -= 10.0
+      self.save!
+      buyer.save!
       bond.save!
     end
   end

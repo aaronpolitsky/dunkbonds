@@ -7,22 +7,37 @@ class Order < ActiveRecord::Base
 
   before_save :execute
 
-  def find_bond_ask
-    match = Order.where(:type_of => "bond_ask").first
-    
+  def find_matching_ask
+    Order.where(:type_of => "bond ask", :goal_id => self.goal_id, :status => "pending").first
+  end
 
+  def find_matching_bid
+    Order.where(:type_of => "bond bid", :goal_id => self.goal_id, :status => "pending").first
   end
 
   def execute
-    status = "pending"
-    if type_of == "bond bid"
-      find_bond_ask
-    elsif type_of == "bond ask"
-      
-    elsif type_of == "swap bid"
-      
-    elsif type_of == "swap ask"
-
+    unless status == "executed"
+      self.status = "pending"
+      if type_of == "bond bid"
+        match = find_matching_ask
+        unless match.nil?
+          match.account.sell_bond!(self.account)
+          self.status = match.status = "executed"
+          match.save!
+        end
+        
+      elsif type_of == "bond ask"
+        match = find_matching_bid
+        unless match.nil?
+          account.sell_bond!(match.account)
+          self.status = match.status = "executed"
+          match.save!
+        end
+      elsif type_of == "swap bid"
+        
+      elsif type_of == "swap ask"
+        
+      end
     end
   end
 end

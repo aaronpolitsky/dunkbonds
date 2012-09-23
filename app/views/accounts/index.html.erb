@@ -2,6 +2,7 @@
 
 <table>
   <tr>
+    <th>Account</th>
     <th>Goal</th>
     <th>Is treasury</th>
     <th>Balance</th>
@@ -12,6 +13,7 @@
 
 <% @accounts.each do |account| %>
   <tr>
+    <td><%= account.id %></td>
     <td><%= account.goal_id %></td>
     <td><%= account.is_treasury %></td>
     <td><%= account.balance %></td>
