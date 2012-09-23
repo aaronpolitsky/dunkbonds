@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120920155222) do
+ActiveRecord::Schema.define(:version => 20120920184259) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -35,6 +35,17 @@ ActiveRecord::Schema.define(:version => 20120920155222) do
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.string   "period"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "orders", :force => true do |t|
+    t.integer  "account_id"
+    t.string   "status"
+    t.string   "type_of"
+    t.decimal  "bid_ask",    :precision => 8, :scale => 2
+    t.integer  "goal_id"
+    t.decimal  "price",      :precision => 8, :scale => 2
     t.datetime "created_at"
     t.datetime "updated_at"
   end

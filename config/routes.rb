@@ -1,4 +1,6 @@
 TwoODunkbonds::Application.routes.draw do
+  resources :orders
+
   resources :accounts
 
   resources :goals
