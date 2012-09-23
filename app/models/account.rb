@@ -1,27 +1,36 @@
 class Account < ActiveRecord::Base
+  # A bond is just a link between two accounts establishing a payment flow
+  # A swap is the same link seen from the other perspective.  
+
   belongs_to :goal
-  has_many :bonds, :foreign_key => :debtor_id # a debtor owns bonds and pays creditor
-  has_many :swaps, :class_name => "Bond", :foreign_key => :creditor_id # a creditor pays a debtor periodically, also the same as a swap
+  has_many :bonds, :foreign_key => :creditor_id # a creditor owns bonds and collects payments from debtors
+  has_many :swaps, :class_name => "Bond", :foreign_key => :debtor_id # a debtor pays a creditor periodically, also the same as a swap
 
   def sell_swap(buyer)
-#    if Bond.exists?(:creditor_id => self, :debtor_id => buyer, :goal_id => self.goal)
-#      bond = self.bonds.where(:debtor_id => buyer, :goal_id => self.goal_id).first
-#    else
-#      bond = self.bonds.where(:goal_id => self.goal_id).first
-#    end
-    swap = Bond.where(:creditor_id => self.id).first
+    swap = self.swaps.first
+    swap.debtor_id = buyer.id
     self.balance += 10.0
-    buyer.balance -= 10
-    swap.new_creditor!(buyer.id)
+    buyer.balance -= 10.0
+    swap.save!
   end
 
   def sell_bond(buyer)
-    #transaction
-    bond = Bond.where(:debtor_id => self.id).first  #TODO find if exists
-    self.balance += 10.0
-    buyer.balance -= 10.0
-    bond.new_debtor!(buyer.id)
-    #end transaction
+    Account.transaction do
+      if Bond.exists?(:creditor_id => buyer.id,
+                      :debtor_id => self.id, 
+                      :goal_id => self.goal.id)
+        bond = buyer.bonds.where(:debtor_id => self.id, :goal_id => self.goal.id).first
+        bond.qty += 1
+      else
+        #this creates a new bond-swap link rather than transferring ownership.  could be a bad idea, could be just fine. 
+        bond = buyer.bonds.create!(:debtor_id => self.id, 
+                                   :goal_id => self.goal.id, 
+                                   :qty => 1)
+      end
+      self.balance += 10.0
+      buyer.balance -= 10.0
+      bond.save!
+    end
   end
 
 end

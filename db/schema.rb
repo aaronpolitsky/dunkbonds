@@ -29,6 +29,8 @@ ActiveRecord::Schema.define(:version => 20120920184259) do
     t.datetime "updated_at"
   end
 
+  add_index "bonds", ["creditor_id", "debtor_id", "goal_id"], :name => "creditor_debtor_goal", :unique => true
+
   create_table "goals", :force => true do |t|
     t.string   "title"
     t.text     "description"

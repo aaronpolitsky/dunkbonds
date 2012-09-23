@@ -21,7 +21,7 @@
   </div>
   <div class="field">
     <%= f.label :type_of %><br />
-    <%= f.text_field :type_of %>
+    <%= f.select :type_of, Order::TYPES %>
   </div>
   <div class="field">
     <%= f.label :bid_ask %><br />
