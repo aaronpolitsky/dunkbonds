@@ -1,0 +1,21 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  account_id: 1
+  status: MyString
+  type_of: MyString
+  max_bid_min_ask: 9.99
+  goal_id: 1
+  cart_id: 1
+  order_id: 1
+  price: 9.99
+
+two:
+  account_id: 1
+  status: MyString
+  type_of: MyString
+  max_bid_min_ask: 9.99
+  goal_id: 1
+  cart_id: 1
+  order_id: 1
+  price: 9.99

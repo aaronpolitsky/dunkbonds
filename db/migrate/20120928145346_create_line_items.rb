@@ -1,11 +1,13 @@
-class CreateOrders < ActiveRecord::Migration
+class CreateLineItems < ActiveRecord::Migration
   def self.up
-    create_table :orders do |t|
+    create_table :line_items do |t|
       t.integer :account_id
       t.string :status
       t.string :type_of
-      t.decimal :bid_ask, :precision => 8, :scale => 2
+      t.decimal :max_bid_min_ask, :precision => 8, :scale => 2
       t.integer :goal_id
+      t.integer :cart_id
+      t.integer :order_id
       t.decimal :price, :precision => 8, :scale => 2
 
       t.timestamps
@@ -13,6 +15,6 @@ class CreateOrders < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :orders
+    drop_table :line_items
   end
 end

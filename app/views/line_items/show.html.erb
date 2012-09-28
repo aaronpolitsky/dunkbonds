@@ -1,0 +1,45 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Account:</b>
+  <%= @line_item.account_id %>
+</p>
+
+<p>
+  <b>Status:</b>
+  <%= @line_item.status %>
+</p>
+
+<p>
+  <b>Type of:</b>
+  <%= @line_item.type_of %>
+</p>
+
+<p>
+  <b>Max bid min ask:</b>
+  <%= @line_item.max_bid_min_ask %>
+</p>
+
+<p>
+  <b>Goal:</b>
+  <%= @line_item.goal_id %>
+</p>
+
+<p>
+  <b>Cart:</b>
+  <%= @line_item.cart_id %>
+</p>
+
+<p>
+  <b>Order:</b>
+  <%= @line_item.order_id %>
+</p>
+
+<p>
+  <b>Price:</b>
+  <%= @line_item.price %>
+</p>
+
+
+<%= link_to 'Edit', edit_line_item_path(@line_item) %> |
+<%= link_to 'Back', line_items_path %>

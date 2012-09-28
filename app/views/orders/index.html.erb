@@ -3,11 +3,6 @@
 <table>
   <tr>
     <th>Account</th>
-    <th>Status</th>
-    <th>Type of</th>
-    <th>Bid ask</th>
-    <th>Goal</th>
-    <th>Price</th>
     <th></th>
     <th></th>
     <th></th>
@@ -16,11 +11,6 @@
 <% @orders.each do |order| %>
   <tr>
     <td><%= order.account_id %></td>
-    <td><%= order.status %></td>
-    <td><%= order.type_of %></td>
-    <td><%= order.bid_ask %></td>
-    <td><%= order.goal_id %></td>
-    <td><%= order.price %></td>
     <td><%= link_to 'Show', order %></td>
     <td><%= link_to 'Edit', edit_order_path(order) %></td>
     <td><%= link_to 'Destroy', order, :confirm => 'Are you sure?', :method => :delete %></td>

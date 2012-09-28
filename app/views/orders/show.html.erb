@@ -5,31 +5,6 @@
   <%= @order.account_id %>
 </p>
 
-<p>
-  <b>Status:</b>
-  <%= @order.status %>
-</p>
-
-<p>
-  <b>Type of:</b>
-  <%= @order.type_of %>
-</p>
-
-<p>
-  <b>Bid ask:</b>
-  <%= @order.bid_ask %>
-</p>
-
-<p>
-  <b>Goal:</b>
-  <%= @order.goal_id %>
-</p>
-
-<p>
-  <b>Price:</b>
-  <%= @order.price %>
-</p>
-
 
 <%= link_to 'Edit', edit_order_path(@order) %> |
 <%= link_to 'Back', orders_path %>
