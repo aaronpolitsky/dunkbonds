@@ -14,6 +14,7 @@ class OrdersController < ApplicationController
   # GET /orders/1.xml
   def show
     @order = Order.find(params[:id])
+    @line_items = @order.line_items
 
     respond_to do |format|
       format.html # show.html.erb
@@ -24,6 +25,12 @@ class OrdersController < ApplicationController
   # GET /orders/new
   # GET /orders/new.xml
   def new
+    @cart = current_cart
+    if @cart.line_items.empty?
+      redirect_to line_items_path, :notice => "Your cart is empty."
+      return
+    end
+
     @order = Order.new
 
     respond_to do |format|
@@ -41,12 +48,18 @@ class OrdersController < ApplicationController
   # POST /orders.xml
   def create
     @order = Order.new(params[:order])
+    debugger
+    @order.add_line_items_from_cart(current_cart)
+    @order.execute_line_items
 
     respond_to do |format|
       if @order.save
+        Cart.destroy(session[:cart_id])
+        session[:cart_id] = nil
         format.html { redirect_to(@order, :notice => 'Order was successfully created.') }
         format.xml  { render :xml => @order, :status => :created, :location => @order }
       else
+        @cart = current_cart
         format.html { render :action => "new" }
         format.xml  { render :xml => @order.errors, :status => :unprocessable_entity }
       end

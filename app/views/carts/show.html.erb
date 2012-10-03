@@ -1,2 +1,25 @@
+<p id="notice"><%= notice %></p>
 
 
+<table>
+  <tr>
+    <th>Account</th>
+    <th>Status</th>
+    <th>Type of</th>
+    <th>Max bid min ask</th>
+    <th>Goal</th>
+    <th>Cart</th>
+    <th>Order</th>
+    <th>Price</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<%= render @line_items %>
+</table>
+
+<%= button_to "Checkout", new_order_path, :method => :get %>
+
+<%= link_to 'Edit', edit_cart_path(@cart) %> |
+<%= link_to 'Back', carts_path %>

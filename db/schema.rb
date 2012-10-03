@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120928152006) do
+ActiveRecord::Schema.define(:version => 20120928152901) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -30,6 +30,11 @@ ActiveRecord::Schema.define(:version => 20120928152006) do
   end
 
   add_index "bonds", ["creditor_id", "debtor_id", "goal_id"], :name => "creditor_debtor_goal", :unique => true
+
+  create_table "carts", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "goals", :force => true do |t|
     t.string   "title"

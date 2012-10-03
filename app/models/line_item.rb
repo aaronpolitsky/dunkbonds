@@ -7,7 +7,18 @@ class LineItem < ActiveRecord::Base
   TYPES = ["bond bid", "bond ask",
            "swap bid", "swap ask"]
 
-  before_save :execute
+  STATUSES = ["new", 
+              "in cart",
+              "pending",
+              "executed",
+              "cancelled"]
+  
+  after_create :set_new_status
+
+  def set_new_status
+    self.status = "new" 
+    self.save!
+  end
 
   def find_matching_ask
     LineItem.where(:type_of => "bond ask", 
@@ -21,7 +32,7 @@ class LineItem < ActiveRecord::Base
                    :status => "pending").first
   end
 
-  def execute
+  def execute!
     unless status == "executed"
       self.status = "pending"
       if type_of == "bond bid"
@@ -44,6 +55,7 @@ class LineItem < ActiveRecord::Base
       elsif type_of == "swap ask"
         
       end
+      self.save!
     end
   end
 

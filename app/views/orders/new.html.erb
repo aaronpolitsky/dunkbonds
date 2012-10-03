@@ -1,5 +1,34 @@
 <h1>New order</h1>
 
+
+<p>
+  <b>Order Account:</b>
+  <%= @order.account_id %>
+</p>
+
+<table>
+  <tr>
+    <th>Line Item Account</th>
+    <th>Status</th>
+    <th>Type of</th>
+    <th>Max bid min ask</th>
+    <th>Goal</th>
+    <th>Cart</th>
+    <th>Order</th>
+    <th>Price</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<%= render @cart.line_items %>
+</table>
+
+
+<h4>
+Finalize Order
+</h4>
 <%= render 'form' %>
+
 
 <%= link_to 'Back', orders_path %>

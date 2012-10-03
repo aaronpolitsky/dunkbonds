@@ -1,9 +1,27 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <b>Account:</b>
+  <b>Order Account:</b>
   <%= @order.account_id %>
 </p>
+
+<table>
+  <tr>
+    <th>Account</th>
+    <th>Status</th>
+    <th>Type of</th>
+    <th>Max bid min ask</th>
+    <th>Goal</th>
+    <th>Cart</th>
+    <th>Order</th>
+    <th>Price</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<%= render @line_items %>
+</table>
 
 
 <%= link_to 'Edit', edit_order_path(@order) %> |
