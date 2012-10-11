@@ -9,3 +9,15 @@ two:
   goal_id: 1
   is_treasury: false
   balance: 9.99
+
+treasury:
+  goal_id: 1
+  is_treasury: true
+  balance: 0.00
+
+acct:
+  goal_id: 1
+  is_treasury: false
+  balance: 0.00
+
+

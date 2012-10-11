@@ -48,7 +48,7 @@ class OrdersController < ApplicationController
   # POST /orders.xml
   def create
     @order = Order.new(params[:order])
-    debugger
+#    debugger
     @order.add_line_items_from_cart(current_cart)
     @order.execute_line_items
 
