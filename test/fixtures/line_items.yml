@@ -22,14 +22,12 @@ two:
 
 t_bond_ask:
   account_id: 1
-  status: 
   type_of: "bond ask"
   max_bid_min_ask: 10.00
   goal_id: 1
 
 a_bond_bid:
   account_id: 2
-  status: 
   type_of: "bond bid"
   max_bid_min_ask: 10.00
   goal_id: 1

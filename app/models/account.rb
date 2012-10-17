@@ -9,32 +9,60 @@ class Account < ActiveRecord::Base
   has_many :line_items
 
   def sell_swap(buyer)
-    swap = self.swaps.first
-    swap.debtor_id = buyer.id
-    self.balance += 10.0
-    buyer.balance -= 10.0
-    swap.save!
+
   end
 
   def sell_bond!(buyer)
-    Account.transaction do
-      if Bond.exists?(:creditor_id => buyer.id,
-                      :debtor_id => self.id, 
-                      :goal_id => self.goal.id)
-        bond = buyer.bonds.where(:debtor_id => self.id, :goal_id => self.goal.id).first
-        bond.qty += 1
-      else
-        #this creates a new bond-swap link rather than transferring ownership.  could be a bad idea, could be just fine. 
-        bond = buyer.bonds.create!(:debtor_id => self.id, 
-                                   :goal_id => self.goal.id, 
-                                   :qty => 1)
+#    Account.transaction do
+      if self.is_treasury?
+        # increment qty if bond relationship already exists
+        if Bond.exists?(:creditor_id => buyer.id,
+                        :debtor_id => self.id, 
+                        :goal_id => self.goal.id)
+          bond = buyer.bonds.where(:debtor_id => self.id, :goal_id => self.goal.id).first
+          bond.qty += 1
+          bond.save!
+        else
+          #create a new bond-swap relationship
+          bond = buyer.bonds.create!(:debtor_id => self.id, 
+                                     :goal_id => self.goal.id, 
+                                     :qty => 1)
+          bond.save!
+        end
+#        self.balance += 10.0
+#        buyer.balance -= 10.0
+#        self.save!
+#        buyer.save!
+      else #regular accounts, secondary market
+        #these sell their end of the bond-swap relationship, if they have any to sell
+        if (self.bonds.sum(:qty) > 0)
+          bond = self.bonds.where(:goal_id => self.goal.id).first
+          if (bond.qty > 1)
+            bond.qty -= 1
+            bond.save!
+            if (buyer.bonds.where(:goal_id => self.goal.id).sum(:qty) == 0)
+              bond = buyer.bonds.create!(:debtor_id => self.id, 
+                                         :goal_id => self.goal.id, 
+                                         :qty => 1)
+              bond.save!
+            else
+              buyer_bond = buyer.bonds.where(:goal_id => self.goal.id).first
+              buyer_bond.qty += 1              
+              buyer_bond.save!
+            end
+          else #if only one left, transfer it
+            buyer.bonds << bond
+          end
+
+        else
+          #this is the error case, just to make sure my test tests the right thing. 
+#          bond = buyer.bonds.create!(:debtor_id => buyer.goal(:treasury), 
+#                                     :goal_id => buyer.goal.id, 
+#                                     :qty => 1)
+        end
       end
-      self.balance += 10.0
-      buyer.balance -= 10.0
-      self.save!
-      buyer.save!
-      bond.save!
-    end
+#    end
   end
 
 end
+

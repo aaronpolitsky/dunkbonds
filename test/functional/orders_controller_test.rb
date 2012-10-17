@@ -2,17 +2,13 @@ require 'test_helper'
 
 class OrdersControllerTest < ActionController::TestCase
   setup do
+    @goal = goals(:one)
+    @treasury = accounts(:treasury)
+    @acct = accounts(:acct)
+    @goal.accounts << @treasury
+    @goal.accounts << @acct
     @order = orders(:one)
-    @cart = Cart.create
-    @line_item = line_items(:t_bond_ask)
-    @line_item.cart_id = @cart
-    @line_item.save!
-
     @bid_order = orders(:bid_order)
-    @cart = current_cart
-    @bid_line_item = line_items(:a_bond_bid)
-    @bid_line_item.cart_id = @cart
-    @bid_line_item.save!
   end
 
   test "should get index" do
@@ -21,31 +17,65 @@ class OrdersControllerTest < ActionController::TestCase
     assert_not_nil assigns(:orders)
   end
 
-  test "should get new" do
+  test "should get new order if cart is not empty" do
+    cart = current_cart
+    cart.line_items << line_items(:t_bond_ask)
+
+    assert_equal 1, cart.line_items.size
     get :new
+
     assert_response :success
   end
 
-  test "should create order" do
+  test "should redirect to line_items if cart is empty" do
+    get :new
+    assert_redirected_to line_items_path
+  end
+
+  test "should create order if cart is not empty" do
+    cart = current_cart
+    t_bond_ask = @treasury.line_items.create!(:t_bond_ask)
+#    t_bond_ask = line_items(:t_bond_ask)
+    cart.line_items << t_bond_ask
+
     assert_difference('Order.count') do
       post :create, :order => @order.attributes
     end
 
-    assert @order.line_items.count == 1
+    assert assigns(:order).line_items.count == 1
     assert session[:cart_id].nil?
     assert_redirected_to order_path(assigns(:order))
   end
 
   test "should match pending ask with new bid" do
-    post :create, :order => @order.attributes
-    assert @order.line_items.first.status == "pending"    
+    #set up pending bond bid from treasury
+    treas_cart = current_cart
+    t_bond_ask = line_items(:t_bond_ask)
+    @treasury.line_items << t_bond_ask
+    treas_cart.line_items << t_bond_ask
 
+    assert_difference('Order.count') do
+      post :create, :order => @order.attributes
+    end
+    assert assigns(:order).line_items.count == 1
+    assert assigns(:order).line_items.first.status == "pending"    
+    assert_nil session[:cart_id]
+
+    #place and execute bond ask from account
+    account_cart = current_cart
+    a_bond_bid = line_items(:a_bond_bid)
+    @acct.line_items << a_bond_bid
+    account_cart.line_items << a_bond_bid
     assert_difference('Order.count') do
       post :create, :order => @bid_order.attributes
     end
+    assert assigns(:order).line_items.count == 1
+    assert assigns(:order).line_items.first.status == "executed"
+    assert @acct.line_items.first.status == "executed"
+    assert @treasury.line_items.first.status == "executed"
+  end
 
-    assert @bid_order.line_items.first.status == "executed"
-    assert @order.line_items.first.status == "executed"
+  test "should update bond quantity instead of creating new bond row " do
     
   end
 
