@@ -20,7 +20,7 @@ class GoalsControllerTest < ActionController::TestCase
     assert_difference('Goal.count') do
       post :create, :goal => @goal.attributes
     end
-
+    
     assert_redirected_to goal_path(assigns(:goal))
   end
 

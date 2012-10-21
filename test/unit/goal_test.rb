@@ -18,14 +18,33 @@ class GoalTest < ActiveSupport::TestCase
     assert g.errors[:ends_at].any?
   end
 
-  test "goal dates and period must be chosen to allow for several periods" do
-    g = goals(:period_longer_than_duration)
-    g.invalid?
-  end
-
   test "period must be 1 day, 1 week, or 1 month" do
-    g = goals(:one)
+    g = goals(:invalid_period)
     assert g.invalid?
     assert g.errors[:period].any?
   end
+
+  test "period must not be longer than duration" do
+    g = goals(:period_longer_than_duration)
+    assert g.invalid?
+  end
+
+  test "a monthly period goal's dates must be aligned to first of month" do
+    g = goals(:not_monthly_aligned)
+    assert g.invalid?
+    assert g.errors.any?
+  end
+
+  test "duration must allow for at least 5 periods" do
+    g = goals(:four_week_weekly_period)
+    assert g.invalid?
+    assert g.errors.any?
+    g = goals(:four_day_daily_period)
+    assert g.invalid?
+    assert g.errors.any?
+    g = goals(:four_month_monthly_period)
+    assert g.invalid?
+    assert g.errors.any?
+  end
+
 end

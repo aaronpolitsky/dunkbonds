@@ -17,7 +17,7 @@ class OrdersControllerTest < ActionController::TestCase
     assert_not_nil assigns(:orders)
   end
 
-  test "should get new order if cart is not empty" do
+  test "should get new order unless cart is empty" do
     cart = current_cart
     cart.line_items << line_items(:t_bond_ask)
 
