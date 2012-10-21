@@ -28,7 +28,7 @@ gem 'ruby-debug'
 # and rake tasks are available in development mode:
 
 group :development, :test do
-#  gem 'rspec-rails'
-#  gem 'autotest'
-#  gem 'webrat'
+  gem 'rspec-rails'
+  gem 'autotest'
+  gem 'webrat'
 end

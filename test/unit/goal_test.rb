@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class GoalTest < ActiveSupport::TestCase
-  # Replace this with your real tests.
   test "must have valid attributes" do
     g = Goal.new
     assert g.invalid?
