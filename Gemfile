@@ -31,4 +31,5 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'autotest'
   gem 'webrat'
+  gem 'factory_girl_rails'
 end

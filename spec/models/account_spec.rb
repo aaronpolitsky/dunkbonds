@@ -1,11 +1,10 @@
 require 'spec_helper'
 
 describe Account do
-  fixtures :goals, :accounts
   before do
-    @goal = goals(:one)
-    @treasury = accounts(:treasury)
-    @buyer  = accounts(:acct)
+    @goal = Factory.create(:goal)
+    @treasury = Factory.create(:account, :is_treasury => true)
+    @buyer  = Factory.create(:account)
     @goal.accounts << @treasury
     @goal.accounts << @buyer
   end
