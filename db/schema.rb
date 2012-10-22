@@ -10,12 +10,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120928152901) do
+ActiveRecord::Schema.define(:version => 20120928152006) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
     t.boolean  "is_treasury"
-    t.decimal  "balance",     :precision => 8, :scale => 2
+    t.decimal  "balance",     :precision => 8, :scale => 2, :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -31,11 +31,6 @@ ActiveRecord::Schema.define(:version => 20120928152901) do
 
   add_index "bonds", ["creditor_id", "debtor_id", "goal_id"], :name => "creditor_debtor_goal", :unique => true
 
-  create_table "carts", :force => true do |t|
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "goals", :force => true do |t|
     t.string   "title"
     t.text     "description"
@@ -48,7 +43,7 @@ ActiveRecord::Schema.define(:version => 20120928152901) do
 
   create_table "line_items", :force => true do |t|
     t.integer  "account_id"
-    t.string   "status"
+    t.string   "status",                                        :default => "new"
     t.string   "type_of"
     t.decimal  "max_bid_min_ask", :precision => 8, :scale => 2
     t.integer  "goal_id"
