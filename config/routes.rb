@@ -1,13 +1,14 @@
 TwoODunkbonds::Application.routes.draw do
+
   resources :carts
 
   resources :line_items
 
   resources :orders 
 
-  resources :goals
-
-  resources :accounts
+  resources :goals do
+    resources :accounts, :posts
+  end
 
 
 

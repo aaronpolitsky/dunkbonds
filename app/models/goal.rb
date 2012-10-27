@@ -1,33 +1,62 @@
+require 'rss'
+
 class Goal < ActiveRecord::Base
   has_many :accounts
-
+  has_many :posts
+  
   PERIODS = ['1 day', '1 week', '1 month']
   validates :period, :inclusion => PERIODS
   validates :title, :description, :presence => true
   validates :starts_at, :presence => true
   validates :ends_at, :presence => true
   validate :dates_and_period_are_appropriate
-
+  
   after_create :create_treasury
-
+  
+  def get_posts_from_rss
+    unless self.blog_url.nil?
+      #get all blog posts
+      feed_posts = RSS::Parser.parse(open("#{self.blog_url}"+"?alt=rss").read, false).items
+      feed_posts.each do |fp|
+        unless fp.guid.nil?
+          found_post = Post.find_by_guid(fp.guid.content)
+          if found_post.nil?
+            self.posts.create!(:title => fp.title,
+                               :description => fp.description,
+                               :guid => fp.guid.content,
+                               :link => fp.link,
+                               :pubDate => fp.pubDate.to_datetime)
+          else
+            #update post
+            found_post.update_attributes(:title => fp.title,
+                                         :description => fp.description,
+                                         :guid => fp.guid.content,
+                                         :link => fp.link,
+                                         :pubDate => fp.pubDate.to_datetime)                                           
+          end
+        end
+      end      
+    end
+  end
+  
   private
-
+  
   def create_treasury
     @treasury = self.accounts.create!(:is_treasury => true, 
                                       :balance     => 0.0)
   end
-
+  
   def dates_and_period_are_appropriate
     #first, defer to dedicated validators
     return if self.starts_at.blank?
     return if self.ends_at.blank?
     return if self.period.blank?
     return unless PERIODS.include? self.period
-
+    
     if self.ends_at < self.starts_at    
       errors.add(:ends_at, "your goal's end date must be later than its start date.") 
     end
-
+    
     case self.period
     when '1 day' then
       if self.starts_at.advance(:days => 5) > self.ends_at
@@ -46,7 +75,7 @@ class Goal < ActiveRecord::Base
       end
     end
   end
-
+  
 end
 
 

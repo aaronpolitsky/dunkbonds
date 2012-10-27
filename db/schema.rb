@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120928152006) do
+ActiveRecord::Schema.define(:version => 20121027204553) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -39,6 +39,8 @@ ActiveRecord::Schema.define(:version => 20120928152006) do
     t.string   "period"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "blog_url"
+    t.string   "blog_service_provider"
   end
 
   create_table "line_items", :force => true do |t|
@@ -56,6 +58,18 @@ ActiveRecord::Schema.define(:version => 20120928152006) do
 
   create_table "orders", :force => true do |t|
     t.integer  "account_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "posts", :force => true do |t|
+    t.integer  "goal_id"
+    t.string   "title"
+    t.text     "description"
+    t.string   "link"
+    t.datetime "pubDate"
+    t.string   "guid"
+    t.boolean  "is_visible",  :default => true
     t.datetime "created_at"
     t.datetime "updated_at"
   end

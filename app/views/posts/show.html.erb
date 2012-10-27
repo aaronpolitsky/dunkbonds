@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Goal:</b>
+  <%= @post.goal_id %>
+</p>
+
+<p>
+  <b>Title:</b>
+  <%= @post.title %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @post.description %>
+</p>
+
+<p>
+  <b>Link:</b>
+  <%= @post.link %>
+</p>
+
+<p>
+  <b>Pubdate:</b>
+  <%= @post.pubDate %>
+</p>
+
+<p>
+  <b>Guid:</b>
+  <%= @post.guid %>
+</p>
+
+<p>
+  <b>Is visible:</b>
+  <%= @post.is_visible %>
+</p>
+
+
+<%= link_to 'Edit', edit_post_path(@post) %> |
+<%= link_to 'Back', posts_path %>

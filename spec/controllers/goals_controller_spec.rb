@@ -54,6 +54,16 @@ describe GoalsController do
       get :show, {:id => goal.to_param}, valid_session
       assigns(:goal).should eq(goal)
     end
+
+    describe "posts" do
+      pending "shows all child posts" do
+        
+      end
+      
+      pending "only shows its posts" do
+        
+      end
+    end
   end
 
   describe "GET new" do

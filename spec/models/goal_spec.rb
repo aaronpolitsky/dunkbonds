@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'rss'
 
 describe Goal do
 
@@ -49,6 +50,48 @@ describe Goal do
       assert g.invalid?
       assert g.errors.any?
     end
+  end
+
+  describe "posts" do
+    it "has many" do
+      g = Factory.build(:goal)
+      g.should respond_to(:posts)
+    end
+
+    describe "rss retrieval" do
+      before :each do
+        @g = Factory.create(:goal)
+      end
+
+      describe "of new posts" do 
+        it "creates new posts" do
+          expect {
+            @g.get_posts_from_rss 
+          }.to change{Post.count}
+        end
+      end
+
+      describe "of existing posts" do
+        it "does not create a new post" do
+          @g.get_posts_from_rss 
+          expect {
+            @g.get_posts_from_rss 
+          }.to_not change{Post.count}
+        end
+
+        it "updates post" do
+          @g.get_posts_from_rss 
+          p = @g.posts.first
+          p.title = "XXX"
+          p.save!
+          expect {
+            @g.get_posts_from_rss 
+          }.to change{@g.posts.first.reload.title}
+        end
+
+      end
+    end
+
   end
 
 end
