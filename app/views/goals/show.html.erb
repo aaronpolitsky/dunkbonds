@@ -1,30 +1,47 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <b>Title:</b>
-  <%= @goal.title %>
-</p>
+<div class="goal">
+  <div class="title">
+    <p>
+      <b>Title:</b>
+      <%= @goal.title %>
+    </p>
+  </div>
 
-<p>
-  <b>Description:</b>
-  <%= @goal.description %>
-</p>
+  <div class="description">
+  <p>
+    <b>Description:</b>
+    <%= @goal.description %>
+  </p>
+  </div>
 
-<p>
-  <b>Starts at:</b>
-  <%= @goal.starts_at %>
-</p>
+  <p>
+    <b>Starts at:</b>
+    <%= @goal.starts_at %>
+  </p>
 
-<p>
-  <b>Ends at:</b>
-  <%= @goal.ends_at %>
-</p>
+  <p>
+    <b>Ends at:</b>
+    <%= @goal.ends_at %>
+  </p>
 
-<p>
-  <b>Period:</b>
-  <%= @goal.period %>
-</p>
+  <p>
+    <b>Period:</b>
+    <%= @goal.period %>
+  </p>
+</div>
 
+<div class="feed">
+  <% @posts.each do |post| %>
+  <div class="post">
+    <h3><%= post.title %></h3>
+    <h4><%= post.pubDate %></h4>
+    <div class="description">
+      <%= post.description %>
+    </div>
+  </div>
+  <% end %>
+</div>
 
 <%= link_to 'Edit', edit_goal_path(@goal) %> |
 <%= link_to 'Back', goals_path %>

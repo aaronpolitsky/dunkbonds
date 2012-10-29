@@ -19,6 +19,7 @@ require 'spec_helper'
 # that an instance is receiving a specific message.
 
 describe GoalsController do
+render_views
 
   # This should return the minimal set of attributes required to create a valid
   # Goal. As you add validations to Goal, be sure to
@@ -49,19 +50,42 @@ describe GoalsController do
   end
 
   describe "GET show" do
+    before :each do
+      @goal = Goal.create! valid_attributes
+      get :show, {:id => @goal.to_param}, valid_session
+    end
+
     it "assigns the requested goal as @goal" do
-      goal = Goal.create! valid_attributes
-      get :show, {:id => goal.to_param}, valid_session
-      assigns(:goal).should eq(goal)
+      assigns(:goal).should eq(@goal)
     end
 
     describe "posts" do
-      pending "shows all child posts" do
-        
+      before :each do
+        @post1 = Factory.create(:post)
+        @post2 = Factory.create(:post, :description => "i am post 2")
+        @goal.posts << @post1
+        @goal.posts << @post2
+        @goal.posts.count.should eq 2
+        get :show, {:id => @goal.to_param}, valid_session
+      end
+
+      it "should get its posts" do
+        assigns(:posts).should include @post1
+        assigns(:posts).should include @post2
+      end
+
+      it "shows all child posts" do
+        response.should have_selector ".feed"
+        response.should have_selector ".feed .post"
+        response.should have_selector 'h3', :content => @post1.title
+        response.should have_selector '.feed .post .description', :content => @post1.description
+        response.should have_selector 'h3', :content => @post2.title
+        response.should have_selector '.feed .post .description', :content => @post2.description
       end
       
-      pending "only shows its posts" do
-        
+      it "only shows its posts" do
+        @not_my_post = Factory.create(:post, :description => "not mine.")
+        response.should_not have_selector '.feed .post .description', :content => @not_my_post.description
       end
     end
   end

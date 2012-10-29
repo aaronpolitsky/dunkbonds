@@ -6,9 +6,11 @@ TwoODunkbonds::Application.routes.draw do
 
   resources :orders 
 
-  resources :goals do
-    resources :accounts, :posts
-  end
+  resources :goals 
+
+  resources :posts  
+
+  resources :accounts
 
 
 
