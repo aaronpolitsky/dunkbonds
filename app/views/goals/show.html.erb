@@ -35,9 +35,9 @@
   <% @posts.each do |post| %>
   <div class="post">
     <h3><%= post.title %></h3>
-    <h4><%= post.pubDate %></h4>
-    <div class="description">
-      <%= post.description %>
+    <h4><%= post.published_at %></h4>
+    <div class="content">
+      <%= post.content %>
     </div>
   </div>
   <% end %>

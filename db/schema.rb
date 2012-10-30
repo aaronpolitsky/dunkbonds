@@ -65,11 +65,11 @@ ActiveRecord::Schema.define(:version => 20121027204553) do
   create_table "posts", :force => true do |t|
     t.integer  "goal_id"
     t.string   "title"
-    t.text     "description"
-    t.string   "link"
-    t.datetime "pubDate"
+    t.text     "content"
+    t.string   "url"
+    t.datetime "published_at"
     t.string   "guid"
-    t.boolean  "is_visible",  :default => true
+    t.boolean  "is_visible",   :default => true
     t.datetime "created_at"
     t.datetime "updated_at"
   end

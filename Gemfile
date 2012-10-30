@@ -33,3 +33,5 @@ group :development, :test do
   gem 'webrat'
   gem 'factory_girl_rails'
 end
+
+gem 'feedzirra'

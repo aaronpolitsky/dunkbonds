@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'rss'
 
 describe Goal do
 
@@ -58,7 +57,11 @@ describe Goal do
       g.should respond_to(:posts)
     end
 
-    describe "rss retrieval" do
+    pending "the goal validates the feed" do
+
+    end
+
+    describe "feed retrieval" do
       before :each do
         @g = Factory.create(:goal)
       end
@@ -66,26 +69,26 @@ describe Goal do
       describe "of new posts" do 
         it "creates new posts" do
           expect {
-            @g.get_posts_from_rss 
+            @g.update_from_feed
           }.to change{Post.count}
         end
       end
 
       describe "of existing posts" do
         it "does not create a new post" do
-          @g.get_posts_from_rss 
+            @g.update_from_feed
           expect {
-            @g.get_posts_from_rss 
+            @g.update_from_feed
           }.to_not change{Post.count}
         end
 
         it "updates post" do
-          @g.get_posts_from_rss 
+          @g.update_from_feed
           p = @g.posts.first
           p.title = "XXX"
           p.save!
           expect {
-            @g.get_posts_from_rss 
+            @g.update_from_feed
           }.to change{@g.posts.first.reload.title}
         end
 

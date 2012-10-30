@@ -1,6 +1,6 @@
 Factory.define :post do |p|
   p.title "blah"
-  p.description "blahblah"
-  p.pubDate DateTime.now
-  p.link "url"
+  p.content "blahblah"
+  p.published_at DateTime.now
+  p.url "url"
 end

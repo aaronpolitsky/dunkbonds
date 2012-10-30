@@ -1,5 +1,3 @@
-require 'rss'
-
 class Goal < ActiveRecord::Base
   has_many :accounts
   has_many :posts
@@ -13,32 +11,35 @@ class Goal < ActiveRecord::Base
   
   after_create :create_treasury
   
-  def get_posts_from_rss
+  def update_from_feed
     unless self.blog_url.nil?
-      #get all blog posts
-      feed_posts = RSS::Parser.parse(open("#{self.blog_url}"+"?alt=rss").read, false).items
-      feed_posts.each do |fp|
-        unless fp.guid.nil?
-          found_post = Post.find_by_guid(fp.guid.content)
-          if found_post.nil?
-            self.posts.create!(:title => fp.title,
-                               :description => fp.description,
-                               :guid => fp.guid.content,
-                               :link => fp.link,
-                               :pubDate => fp.pubDate.to_datetime)
-          else
-            #update post
-            found_post.update_attributes(:title => fp.title,
-                                         :description => fp.description,
-                                         :guid => fp.guid.content,
-                                         :link => fp.link,
-                                         :pubDate => fp.pubDate.to_datetime)                                           
-          end
-        end
-      end      
+      feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)
+      add_entries(feed.entries)
     end
   end
-  
+
+  def add_entries(entries)
+    entries.each do |entry|
+      unless self.posts.exists? :guid => entry.id
+        self.posts.create!(
+                           :title        => entry.title,
+                           :content      => entry.content,
+                           :url          => entry.url,
+                           :published_at => entry.published,
+                           :guid         => entry.id
+                           )
+      else
+        found_post = self.posts.find_by_guid(entry.id)
+        found_post.update_attributes(
+                                     :title        => entry.title,
+                                     :content      => entry.content,
+                                     :url          => entry.url,
+                                     :published_at => entry.published
+                                     )
+      end
+    end
+  end
+
   private
   
   def create_treasury

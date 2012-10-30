@@ -62,7 +62,7 @@ render_views
     describe "posts" do
       before :each do
         @post1 = Factory.create(:post)
-        @post2 = Factory.create(:post, :description => "i am post 2")
+        @post2 = Factory.create(:post, :content => "i am post 2")
         @goal.posts << @post1
         @goal.posts << @post2
         @goal.posts.count.should eq 2
@@ -78,14 +78,14 @@ render_views
         response.should have_selector ".feed"
         response.should have_selector ".feed .post"
         response.should have_selector 'h3', :content => @post1.title
-        response.should have_selector '.feed .post .description', :content => @post1.description
+        response.should have_selector '.feed .post .content', :content => @post1.content
         response.should have_selector 'h3', :content => @post2.title
-        response.should have_selector '.feed .post .description', :content => @post2.description
+        response.should have_selector '.feed .post .content', :content => @post2.content
       end
       
       it "only shows its posts" do
-        @not_my_post = Factory.create(:post, :description => "not mine.")
-        response.should_not have_selector '.feed .post .description', :content => @not_my_post.description
+        @not_my_post = Factory.create(:post, :content => "not mine.")
+        response.should_not have_selector '.feed .post .content', :content => @not_my_post.content
       end
     end
   end
