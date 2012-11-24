@@ -29,9 +29,9 @@ gem 'ruby-debug'
 
 group :development, :test do
   gem 'rspec-rails'
-  gem 'autotest'
+  gem 'autotest-rails'
   gem 'webrat'
   gem 'factory_girl_rails'
 end
 
-gem 'feedzirra'
+gem 'feedzirra', '0.1.1'
