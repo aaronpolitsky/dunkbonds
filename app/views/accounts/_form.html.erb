@@ -1,19 +1,21 @@
-<%= form_for(@account) do |f| %>
+<% if is_admin? %>
+<div class="admin form">
+  <%= form_for(@account) do |f| %>
   <% if @account.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@account.errors.count, "error") %> prohibited this account from being saved:</h2>
-
-      <ul>
+  <div id="error_explanation">
+    <h2><%= pluralize(@account.errors.count, "error") %> prohibited this account from being saved:</h2>
+    
+    <ul>
       <% @account.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
+      <li><%= msg %></li>
       <% end %>
-      </ul>
-    </div>
+    </ul>
+  </div>
   <% end %>
-
+  
   <div class="field">
     <%= f.label :goal_id %><br />
-    <%= f.text_field :goal_id %>
+    <%= f.text_field :goal_id, :value => params[:goal_id] %>
   </div>
   <div class="field">
     <%= f.label :is_treasury %><br />
@@ -26,4 +28,22 @@
   <div class="actions">
     <%= f.submit %>
   </div>
+  <% end %>
+</div>
+
+<% else %>
+
+<div class="account form">
+  <%= form_for(@account) do |f| %>
+  <div class="field">
+    <%= f.hidden_field :goal_id, :value => params[:goal_id] %>
+  </div>
+  <div class="field">
+    <%= f.hidden_field :is_treasury, :value => false %>
+  </div>
+  <div class="actions">
+    <%= f.submit "Open an Account with this Goal" %>
+  </div>
+  <% end %>
+</div>
 <% end %>

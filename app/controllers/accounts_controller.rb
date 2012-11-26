@@ -1,8 +1,12 @@
 class AccountsController < ApplicationController
-  # GET /accounts
-  # GET /accounts.xml
+  # GET /goals/1/accounts
+  # GET /goals/1/accounts.xml
+
+#  before_filter :is_admin?, :only => [:index, :edit, :update]
+
   def index
-    @accounts = Account.all
+    @goal = Goal.find(params[:goal_id])
+    @accounts = @goal.accounts
 
     respond_to do |format|
       format.html # index.html.erb
@@ -24,6 +28,7 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   # GET /accounts/new.xml
   def new
+    @goal = Goal.find(params[:goal_id])
     @account = Account.new
 
     respond_to do |format|
@@ -44,7 +49,8 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       if @account.save
-        format.html { redirect_to(@account, :notice => 'Account was successfully created.') }
+        flash[:notice] = 'Account was successfully created.'
+        format.html { redirect_to goal_account_path(@account.goal, @account) }
         format.xml  { render :xml => @account, :status => :created, :location => @account }
       else
         format.html { render :action => "new" }
@@ -80,4 +86,5 @@ class AccountsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
 end

@@ -1,5 +1,6 @@
-<h1>New account</h1>
+<h1>New Account with <%= @goal.title %></h1>
 
+Do you want to follow this goal?
 <%= render 'form' %>
 
-<%= link_to 'Back', accounts_path %>
+<%= link_to 'Back', goal_accounts_path(params[:goal]) %>

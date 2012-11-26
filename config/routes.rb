@@ -4,14 +4,14 @@ TwoODunkbonds::Application.routes.draw do
 
   resources :line_items
 
-  resources :orders 
+  resources :goals do
+    resources :accounts
+    resources :posts  
+  end
 
-  resources :goals 
-
-  resources :posts  
-
-  resources :accounts
-
+  resources :accounts do
+    resources :orders 
+  end
 
 
   # The priority is based upon order of creation:
