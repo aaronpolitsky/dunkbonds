@@ -14,13 +14,15 @@ describe Goal do
     assert g.errors[:period].any?
   end 
   
-  describe "goal dates and period: " do
+  describe "goal dates: " do
     it "ends_at must be later than starts_at" do
       g = Factory.build(:backwards_dates)
       assert g.invalid?
       assert g.errors[:ends_at].any?
     end
-    
+  end
+
+  describe "with uncertain completion dates: " do
     it "period must be 1 day, 1 week, or 1 month" do
       g = Factory.build(:invalid_period)
       assert g.invalid?
@@ -48,6 +50,22 @@ describe Goal do
       g = Factory.build(:four_month_monthly_period)
       assert g.invalid?
       assert g.errors.any?
+    end
+  end
+
+  describe "goals with certain do or die dates:" do
+    it "do not have a period" do
+      g = Factory.build(:certain_date_goal)
+      assert g.valid?
+      g.period = "1 month"
+      assert g.invalid?
+    end
+
+    it "starts_at and ends_at can be whenever, so long as they're in order" do
+      g = Factory.build(:certain_date_goal)
+      assert g.valid?
+      g.starts_at = g.ends_at + 1.day
+      assert g.invalid?
     end
   end
 

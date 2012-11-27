@@ -71,6 +71,16 @@ Factory.define :not_monthly_aligned, :class => Goal do |g|
   g.blog_url "http://rsstestdunkbonds.blogspot.com/feeds/posts/default"
 end
 
+Factory.define :certain_date_goal, :class => Goal do |g|
+  g.title  "title"
+  g.description  "desc."
+  g.starts_at   DateTime.civil(2012, 12, 4)
+  g.ends_at   DateTime.civil(2013, 5, 18)
+  g.period   "none"
+  g.blog_url "http://rsstestdunkbonds.blogspot.com/feeds/posts/default"
+end
+
+
 
 
 

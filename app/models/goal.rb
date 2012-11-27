@@ -2,7 +2,7 @@ class Goal < ActiveRecord::Base
   has_many :accounts
   has_many :posts
   
-  PERIODS = ['1 day', '1 week', '1 month']
+  PERIODS = ['none', '1 day', '1 week', '1 month']
   validates :period, :inclusion => PERIODS
   validates :title, :description, :presence => true
   validates :starts_at, :presence => true
