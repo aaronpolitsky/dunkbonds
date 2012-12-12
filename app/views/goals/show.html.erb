@@ -1,5 +1,3 @@
-<p id="notice"><%= notice %></p>
-
 <div class="goal">
   <div class="title">
     <p>
@@ -30,6 +28,8 @@
     <%= @goal.period %>
   </p>
 </div>
+
+<%= link_to 'Follow This Goal', new_goal_account_path(@goal) %>
 
 <div class="feed">
   <% @posts.each do |post| %>

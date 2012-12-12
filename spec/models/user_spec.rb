@@ -25,6 +25,25 @@ describe User do
 
     describe "created goals and" do
     end
+  end
+
+  describe "can follow goals" do
+    it "via user.follow_goal(goal)" do
+      g = Factory.create(:goal)
+      u = Factory.create(:user)
+      assert u.followed_goals.empty?
+      u.follow_goal(g)
+      assert u.followed_goals.include?(g)
+    end
+    
+    it "which creates a unique account with the goal" do
+      g = Factory.create(:goal)
+      u = Factory.create(:user)
+      u.follow_goal(g)
+      u.follow_goal(g) #try it twice to test uniqueness
+      u.accounts.count.should eq 1
+    end
 
   end
+
 end

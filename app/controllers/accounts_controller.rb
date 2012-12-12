@@ -45,17 +45,17 @@ class AccountsController < ApplicationController
   # POST /accounts
   # POST /accounts.xml
   def create
-    @account = @goal.accounts.new(params[:account])
-
+    new_follow = my_current_user.follow_goal(@goal)
+    @account = my_current_user.accounts.find_by_goal_id(@goal)
+    
     respond_to do |format|
-      if @account.save
-        flash[:notice] = 'Account was successfully created.'
-        format.html { redirect_to [@goal, @account] }
-        format.xml  { render :xml => @account, :status => :created, :location => @account }
+      if new_follow
+        flash[:notice] = "You're now following #{@goal.title}."
       else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @account.errors, :status => :unprocessable_entity }
-      end
+        flash[:notice] = "You're already following #{@goal.title}."
+      end        
+      format.html { redirect_to [@goal, @account] }
+      format.xml  { render :xml => @account, :status => :created, :location => @account }
     end
   end
 

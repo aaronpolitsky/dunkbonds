@@ -81,9 +81,24 @@ describe AccountsController do
   end
 
   describe "GET new" do
-    it "assigns a new account as @account" do
+    before :each do
       get :new, {:goal_id => @goal.to_param}, valid_session
-      assigns(:account).should be_a_new(Account)
+    end
+
+    describe "assigns" do
+      it "a new account as @account" do
+        assigns(:account).should be_a_new(Account)
+      end
+    end
+
+    describe "shows" do
+      it "A heading Follow <goal.title>?" do
+        response.should have_selector 'h3', :content => "Follow #{@goal.title}?" 
+      end
+
+      it "an explanation of how following and creating an account are linked" do
+        response.should have_selector '#following_explanation'
+      end
     end
   end
 
@@ -116,14 +131,14 @@ describe AccountsController do
     end
 
     describe "with invalid params" do
-      it "assigns a newly created but unsaved account as @account" do
+      pending "assigns a newly created but unsaved account as @account" do
         # Trigger the behavior that occurs when invalid params are submitted
         Account.any_instance.stub(:save).and_return(false)
         post :create, {:goal_id => @goal.to_param, :account => {}}, valid_session
         assigns(:account).should be_a_new(Account)
       end
 
-      it "re-renders the 'new' template" do
+      pending "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Account.any_instance.stub(:save).and_return(false)
         post :create, {:goal_id => @goal.to_param, :account => {}}, valid_session

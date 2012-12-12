@@ -42,69 +42,80 @@ describe GoalsController do
   end
 
   describe "GET index" do
-    describe "for regular user" do
     before :each do
+      @user = Factory.create(:user)
+
       3.times {Factory.create(:goal)}
       @goals = Goal.all
+      @goals.second.title = "followed"
+      @goals.last.title = "unfollowed"
+      @goals.second.save!
+      @goals.last.save!
+
+      @user.follow_goal(@goals.second)
+      
+      @followed_goals = @user.followed_goals
+      @unfollowed_goals = @goals - @followed_goals
+
       get :index, {}, valid_session
     end
 
-    it "assigns all goals as @goals" do
-      assigns(:goals).should eq(@goals)
-    end
-
-    pending "assigns followed goals as @followed_goals" do
-      assigns(:goals).should eq(@followed_goals)
-    end
-
-    pending "assigns unfollowed goals as @unfollowed_goals" do
-      assigns(:goals).should eq(@unfollowed_goals)
-    end
-
-    it "shows a list of all goals" do
-      response.should have_selector ".goals .goal"
-    end
-
-    pending "shows a list of followed goals" do
-      response.should have_selector ".goals .goal"
-    end
-
-    pending "shows a list of unfollowed goals" do
-      response.should have_selector ".goals .goal"
-    end
-
-    end
-
-    describe "for admin" do
+    describe "assigns" do
+      it "all goals as @goals" do
+        assigns(:goals).should eq(@goals)
+      end
       
+      it "followed goals as @followed_goals" do
+        assigns(:followed_goals).should eq(@followed_goals)
+      end
+      
+      it "unfollowed goals as @unfollowed_goals" do
+        assigns(:unfollowed_goals).should eq(@unfollowed_goals)
+      end
     end
+
+    describe "shows" do
+      it "a list of all goals" do
+        response.should have_selector 'h3', :content => "All Goals"
+        response.should have_selector ".all_goals .goal", :content => @goals.first.title
+      end
+      
+      it "a list of followed goals" do
+        response.should have_selector 'h3', :content => "Followed Goals"
+        response.should have_selector ".followed_goals .goal", :content => @followed_goals.first.title
+      end
+      
+      it "a list of unfollowed goals" do
+        response.should have_selector 'h3', :content => "Other Goals"
+        response.should have_selector ".unfollowed_goals .goal", :content => @unfollowed_goals.first.title
+      end
+    end
+
   end
 
   describe "GET show" do
     before :each do
       @goal = Factory(:goal)
+      @post1 = Factory.create(:post)
+      @post2 = Factory.create(:post, :content => "i am post 2")
+      @goal.posts << @post1
+      @goal.posts << @post2
+      @goal.posts.count.should eq 2
       get :show, {:id => @goal.to_param}, valid_session
     end
 
-    it "assigns the requested goal as @goal" do
-      assigns(:goal).should eq(@goal)
-    end
-
-    describe "posts" do
-      before :each do
-        @post1 = Factory.create(:post)
-        @post2 = Factory.create(:post, :content => "i am post 2")
-        @goal.posts << @post1
-        @goal.posts << @post2
-        @goal.posts.count.should eq 2
-        get :show, {:id => @goal.to_param}, valid_session
+    describe "assigns" do
+      it "its goal as @goal" do
+        assigns(:goal).should eq(@goal)
       end
 
-      it "should get its posts" do
+      it "its posts as @posts" do
         assigns(:posts).should eq @goal.posts
       end
+    end
 
-      it "shows all child posts" do
+    describe "shows" do
+      it "all child posts" do
         response.should have_selector ".feed"
         response.should have_selector ".feed .post"
         response.should have_selector 'h3', :content => @post1.title
@@ -113,10 +124,14 @@ describe GoalsController do
         response.should have_selector '.feed .post .content', :content => @post2.content
       end
       
-      it "only shows its posts" do
-        @not_my_post = Factory.create(:post, :content => "not mine.")
-        response.should_not have_selector '.feed .post .content', :content => @not_my_post.content
+      it "only its posts" do
+        not_my_post = Factory.create(:post, :content => "not mine.")
+        response.should_not have_selector '.feed .post .content', :content => not_my_post.content
       end
+
+      it "a link to follow the goal" do
+        response.should have_selector 'a', :content => "Follow This Goal"
+      end      
     end
   end
 

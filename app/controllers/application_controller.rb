@@ -4,6 +4,15 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def my_current_user
+    if User.count.zero?
+      u = User.create!(:name => "guest", 
+                       :email => "guest_#{Time.now.to_i}#{rand(99)}@example.com",
+                       :password => "just visiting, thanks.")
+    end
+    User.first 
+  end
+
   def current_cart
     Cart.find(session[:cart_id])
   rescue ActiveRecord::RecordNotFound

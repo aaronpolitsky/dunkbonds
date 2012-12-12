@@ -1,6 +1,5 @@
-<h1>Listing goals</h1>
-
-<table class="goals">
+<h3>Followed Goals</h3>
+<table class="followed_goals">
   <tr>
     <th>Title</th>
     <th>Description</th>
@@ -12,18 +11,39 @@
     <th></th>
   </tr>
 
-<% @goals.each do |goal| %>
-  <tr class="goal">
-    <td><%= goal.title %></td>
-    <td><%= goal.description %></td>
-    <td><%= goal.starts_at %></td>
-    <td><%= goal.ends_at %></td>
-    <td><%= goal.period %></td>
-    <td><%= link_to 'Show', goal %></td>
-    <td><%= link_to 'Edit', edit_goal_path(goal) %></td>
-    <td><%= link_to 'Destroy', goal, :confirm => 'Are you sure?', :method => :delete %></td>
+  <%= render @followed_goals %>
+</table>
+
+<h3>Other Goals</h3>
+<table class="unfollowed_goals">
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Starts at</th>
+    <th>Ends at</th>
+    <th>Period</th>
+    <th></th>
+    <th></th>
+    <th></th>
   </tr>
-<% end %>
+
+  <%= render @unfollowed_goals %>
+</table>
+
+<h3>All Goals</h3>
+<table class="all_goals">
+  <tr>
+    <th>Title</th>
+    <th>Description</th>
+    <th>Starts at</th>
+    <th>Ends at</th>
+    <th>Period</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+  <%= render @goals %>
 </table>
 
 <br />

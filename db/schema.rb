@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121212144955) do
+ActiveRecord::Schema.define(:version => 20121212163932) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(:version => 20121212144955) do
     t.datetime "updated_at"
     t.integer  "user_id"
   end
+
+  add_index "accounts", ["user_id", "goal_id"], :name => "user_goal", :unique => true
 
   create_table "bonds", :force => true do |t|
     t.integer  "creditor_id"

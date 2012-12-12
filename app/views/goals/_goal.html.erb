@@ -1,0 +1,10 @@
+<tr class="goal">
+  <td class="title"><%= goal.title %></td>
+  <td><%= goal.description %></td>
+  <td><%= goal.starts_at %></td>
+  <td><%= goal.ends_at %></td>
+  <td><%= goal.period %></td>
+  <td><%= link_to 'Show', goal %></td>
+  <td><%= link_to 'Edit', edit_goal_path(goal) %></td>
+  <td><%= link_to 'Destroy', goal, :confirm => 'Are you sure?', :method => :delete %></td>
+</tr>
