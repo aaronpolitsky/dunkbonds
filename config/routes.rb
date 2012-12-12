@@ -1,5 +1,7 @@
 TwoODunkbonds::Application.routes.draw do
 
+  devise_for :users
+
   resources :carts
   resources :orders 
   resources :line_items
