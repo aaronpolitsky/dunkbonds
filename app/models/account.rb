@@ -2,11 +2,11 @@ class Account < ActiveRecord::Base
   # A bond is just a link between two accounts establishing a payment flow
   # A swap is the same link seen from the other perspective.  
 
+  belongs_to :user
   belongs_to :goal
-#  has_many :orders
+  has_many :line_items
   has_many :bonds, :foreign_key => :creditor_id # a creditor owns bonds and collects payments from debtors
   has_many :swaps, :class_name => "Bond", :foreign_key => :debtor_id # a debtor pays a creditor periodically, also the same as a swap
-  has_many :line_items
 
   def sell_swap(buyer)
 

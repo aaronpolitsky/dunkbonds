@@ -9,6 +9,45 @@ describe Account do
     @goal.accounts << @buyer
   end
   
+  describe "has many" do
+    describe "line_items and" do
+      it "responds to line_items" do
+        a = Factory.create(:account)
+        a.should respond_to(:line_items)
+      end
+    end
+
+    describe "bonds and" do
+      it "responds to bonds" do
+        a = Factory.create(:account)
+        a.should respond_to(:bonds)
+      end
+    end
+
+    describe "swaps and" do
+      it "responds to swaps" do
+        a = Factory.create(:account)
+        a.should respond_to(:swaps)
+      end
+    end
+  end
+
+  describe "belongs to" do
+    describe "its user and" do
+      it "responds to user" do
+        a = Factory.create(:account)
+        a.should respond_to(:user)
+      end
+    end
+
+    describe "its goal and" do
+      it "responds to goal" do
+        a = Factory.create(:account)
+        a.should respond_to(:goal)
+      end
+    end
+  end  
+
   it "should have an initial balance of zero" do
     a = Account.create!
     a.balance.should eq 0.0

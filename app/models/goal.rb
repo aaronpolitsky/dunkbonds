@@ -1,6 +1,7 @@
 class Goal < ActiveRecord::Base
   has_many :accounts
   has_many :posts
+  has_many :followers, :through => :accounts, :class_name => "User"
   
   PERIODS = ['none', '1 day', '1 week', '1 month']
   BLOG_SERVICES = ['other', 'Blogger (blogspot)']
@@ -18,7 +19,9 @@ class Goal < ActiveRecord::Base
   def update_from_feed
     unless self.blog_url.nil? || self.blog_url.empty?
       feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)
-      add_entries(feed.entries)
+      add_entries(feed.entries) unless (feed.zero? || feed.entries.empty?)
+#    rescue ActiveRecord::NoMethodError
+#      flash[:notice] = "Feed doesn't exist.  Double check that blog url."
     end
   end
 
@@ -34,12 +37,12 @@ class Goal < ActiveRecord::Base
                            )
       else
         found_post = self.posts.find_by_guid(entry.id)
-        found_post.update_attributes(
-                                     :title        => entry.title,
-                                     :content      => entry.content,
-                                     :url          => entry.url,
-                                     :published_at => entry.published
-                                     )
+        found_post.update_attributes!(
+                                      :title        => entry.title,
+                                      :content      => entry.content,
+                                      :url          => entry.url,
+                                      :published_at => entry.published
+                                      )
       end
     end
   end

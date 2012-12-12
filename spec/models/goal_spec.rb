@@ -97,38 +97,49 @@ describe Goal do
     end
   end
 
-  describe "posts" do
-    it "has many" do
-      g = Factory.build(:goal)
-      g.should respond_to(:posts)
+  describe "has many" do
+    describe "posts and" do
+      it "should respond to posts" do
+        g = Factory.build(:goal)
+        g.should respond_to(:posts)
+      end
     end
 
+    describe "followers and" do
+      it "should respond to followers" do
+        g = Factory.build(:goal)
+        g.should respond_to(:followers)
+      end
+    end
+  end
+  
+  describe "has a feed and" do
     pending "the goal validates the feed" do
       
     end
-
-    describe "feed retrieval" do
+    
+    describe "retrieval" do
       before :each do
         @g = Factory.create(:goal)
       end
-
+      
       describe "of new posts" do 
-        it "creates new posts" do
+        pending "creates new posts" do
           expect {
             @g.update_from_feed
-          }.to change{Post.count}
+          }.to change{Post.count} 
         end
       end
-
+      
       describe "of existing posts" do
         it "does not create a new post" do
-            @g.update_from_feed
+          @g.update_from_feed
           expect {
             @g.update_from_feed
           }.to_not change{Post.count}
         end
-
-        it "updates post" do
+        
+        pending "updates posts" do
           @g.update_from_feed
           p = @g.posts.first
           p.title = "XXX"
@@ -137,11 +148,9 @@ describe Goal do
             @g.update_from_feed
           }.to change{@g.posts.first.reload.title}
         end
-
       end
     end
-
   end
-
+  
 end
 
