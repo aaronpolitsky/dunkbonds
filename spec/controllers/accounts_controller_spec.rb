@@ -19,12 +19,17 @@ require 'spec_helper'
 # that an instance is receiving a specific message.
 
 describe AccountsController do
+  render_views
+
+  before :each do
+    @goal = Factory.create(:goal)
+  end
 
   # This should return the minimal set of attributes required to create a valid
   # Account. As you add validations to Account, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {:is_treasury => false}
   end
 
   # This should return the minimal set of values that should be in the session
@@ -36,31 +41,56 @@ describe AccountsController do
 
   describe "GET index" do
     it "assigns all accounts as @accounts" do
-      account = Account.create! valid_attributes
-      get :index, {}, valid_session
+      account = @goal.accounts.create! valid_attributes
+      get :index, {:goal_id => @goal.to_param, }, valid_session
       assigns(:accounts).should eq([account])
     end
   end
 
   describe "GET show" do
     it "assigns the requested account as @account" do
-      account = Account.create! valid_attributes
-      get :show, {:id => account.to_param}, valid_session
+      account = @goal.accounts.create! valid_attributes
+      get :show, {:goal_id => @goal.to_param, :id => account.to_param}, valid_session
       assigns(:account).should eq(account)
     end
+    
+    it "lists [its user's] line items on this goal, grouped by order" do
+      account = @goal.accounts.create! valid_attributes
+      wrong_line_items = []
+      3.times do
+        o = Order.create!
+        2.times {o.line_items.create!(:account_id => account.id, :goal_id => @goal)}
+        wrong_line_items << o.line_items.create! #other goals
+      end
+      line_items = LineItem.where(:account_id => account.id, :goal_id => @goal)
+      get :show, {:goal_id => @goal.to_param, :id => account.to_param}, valid_session      
+      assigns(:account).line_items.should eq(line_items)
+      assigns(:account).line_items.should_not include(wrong_line_items)
+    end
+
+    it "displays a list of this account's line items, if it has any" do
+      account = @goal.accounts.create! valid_attributes
+      2.times do
+        o = Order.create!
+        2.times {o.line_items.create!(:account_id => account.id, :goal_id => @goal)}
+      end
+      get :show, {:goal_id => @goal.to_param, :id => account.to_param}, valid_session      
+      response.should have_selector ".line_items .line_item"
+    end
+
   end
 
   describe "GET new" do
     it "assigns a new account as @account" do
-      get :new, {}, valid_session
+      get :new, {:goal_id => @goal.to_param}, valid_session
       assigns(:account).should be_a_new(Account)
     end
   end
 
   describe "GET edit" do
     it "assigns the requested account as @account" do
-      account = Account.create! valid_attributes
-      get :edit, {:id => account.to_param}, valid_session
+      account = @goal.accounts.create! valid_attributes
+      get :edit, { :goal_id => @goal.to_param, :id => account.to_param }, valid_session
       assigns(:account).should eq(account)
     end
   end
@@ -69,19 +99,19 @@ describe AccountsController do
     describe "with valid params" do
       it "creates a new Account" do
         expect {
-          post :create, {:account => valid_attributes}, valid_session
+          post :create, {:goal_id => @goal.to_param, :account => valid_attributes}, valid_session
         }.to change(Account, :count).by(1)
       end
 
       it "assigns a newly created account as @account" do
-        post :create, {:account => valid_attributes}, valid_session
+        post :create, {:goal_id => @goal.to_param, :account => valid_attributes}, valid_session
         assigns(:account).should be_a(Account)
         assigns(:account).should be_persisted
       end
 
       it "redirects to the created account" do
-        post :create, {:account => valid_attributes}, valid_session
-        response.should redirect_to(Account.last)
+        post :create, {:goal_id => @goal.to_param, :account => valid_attributes}, valid_session
+        response.should redirect_to([@goal, @goal.accounts.last])
       end
     end
 
@@ -89,14 +119,14 @@ describe AccountsController do
       it "assigns a newly created but unsaved account as @account" do
         # Trigger the behavior that occurs when invalid params are submitted
         Account.any_instance.stub(:save).and_return(false)
-        post :create, {:account => {}}, valid_session
+        post :create, {:goal_id => @goal.to_param, :account => {}}, valid_session
         assigns(:account).should be_a_new(Account)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Account.any_instance.stub(:save).and_return(false)
-        post :create, {:account => {}}, valid_session
+        post :create, {:goal_id => @goal.to_param, :account => {}}, valid_session
         response.should render_template("new")
       end
     end
@@ -105,59 +135,68 @@ describe AccountsController do
   describe "PUT update" do
     describe "with valid params" do
       it "updates the requested account" do
-        account = Account.create! valid_attributes
+        account = @goal.accounts.create! valid_attributes
         # Assuming there are no other accounts in the database, this
         # specifies that the Account created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
         Account.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:id => account.to_param, :account => {'these' => 'params'}}, valid_session
+        put :update, {:goal_id => @goal.to_param, :id => account.to_param, :account => {'these' => 'params'}}, valid_session
       end
 
       it "assigns the requested account as @account" do
-        account = Account.create! valid_attributes
-        put :update, {:id => account.to_param, :account => valid_attributes}, valid_session
+        account = @goal.accounts.create! valid_attributes
+        put :update, {:goal_id => @goal.to_param, :id => account.to_param, :account => valid_attributes}, valid_session
         assigns(:account).should eq(account)
       end
 
       it "redirects to the account" do
-        account = Account.create! valid_attributes
-        put :update, {:id => account.to_param, :account => valid_attributes}, valid_session
-        response.should redirect_to(account)
+        account = @goal.accounts.create! valid_attributes
+        put :update, {:goal_id => @goal.to_param, :id => account.to_param, :account => valid_attributes}, valid_session
+        response.should redirect_to([@goal, account])
       end
     end
 
     describe "with invalid params" do
       it "assigns the account as @account" do
-        account = Account.create! valid_attributes
+        account = @goal.accounts.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Account.any_instance.stub(:save).and_return(false)
-        put :update, {:id => account.to_param, :account => {}}, valid_session
+        put :update, {:goal_id => @goal.to_param, :id => account.to_param, :account => {}}, valid_session
         assigns(:account).should eq(account)
       end
 
       it "re-renders the 'edit' template" do
-        account = Account.create! valid_attributes
+        account = @goal.accounts.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Account.any_instance.stub(:save).and_return(false)
-        put :update, {:id => account.to_param, :account => {}}, valid_session
+        put :update, {:goal_id => @goal.to_param, :id => account.to_param, :account => {}}, valid_session
         response.should render_template("edit")
       end
     end
   end
 
   describe "DELETE destroy" do
-    it "destroys the requested account" do
-      account = Account.create! valid_attributes
-      expect {
-        delete :destroy, {:id => account.to_param}, valid_session
-      }.to change(Account, :count).by(-1)
+    describe "for the correct user" do
+      
+      it "destroys the requested account" do
+        account = @goal.accounts.create! valid_attributes
+        expect {
+          delete :destroy, {:goal_id => @goal.to_param, :id => account.to_param}, valid_session
+        }.to change(Account, :count).by(-1)
+      end
+      
+      it "redirects to that goal" do
+        account = @goal.accounts.create! valid_attributes
+        delete :destroy, {:goal_id => @goal.to_param, :id => account.to_param}, valid_session
+        response.should redirect_to(@goal)
+        flash[:notice].should contain "You are no longer following this goal."
+      end
     end
 
-    it "redirects to the accounts list" do
-      account = Account.create! valid_attributes
-      delete :destroy, {:id => account.to_param}, valid_session
-      response.should redirect_to(accounts_url)
+    describe "for the incorrect user" do
+      pending "does not destroy the requested account"
+      pending "redirects to that goal"
     end
   end
 

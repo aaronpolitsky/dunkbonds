@@ -1,4 +1,5 @@
 class OrdersController < ApplicationController
+
   # GET /orders
   # GET /orders.xml
   def index
@@ -47,11 +48,11 @@ class OrdersController < ApplicationController
   # POST /orders.xml
   def create
     @order = Order.new(params[:order])
-    @order.get_cart_items(current_cart)
-    @order.execute_line_items
-
+    
     respond_to do |format|
       if @order.save
+        @order.get_cart_items(current_cart)
+        @order.execute_line_items
         Cart.destroy(session[:cart_id])
         session[:cart_id] = nil
         format.html { redirect_to(@order, :notice => 'Order was successfully created.') }
@@ -90,4 +91,5 @@ class OrdersController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
 end

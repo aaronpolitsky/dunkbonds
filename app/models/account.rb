@@ -3,7 +3,7 @@ class Account < ActiveRecord::Base
   # A swap is the same link seen from the other perspective.  
 
   belongs_to :goal
-  has_many :orders
+#  has_many :orders
   has_many :bonds, :foreign_key => :creditor_id # a creditor owns bonds and collects payments from debtors
   has_many :swaps, :class_name => "Bond", :foreign_key => :debtor_id # a debtor pays a creditor periodically, also the same as a swap
   has_many :line_items

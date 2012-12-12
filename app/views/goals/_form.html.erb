@@ -31,6 +31,21 @@
     <%= f.label :period %><br />
     <%= f.select :period, Goal::PERIODS %>
   </div>
+
+  <div class="field">
+    <div class="blog_service_provider">
+    <%= f.label "Choose your blog service provider" %><br />
+    <%= f.select :blog_service_provider, Goal::BLOG_SERVICES, {:value => @goal.blog_service_provider} %>
+    </div>
+  </div>
+
+  <div class="field">
+    <div class="blog_url">
+    <%= f.label "Enter your blog's url" %><br />
+    <%= f.text_field :blog_url, {:value => @goal.blog_url}%>
+    </div>
+  </div>
+
   <div class="actions">
     <%= f.submit %>
   </div>

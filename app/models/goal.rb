@@ -3,16 +3,20 @@ class Goal < ActiveRecord::Base
   has_many :posts
   
   PERIODS = ['none', '1 day', '1 week', '1 month']
+  BLOG_SERVICES = ['other', 'Blogger (blogspot)']
+
   validates :period, :inclusion => PERIODS
   validates :title, :description, :presence => true
   validates :starts_at, :presence => true
   validates :ends_at, :presence => true
   validate :dates_and_period_are_appropriate
-  
+
   after_create :create_treasury
   
+  before_update :purge_old_posts_and_update_feed_on_blog_changes
+
   def update_from_feed
-    unless self.blog_url.nil?
+    unless self.blog_url.nil? || self.blog_url.empty?
       feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)
       add_entries(feed.entries)
     end
@@ -42,6 +46,16 @@ class Goal < ActiveRecord::Base
 
   private
   
+  def purge_old_posts_and_update_feed_on_blog_changes
+    unless self.changes[:blog_url].nil?
+      self.posts.all.each do |p|
+        p.destroy
+      end        
+      self.update_from_feed
+    end
+  end
+  
+
   def create_treasury
     @treasury = self.accounts.create!(:is_treasury => true, 
                                       :balance     => 0.0)

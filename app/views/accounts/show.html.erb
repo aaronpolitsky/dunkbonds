@@ -2,7 +2,7 @@
 
 <p>
   <b>Goal:</b>
-  <%= @account.goal_id %>
+  <%= @goal.id %>
 </p>
 
 <p>
@@ -15,6 +15,15 @@
   <%= @account.balance %>
 </p>
 
+<table class="line_items">
+  <tr>
+    <th>Account</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+  <%= render @line_items %>
+</tr>
 
-<%= link_to 'Edit', edit_account_path(@account) %> |
-<%= link_to 'Back', goal_accounts_path(params[:goal]) %>
+<%= link_to 'Edit', edit_goal_account_path(@goal, @account) %> |
+<%= link_to 'Back', goal_accounts_path(@goal) %>

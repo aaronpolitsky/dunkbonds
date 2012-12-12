@@ -19,7 +19,7 @@ require 'spec_helper'
 # that an instance is receiving a specific message.
 
 describe GoalsController do
-render_views
+  render_views
 
   # This should return the minimal set of attributes required to create a valid
   # Goal. As you add validations to Goal, be sure to
@@ -42,16 +42,47 @@ render_views
   end
 
   describe "GET index" do
-    it "assigns all goals as @goals" do
-      goal = Goal.create! valid_attributes
+    describe "for regular user" do
+    before :each do
+      3.times {Factory.create(:goal)}
+      @goals = Goal.all
       get :index, {}, valid_session
-      assigns(:goals).should eq([goal])
+    end
+
+    it "assigns all goals as @goals" do
+      assigns(:goals).should eq(@goals)
+    end
+
+    pending "assigns followed goals as @followed_goals" do
+      assigns(:goals).should eq(@followed_goals)
+    end
+
+    pending "assigns unfollowed goals as @unfollowed_goals" do
+      assigns(:goals).should eq(@unfollowed_goals)
+    end
+
+    it "shows a list of all goals" do
+      response.should have_selector ".goals .goal"
+    end
+
+    pending "shows a list of followed goals" do
+      response.should have_selector ".goals .goal"
+    end
+
+    pending "shows a list of unfollowed goals" do
+      response.should have_selector ".goals .goal"
+    end
+
+    end
+
+    describe "for admin" do
+      
     end
   end
 
   describe "GET show" do
     before :each do
-      @goal = Goal.create! valid_attributes
+      @goal = Factory(:goal)
       get :show, {:id => @goal.to_param}, valid_session
     end
 
@@ -70,8 +101,7 @@ render_views
       end
 
       it "should get its posts" do
-        assigns(:posts).should include @post1
-        assigns(:posts).should include @post2
+        assigns(:posts).should eq @goal.posts
       end
 
       it "shows all child posts" do
@@ -91,18 +121,38 @@ render_views
   end
 
   describe "GET new" do
-    it "assigns a new goal as @goal" do
+    before :each do
+      @goal = Goal.new 
       get :new, {}, valid_session
+    end
+
+    it "assigns a new goal as @goal" do
       assigns(:goal).should be_a_new(Goal)
     end
+
+    it "displays blog form fields" do
+      response.should have_selector ".blog_url"
+      response.should have_selector ".blog_service_provider"
+    end
+
   end
 
   describe "GET edit" do
-    it "assigns the requested goal as @goal" do
-      goal = Goal.create! valid_attributes
-      get :edit, {:id => goal.to_param}, valid_session
-      assigns(:goal).should eq(goal)
+    before :each do
+      @goal = Factory.create(:goal)
+      get :edit, {:id => @goal.to_param}, valid_session
     end
+
+    it "assigns the requested goal as @goal" do
+      assigns(:goal).should eq(@goal)
+    end
+
+    it "displays blog form fields filled with existing values" do
+      response.should have_selector "input", {:id => 'goal_blog_url', :value => @goal.blog_url }
+      response.should have_selector "select", {:id => "goal_blog_service_provider"}
+      response.should have_selector "option", {:value => @goal.blog_service_provider, :selected => "selected"}
+    end
+
   end
 
   describe "POST create" do
@@ -164,6 +214,17 @@ render_views
         goal = Goal.create! valid_attributes
         put :update, {:id => goal.to_param, :goal => valid_attributes}, valid_session
         response.should redirect_to(goal)
+      end
+
+      pending "updates feed if blog_url changes" do
+        goal = Factory.create(:goal)
+        goal.update_from_feed
+        posts = goal.posts.all
+        goal.blog_url = 'http://dunkbonds.blogspot.com/feeds/posts/default'
+        put :update, {:id => goal.to_param, :goal => valid_attributes}, valid_session
+        goal.posts.reload
+        assert !goal.posts.include?(posts)
+        posts.should_not eq(goal.posts.all)
       end
     end
 

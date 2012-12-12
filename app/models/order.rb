@@ -1,5 +1,5 @@
 class Order < ActiveRecord::Base
-  belongs_to :account
+#  belongs_to :user, not account
   has_many :line_items, :dependent => :destroy
 
   def get_cart_items(cart)

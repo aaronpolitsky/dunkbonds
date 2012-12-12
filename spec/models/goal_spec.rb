@@ -2,8 +2,6 @@ require 'spec_helper'
 
 describe Goal do
 
-  pending "add some examples to (or delete) #{__FILE__}"
-
   it "must have valid attributes" do
     g = Goal.new
     assert g.invalid?
@@ -69,6 +67,36 @@ describe Goal do
     end
   end
 
+  describe "changes to the blog_url" do
+    before :each do
+      @goal = Factory.create(:goal)
+      @goal.update_from_feed
+      @goal.reload
+      @posts = @goal.posts.all
+      @goal.blog_url = 'http://dunkbonds.blogspot.com/feeds/posts/default'
+      @goal.save!
+      @goal.reload
+    end
+    
+    it "delete the old posts" do
+      assert !@goal.posts.include?(@posts.first)          
+    end
+    
+    pending "fetch the new posts from new blog feed" do
+      assert @goal.posts != @posts
+      feed = Feedzirra::Feed.fetch_and_parse(@goal.blog_url)
+      gs = @goal.posts.all
+      fs = feed.entries
+      debugger
+      gs.zip(fs).each do |items|
+        items[0].attributes.each do |a, v|
+          #check for equality
+#          assert items[1](":"+#{a}) == v
+        end
+      end
+    end
+  end
+
   describe "posts" do
     it "has many" do
       g = Factory.build(:goal)
@@ -76,7 +104,7 @@ describe Goal do
     end
 
     pending "the goal validates the feed" do
-
+      
     end
 
     describe "feed retrieval" do

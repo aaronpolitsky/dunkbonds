@@ -1,6 +1,6 @@
 <h1>Listing goals</h1>
 
-<table>
+<table class="goals">
   <tr>
     <th>Title</th>
     <th>Description</th>
@@ -13,7 +13,7 @@
   </tr>
 
 <% @goals.each do |goal| %>
-  <tr>
+  <tr class="goal">
     <td><%= goal.title %></td>
     <td><%= goal.description %></td>
     <td><%= goal.starts_at %></td>

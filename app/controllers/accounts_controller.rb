@@ -2,11 +2,11 @@ class AccountsController < ApplicationController
   # GET /goals/1/accounts
   # GET /goals/1/accounts.xml
 
+  before_filter :load_goal
 #  before_filter :is_admin?, :only => [:index, :edit, :update]
 
   def index
-    @goal = Goal.find(params[:goal_id])
-    @accounts = @goal.accounts
+    @accounts = @goal.accounts.where(:is_treasury => false)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -17,7 +17,8 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.xml
   def show
-    @account = Account.find(params[:id])
+    @account = @goal.accounts.find(params[:id])
+    @line_items = @account.line_items
 
     respond_to do |format|
       format.html # show.html.erb
@@ -28,8 +29,7 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   # GET /accounts/new.xml
   def new
-    @goal = Goal.find(params[:goal_id])
-    @account = Account.new
+    @account = @goal.accounts.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -39,18 +39,18 @@ class AccountsController < ApplicationController
 
   # GET /accounts/1/edit
   def edit
-    @account = Account.find(params[:id])
+    @account = @goal.accounts.find(params[:id])
   end
 
   # POST /accounts
   # POST /accounts.xml
   def create
-    @account = Account.new(params[:account])
+    @account = @goal.accounts.new(params[:account])
 
     respond_to do |format|
       if @account.save
         flash[:notice] = 'Account was successfully created.'
-        format.html { redirect_to goal_account_path(@account.goal, @account) }
+        format.html { redirect_to [@goal, @account] }
         format.xml  { render :xml => @account, :status => :created, :location => @account }
       else
         format.html { render :action => "new" }
@@ -62,15 +62,15 @@ class AccountsController < ApplicationController
   # PUT /accounts/1
   # PUT /accounts/1.xml
   def update
-    @account = Account.find(params[:id])
+    @account = @goal.accounts.find(params[:id])
 
     respond_to do |format|
       if @account.update_attributes(params[:account])
-        format.html { redirect_to(@account, :notice => 'Account was successfully updated.') }
+        format.html { redirect_to [@goal, @account], :notice => 'Account was successfully updated.' }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @account.errors, :status => :unprocessable_entity }
+        format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -78,13 +78,20 @@ class AccountsController < ApplicationController
   # DELETE /accounts/1
   # DELETE /accounts/1.xml
   def destroy
-    @account = Account.find(params[:id])
+    @account = @goal.accounts.find(params[:id])
     @account.destroy
 
     respond_to do |format|
-      format.html { redirect_to(accounts_url) }
+      flash[:notice] = 'You are no longer following this goal.'
+      format.html { redirect_to(@goal) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+
+  def load_goal
+    @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
   end
 
 end

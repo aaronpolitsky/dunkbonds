@@ -1,6 +1,6 @@
 <% if is_admin? %>
-<div class="admin form">
-  <%= form_for(@account) do |f| %>
+<div class="admin_account_form">
+  <%= form_for([@goal, @account]) do |f| %>
   <% if @account.errors.any? %>
   <div id="error_explanation">
     <h2><%= pluralize(@account.errors.count, "error") %> prohibited this account from being saved:</h2>
@@ -33,13 +33,13 @@
 
 <% else %>
 
-<div class="account form">
-  <%= form_for(@account) do |f| %>
+<div class="account_form">
+  <%= form_for([@goal, @account]) do |f| %>
   <div class="field">
     <%= f.hidden_field :goal_id, :value => params[:goal_id] %>
   </div>
   <div class="field">
-    <%= f.hidden_field :is_treasury, :value => false %>
+    <%= f.hidden_field :is_treasury, :value => @account.is_treasury |= false %>
   </div>
   <div class="actions">
     <%= f.submit "Open an Account with this Goal" %>

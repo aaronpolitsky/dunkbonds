@@ -1,40 +1,20 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <b>Goal:</b>
-  <%= @post.goal_id %>
-</p>
+<table class="posts">
+  <tr>
+    <th>Goal</th>
+    <th>Title</th>
+    <th>Content</th>
+    <th>Url</th>
+    <th>Published_at</th>
+    <th>Guid</th>
+    <th>Is visible</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+  <%= render @post %>
+</table>
 
-<p>
-  <b>Title:</b>
-  <%= @post.title %>
-</p>
-
-<p>
-  <b>Description:</b>
-  <%= @post.description %>
-</p>
-
-<p>
-  <b>Link:</b>
-  <%= @post.link %>
-</p>
-
-<p>
-  <b>Pubdate:</b>
-  <%= @post.pubDate %>
-</p>
-
-<p>
-  <b>Guid:</b>
-  <%= @post.guid %>
-</p>
-
-<p>
-  <b>Is visible:</b>
-  <%= @post.is_visible %>
-</p>
-
-
-<%= link_to 'Edit', edit_post_path(@post) %> |
-<%= link_to 'Back', posts_path %>
+<%= link_to 'Edit', edit_goal_post_path(@goal, @post) %> |
+<%= link_to 'Back', goal_posts_path(@goal) %>

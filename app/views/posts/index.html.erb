@@ -1,12 +1,12 @@
 <h1>Listing posts</h1>
 
-<table>
+<table class="posts">
   <tr>
     <th>Goal</th>
     <th>Title</th>
-    <th>Description</th>
-    <th>Link</th>
-    <th>Pubdate</th>
+    <th>Content</th>
+    <th>Url</th>
+    <th>Published_at</th>
     <th>Guid</th>
     <th>Is visible</th>
     <th></th>
@@ -14,22 +14,9 @@
     <th></th>
   </tr>
 
-<% @posts.each do |post| %>
-  <tr>
-    <td><%= post.goal_id %></td>
-    <td><%= post.title %></td>
-    <td><%= post.description %></td>
-    <td><%= post.link %></td>
-    <td><%= post.pubDate %></td>
-    <td><%= post.guid %></td>
-    <td><%= post.is_visible %></td>
-    <td><%= link_to 'Show', post %></td>
-    <td><%= link_to 'Edit', edit_post_path(post) %></td>
-    <td><%= link_to 'Destroy', post, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+<%= render @posts %>
 </table>
 
 <br />
 
-<%= link_to 'New Post', new_post_path %>
+<%= link_to 'New Account', new_goal_post_path(@goal) %>

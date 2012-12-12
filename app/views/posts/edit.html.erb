@@ -2,5 +2,5 @@
 
 <%= render 'form' %>
 
-<%= link_to 'Show', @post %> |
-<%= link_to 'Back', posts_path %>
+<%= link_to 'Show', [@goal, @post] %> |
+<%= link_to 'Back', goal_posts_path(@goal) %>
