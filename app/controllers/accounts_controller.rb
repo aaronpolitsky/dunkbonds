@@ -2,6 +2,8 @@ class AccountsController < ApplicationController
   # GET /goals/1/accounts
   # GET /goals/1/accounts.xml
 
+  before_filter :authenticate_user!, :only => :create
+
   before_filter :load_goal
 #  before_filter :is_admin?, :only => [:index, :edit, :update]
 
@@ -45,8 +47,8 @@ class AccountsController < ApplicationController
   # POST /accounts
   # POST /accounts.xml
   def create
-    new_follow = my_current_user.follow_goal(@goal)
-    @account = my_current_user.accounts.find_by_goal_id(@goal)
+    new_follow = current_user.follow_goal(@goal)
+    @account = current_user.accounts.find_by_goal_id(@goal)
     
     respond_to do |format|
       if new_follow

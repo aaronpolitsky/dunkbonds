@@ -19,7 +19,7 @@ class Goal < ActiveRecord::Base
   def update_from_feed
     unless self.blog_url.nil? || self.blog_url.empty?
       feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)
-      add_entries(feed.entries) unless (feed.zero? || feed.entries.empty?)
+      add_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
 #    rescue ActiveRecord::NoMethodError
 #      flash[:notice] = "Feed doesn't exist.  Double check that blog url."
     end

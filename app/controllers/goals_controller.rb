@@ -1,12 +1,15 @@
 class GoalsController < ApplicationController
-  
+
   # GET /goals
   # GET /goals.xml
   def index
     @goals = Goal.all
-    @followed_goals = my_current_user.followed_goals
-    @unfollowed_goals = @goals - @followed_goals
-
+    if user_signed_in?
+      @followed_goals = current_user.followed_goals
+      @unfollowed_goals = @goals - @followed_goals
+    else
+      @followed_goals = @unfollowed_goals = []
+    end
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @goals }

@@ -112,20 +112,24 @@ describe AccountsController do
 
   describe "POST create" do
     describe "with valid params" do
+      before :each do
+        sign_in Factory.create(:user)
+      end
+
       it "creates a new Account" do
         expect {
-          post :create, {:goal_id => @goal.to_param, :account => valid_attributes}, valid_session
+          post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
         }.to change(Account, :count).by(1)
       end
 
       it "assigns a newly created account as @account" do
-        post :create, {:goal_id => @goal.to_param, :account => valid_attributes}, valid_session
+        post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
         assigns(:account).should be_a(Account)
         assigns(:account).should be_persisted
       end
 
       it "redirects to the created account" do
-        post :create, {:goal_id => @goal.to_param, :account => valid_attributes}, valid_session
+        post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
         response.should redirect_to([@goal, @goal.accounts.last])
       end
     end

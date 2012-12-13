@@ -19,6 +19,8 @@ require 'spec_helper'
 # that an instance is receiving a specific message.
 
 describe GoalsController do
+#  include Devise::TestHelpers
+
   render_views
 
   # This should return the minimal set of attributes required to create a valid
@@ -42,8 +44,10 @@ describe GoalsController do
   end
 
   describe "GET index" do
+
     before :each do
       @user = Factory.create(:user)
+      sign_in @user
 
       3.times {Factory.create(:goal)}
       @goals = Goal.all
@@ -57,7 +61,7 @@ describe GoalsController do
       @followed_goals = @user.followed_goals
       @unfollowed_goals = @goals - @followed_goals
 
-      get :index, {}, valid_session
+      get :index, {}#, valid_session
     end
 
     describe "assigns" do
