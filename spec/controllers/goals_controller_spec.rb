@@ -136,6 +136,10 @@ describe GoalsController do
       it "a link to follow the goal" do
         response.should have_selector 'a', :content => "Follow This Goal"
       end      
+
+      it "a link to support this goal" do
+        response.should have_selector 'a', :content => "Support This Goal"
+      end
     end
   end
 

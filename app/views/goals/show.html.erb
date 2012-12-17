@@ -29,7 +29,8 @@
   </p>
 </div>
 
-<%= link_to 'Follow This Goal', new_goal_account_path(@goal) %>
+<%= link_to 'Follow This Goal', new_goal_account_path(@goal) %> | 
+<%= link_to 'Support This Goal', new_goal_line_item_path(@goal) %> 
 
 <div class="feed">
   <% @posts.each do |post| %>

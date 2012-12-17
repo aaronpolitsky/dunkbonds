@@ -31,7 +31,7 @@ class OrdersController < ApplicationController
 
     respond_to do |format|
       if @cart.line_items.empty?
-        format.html { redirect_to line_items_path, :notice => "Your cart is empty." }
+        format.html { redirect_to @cart, :notice => "Your cart is empty." }
       else
         format.html # new.html.erb
         format.xml  { render :xml => @order }

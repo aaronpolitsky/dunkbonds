@@ -4,15 +4,12 @@ TwoODunkbonds::Application.routes.draw do
 
   resources :carts
   resources :orders 
-  resources :line_items
 
   resources :goals do
     resources :accounts
     resources :posts
+    resources :line_items, :except => :index
   end
-
-
-
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

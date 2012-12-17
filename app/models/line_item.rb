@@ -1,6 +1,8 @@
 class LineItem < ActiveRecord::Base
   belongs_to :cart
   belongs_to :order
+  belongs_to :goal
+  belongs_to :account
 
   TYPES = ["bond bid", "bond ask",
            "swap bid", "swap ask"]
@@ -11,6 +13,8 @@ class LineItem < ActiveRecord::Base
               "executed",
               "cancelled"]
   
+  validates :account, :presence => true
+
   after_create :set_new_status
 
   def set_new_status

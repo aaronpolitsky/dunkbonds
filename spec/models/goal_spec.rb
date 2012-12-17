@@ -111,6 +111,13 @@ describe Goal do
         g.should respond_to(:followers)
       end
     end
+
+    describe "line_items and" do
+      it "should respond to line_items" do
+        g = Factory.build(:goal)
+        g.should respond_to(:line_items)
+      end
+    end
   end
   
   describe "has a feed and" do

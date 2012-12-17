@@ -34,7 +34,7 @@ class AccountsController < ApplicationController
     @account = @goal.accounts.new
 
     respond_to do |format|
-      format.html # new.html.erb
+      format.html { } # new.html.erb
       format.xml  { render :xml => @account }
     end
   end
@@ -56,7 +56,7 @@ class AccountsController < ApplicationController
       else
         flash[:notice] = "You're already following #{@goal.title}."
       end        
-      format.html { redirect_to [@goal, @account] }
+      format.html { redirect_to @goal }
       format.xml  { render :xml => @account, :status => :created, :location => @account }
     end
   end

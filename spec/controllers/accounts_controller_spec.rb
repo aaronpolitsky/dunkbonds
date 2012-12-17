@@ -60,7 +60,7 @@ describe AccountsController do
       3.times do
         o = Order.create!
         2.times {o.line_items.create!(:account_id => account.id, :goal_id => @goal)}
-        wrong_line_items << o.line_items.create! #other goals
+        wrong_line_items << o.line_items.create!(:account => Account.create!) #other goals
       end
       line_items = LineItem.where(:account_id => account.id, :goal_id => @goal)
       get :show, {:goal_id => @goal.to_param, :id => account.to_param}, valid_session      
@@ -99,6 +99,10 @@ describe AccountsController do
       it "an explanation of how following and creating an account are linked" do
         response.should have_selector '#following_explanation'
       end
+
+      it "" do
+
+      end
     end
   end
 
@@ -111,44 +115,29 @@ describe AccountsController do
   end
 
   describe "POST create" do
-    describe "with valid params" do
-      before :each do
-        sign_in Factory.create(:user)
-      end
-
-      it "creates a new Account" do
-        expect {
-          post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
-        }.to change(Account, :count).by(1)
-      end
-
-      it "assigns a newly created account as @account" do
+    before :each do
+      sign_in @user = Factory.create(:user)
+    end
+    
+    it "creates a new Account" do
+      expect {
         post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
-        assigns(:account).should be_a(Account)
-        assigns(:account).should be_persisted
-      end
-
-      it "redirects to the created account" do
+      }.to change(Account, :count).by(1)
+    end
+    
+    it "assigns a newly created account as @account" do
+      post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
+      assigns(:account).should be_a(Account)
+      assigns(:account).should be_persisted
+    end
+    
+    describe "redirects to" do
+      it "the goal" do
         post :create, {:goal_id => @goal.to_param, :account => valid_attributes}#, valid_session
-        response.should redirect_to([@goal, @goal.accounts.last])
+        response.should redirect_to @goal
       end
     end
-
-    describe "with invalid params" do
-      pending "assigns a newly created but unsaved account as @account" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Account.any_instance.stub(:save).and_return(false)
-        post :create, {:goal_id => @goal.to_param, :account => {}}, valid_session
-        assigns(:account).should be_a_new(Account)
-      end
-
-      pending "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Account.any_instance.stub(:save).and_return(false)
-        post :create, {:goal_id => @goal.to_param, :account => {}}, valid_session
-        response.should render_template("new")
-      end
-    end
+    
   end
 
   describe "PUT update" do

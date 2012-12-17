@@ -62,7 +62,7 @@ describe OrdersController do
 
     it "displays a list of its line items if it has any" do
       order = Order.create! valid_attributes
-      2.times {order.line_items.create!}
+      2.times {order.line_items.create!(:goal => Factory.create(:goal), :account => Factory.create(:account))}
       get :show, {:id => order.to_param}, valid_session
       response.should have_selector ".line_items .line_item"      
     end

@@ -1,8 +1,9 @@
 class PostsController < ApplicationController
-  # GET /posts
-  # GET /posts.xml
+
   before_filter :load_goal
 
+  # GET /posts
+  # GET /posts.xml
   def index
     @posts = @goal.posts.all
     
