@@ -1,5 +1,5 @@
 class LineItemsController < ApplicationController
-  before_filter :authenticate_user!, :only => [:new, :create]
+  before_filter :authenticate_user!, :only => :create
   before_filter :load_or_create_account, :only => :create
   before_filter :load_goal
 
@@ -18,7 +18,6 @@ class LineItemsController < ApplicationController
   # GET /line_items/new.xml
   def new
     @line_item = @goal.line_items.new
-    @account = Account.new #dummy until created
 
     respond_to do |format|
       format.html # new.html.erb
@@ -29,7 +28,6 @@ class LineItemsController < ApplicationController
   # GET /line_items/1/edit
   def edit
     @line_item = @goal.line_items.find(params[:id])
-    @account = @line_item.account
   end
 
   # POST /line_items
@@ -55,7 +53,7 @@ class LineItemsController < ApplicationController
   # PUT /line_items/1.xml
   def update
     @line_item = @goal.line_items.find(params[:id])
-    
+
     unless @line_item.cart.nil?
       cart = @line_item.cart 
 

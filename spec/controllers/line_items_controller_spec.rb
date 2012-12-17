@@ -68,8 +68,6 @@ describe LineItemsController do
 
   describe "GET new" do
     before :each do
-      @user = Factory.create(:user)
-      sign_in @user
       get :new, {:goal_id => @goal.to_param}
     end
     
@@ -99,9 +97,6 @@ describe LineItemsController do
     describe "assigns" do
       it "the requested line_item as @line_item" do
         assigns(:line_item).should eq(@line_item)
-      end
-      it "the requested account as @account" do
-        assigns(:account).should eq(@account)
       end
     end
 

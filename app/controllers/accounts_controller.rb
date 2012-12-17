@@ -34,7 +34,7 @@ class AccountsController < ApplicationController
     @account = @goal.accounts.new
 
     respond_to do |format|
-      format.html { } # new.html.erb
+      format.html # new.html.erb
       format.xml  { render :xml => @account }
     end
   end
