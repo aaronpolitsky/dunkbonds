@@ -40,10 +40,16 @@ describe AccountsController do
   end
 
   describe "GET index" do
+    before :each do
+      @user = Factory.create(:user)
+      sign_in @user
+      @user.follow_goal(@goal)
+      @account = @user.accounts.last
+    end
+
     it "assigns all accounts as @accounts" do
-      account = @goal.accounts.create! valid_attributes
-      get :index, {:goal_id => @goal.to_param, }
-      assigns(:accounts).should eq([account])
+      get :index, {:goal_id => @goal.to_param }
+      assigns(:accounts).should eq([@account])
     end
   end
 
@@ -55,9 +61,11 @@ describe AccountsController do
       @account = @user.accounts.last
     end
 
-    it "assigns the requested account as @account" do
-      get :show, {:goal_id => @goal.to_param, :id => @account.to_param}
-      assigns(:account).should eq(@account)
+    describe "assigns" do 
+      it "the requested account as @account" do
+        get :show, {:goal_id => @goal.to_param, :id => @account.to_param}
+        assigns(:account).should eq(@account)
+      end
     end
     
     it "lists [its user's] line items on this goal, grouped by order" do
@@ -68,11 +76,18 @@ describe AccountsController do
         wrong_line_items << o.line_items.create! #other goals
       end
       line_items = @user.line_items.where(:goal_id => @goal)
+      order_line_items = line_items.group_by {|li| li.order.id }
       get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
       assigns(:line_items).should eq(line_items)
       assigns(:line_items).should_not include(wrong_line_items)
       response.should have_selector ".line_items .line_item"
+      assigns(:order_line_items).should eq(order_line_items)
+      assigns(:order_line_items)[@user.orders.first].should eq(order_line_items[@user.orders.first])
+
+      response.should have_selector ".order .line_items .line_item"
     end
+
+
 
     it "should redirect to sign_in if not signed in" do
       sign_out @user

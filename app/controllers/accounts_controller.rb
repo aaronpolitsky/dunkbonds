@@ -24,6 +24,7 @@ class AccountsController < ApplicationController
     @user = current_user
     @account = @goal.accounts.find(params[:id])
     @line_items = @user.line_items.where(:goal_id => @goal)
+    @order_line_items = @line_items.group_by { |li| li.order.id }
 
     respond_to do |format|
       format.html # show.html.erb

@@ -1,11 +1,6 @@
 <p>
   <b>Goal:</b>
-  <%= @goal.id %>
-</p>
-
-<p>
-  <b>Is treasury:</b>
-  <%= @account.is_treasury %>
+  <%= @goal.title %>
 </p>
 
 <p>
@@ -13,18 +8,25 @@
   <%= @account.balance %>
 </p>
 
-<table class="line_items">
-  <tr>
-    <th></th>
-    <th></th>
-    <th></th>
-    <th></th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-  <%= render @line_items %>
-</tr>
+<% @order_line_items.sort.each do |order, line_items| %>
+  <div class="order">
+    <h5>Order #<%= order %></h5>
+    <table class="line_items">
+      <tr>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+	<th></th>
+      </tr>
+      <%= render line_items %>
+    </table
+  </div>
+<% end %>
+
+
 
 <%= link_to 'Edit', edit_goal_account_path(@goal, @account) %> |
 <%= link_to 'Back', goal_accounts_path(@goal) %>
