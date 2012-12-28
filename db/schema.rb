@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121212163932) do
+ActiveRecord::Schema.define(:version => 20121220082411) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -52,7 +52,6 @@ ActiveRecord::Schema.define(:version => 20121212163932) do
   end
 
   create_table "line_items", :force => true do |t|
-    t.integer  "account_id"
     t.string   "status",                                        :default => "new"
     t.string   "type_of"
     t.decimal  "max_bid_min_ask", :precision => 8, :scale => 2
@@ -65,9 +64,9 @@ ActiveRecord::Schema.define(:version => 20121212163932) do
   end
 
   create_table "orders", :force => true do |t|
-    t.integer  "account_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "user_id"
   end
 
   create_table "posts", :force => true do |t|

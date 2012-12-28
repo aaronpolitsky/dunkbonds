@@ -1,5 +1,16 @@
 <tr class="order">
-  <td><%= link_to 'Show', order %></td>
-  <td><%= link_to 'Edit', edit_order_path(order) %></td>
-  <td><%= link_to 'Destroy', order, :confirm => 'Are you sure?', :method => :delete %></td>
+  <td class="number"><%= link_to "Order #{order.id}", order %></td>
+  <table class="line_items">
+    <tr>
+      <th>Status</th>
+      <th>Type of</th>
+      <th>Max bid min ask</th>
+      <th>Goal</th>
+      <th>Price</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+    <%= render order.line_items %>
+  </table>
 </tr>

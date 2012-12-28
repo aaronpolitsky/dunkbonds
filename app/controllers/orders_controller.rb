@@ -1,10 +1,16 @@
 class OrdersController < ApplicationController
 
+  before_filter :authenticate_user!
+
   # GET /orders
   # GET /orders.xml
   def index
-    @orders = Order.all
-
+    @orders = current_user.orders
+    @order_line_items = Hash.new
+    @orders.each do |o|
+      @order_line_items.store o, o.line_items
+    end
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @orders }
@@ -14,7 +20,7 @@ class OrdersController < ApplicationController
   # GET /orders/1
   # GET /orders/1.xml
   def show
-    @order = Order.find(params[:id])
+    @order = current_user.orders.find(params[:id])
     @line_items = @order.line_items
 
     respond_to do |format|
@@ -41,13 +47,13 @@ class OrdersController < ApplicationController
 
   # GET /orders/1/edit
   def edit
-    @order = Order.find(params[:id])
+    @order = current_user.orders.find(params[:id])
   end
 
   # POST /orders
   # POST /orders.xml
   def create
-    @order = Order.new(params[:order])
+    @order = current_user.orders.new(params[:order])
     
     respond_to do |format|
       if @order.save
@@ -67,7 +73,7 @@ class OrdersController < ApplicationController
   # PUT /orders/1
   # PUT /orders/1.xml
   def update
-    @order = Order.find(params[:id])
+    @order = current_user.orders.find(params[:id])
 
     respond_to do |format|
       if @order.update_attributes(params[:order])
@@ -83,7 +89,7 @@ class OrdersController < ApplicationController
   # DELETE /orders/1
   # DELETE /orders/1.xml
   def destroy
-    @order = Order.find(params[:id])
+    @order = current_user.orders.find(params[:id])
     @order.destroy
 
     respond_to do |format|

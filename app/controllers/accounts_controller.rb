@@ -2,13 +2,15 @@ class AccountsController < ApplicationController
   # GET /goals/1/accounts
   # GET /goals/1/accounts.xml
 
-  before_filter :authenticate_user!, :only => :create
+  before_filter :authenticate_user!, :except => [:index, :new]
 
   before_filter :load_goal
+  before_filter :correct_user
+
 #  before_filter :is_admin?, :only => [:index, :edit, :update]
 
   def index
-    @accounts = @goal.accounts.where(:is_treasury => false)
+    @accounts = @goal.accounts.where('user_id') #is non-nil
 
     respond_to do |format|
       format.html # index.html.erb
@@ -19,8 +21,9 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.xml
   def show
+    @user = current_user
     @account = @goal.accounts.find(params[:id])
-    @line_items = @account.line_items
+    @line_items = @user.line_items.where(:goal_id => @goal)
 
     respond_to do |format|
       format.html # show.html.erb
@@ -94,6 +97,10 @@ class AccountsController < ApplicationController
 
   def load_goal
     @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
+  end
+
+  def correct_user
+    true
   end
 
 end

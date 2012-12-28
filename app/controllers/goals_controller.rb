@@ -4,12 +4,14 @@ class GoalsController < ApplicationController
   # GET /goals.xml
   def index
     @goals = Goal.all
+
     if user_signed_in?
       @followed_goals = current_user.followed_goals
       @unfollowed_goals = @goals - @followed_goals
     else
       @followed_goals = @unfollowed_goals = []
     end
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @goals }
@@ -21,7 +23,7 @@ class GoalsController < ApplicationController
   def show
     @goal = Goal.find(params[:id])
     @posts = @goal.posts.all
-
+    @account = current_user.accounts.find_by_goal_id(@goal) if user_signed_in?
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @goal }

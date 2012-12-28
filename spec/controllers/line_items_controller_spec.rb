@@ -52,8 +52,7 @@ describe LineItemsController do
       @user = Factory.create(:user)
       sign_in @user
       @user.follow_goal(@goal)
-      @account = @user.accounts.last
-      @line_item = @goal.line_items.create!(:account => @account)
+      @line_item = @goal.line_items.create!
       get :show, {:goal_id => @goal.to_param, :id => @line_item.to_param}, valid_session
     end
 
@@ -89,8 +88,7 @@ describe LineItemsController do
       @user = Factory.create(:user)
       sign_in @user
       @user.follow_goal @goal
-      @account = @user.accounts.find_by_goal_id(@goal)
-      @line_item = @goal.line_items.create!(:account => @account)
+      @line_item = @goal.line_items.create!
       get :edit, { :goal_id => @goal.to_param, :id => @line_item.to_param }
     end
 
@@ -120,13 +118,6 @@ describe LineItemsController do
         post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
         assigns(:line_item).should be_a(LineItem)
         assigns(:line_item).should be_persisted
-      end
-      
-      it "account as @account" do
-        @user.follow_goal(@goal)
-        account = @user.accounts.last
-        post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
-        assigns(:account).should eq(account)
       end
     end
     
@@ -159,8 +150,7 @@ describe LineItemsController do
         @user = Factory.create(:user)
         sign_in @user
         @user.follow_goal(@goal)
-        @account = @user.accounts.last        
-        @line_item = @goal.line_items.create!(:account_id => @account)
+        @line_item = @goal.line_items.create!
         @cart = subject.send(:current_cart)
         @cart.line_items << @line_item
       end
@@ -190,8 +180,7 @@ describe LineItemsController do
         @user = Factory.create(:user)
         sign_in @user
         @user.follow_goal(@goal)
-        @account = @user.accounts.last        
-        @line_item = @goal.line_items.create!(:account_id => @account)
+        @line_item = @goal.line_items.create!
         @order = Factory.create(:order)
         @order.line_items << @line_item
       end
@@ -222,8 +211,7 @@ describe LineItemsController do
       @user = Factory.create(:user)
       sign_in @user
       @user.follow_goal(@goal)
-      @account = @user.accounts.last        
-      @line_item = @goal.line_items.create!(:account_id => @account)
+      @line_item = @goal.line_items.create!
     end
 
     describe "of a line_item that's in the cart" do

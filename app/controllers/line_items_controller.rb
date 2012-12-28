@@ -1,6 +1,6 @@
 class LineItemsController < ApplicationController
   before_filter :authenticate_user!, :only => :create
-  before_filter :load_or_create_account, :only => :create
+  before_filter :follow_goal, :only => :create
   before_filter :load_goal
 
   # GET /line_items/1
@@ -34,7 +34,6 @@ class LineItemsController < ApplicationController
   # POST /line_items.xml
   def create
     @cart = current_cart
-    params[:line_item][:account_id] = @account.id
     @line_item = @goal.line_items.build(params[:line_item])
 
     respond_to do |format|
@@ -94,9 +93,8 @@ class LineItemsController < ApplicationController
     @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
   end
 
-  def load_or_create_account
+  def follow_goal
     current_user.follow_goal(load_goal)
-    @account = current_user.accounts.find_by_goal_id(@goal)
   end
 end
 

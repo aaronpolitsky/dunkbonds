@@ -2,18 +2,21 @@ require 'spec_helper'
 
 describe Account do
   before do
+    @user = Factory.create(:user)
     @goal = Factory.create(:goal)
+    @user.follow_goal(@goal)
+    @buyer  = @user.accounts.last
     @treasury = Factory.create(:account, :is_treasury => true)
-    @buyer  = Factory.create(:account)
     @goal.accounts << @treasury
-    @goal.accounts << @buyer
   end
   
   describe "has many" do
-    describe "line_items and" do
-      it "responds to line_items" do
-        a = Factory.create(:account)
-        a.should respond_to(:line_items)
+    describe "orders through user and" do
+      it "responds to orders" do
+        o = Factory.create(:order)
+        @user.orders << o
+        @buyer.should respond_to(:orders)
+        @buyer.orders.should eq @user.orders
       end
     end
 
@@ -28,6 +31,25 @@ describe Account do
       it "responds to swaps" do
         a = Factory.create(:account)
         a.should respond_to(:swaps)
+      end
+    end
+
+    describe "line_items" do
+      it "responds to line_items" do
+        o = @user.orders.create!
+        li = @goal.line_items.create!
+        o.line_items << li
+        @buyer.should respond_to(:line_items)
+      end
+
+      it "yields only its goal's line_items" do
+        o = @user.orders.create!
+        li = @goal.line_items.create!
+        li2 = LineItem.create!(:goal => Factory.create(:goal))
+        o.line_items << li
+        o.line_items << li2
+        @buyer.line_items.should eq([li])
+        @buyer.line_items.should_not eq([li2])
       end
     end
   end
@@ -75,6 +97,37 @@ describe Account do
       @untreasury = @goal.accounts.create!(:is_treasury => false, :balance => 0.0)
     end
 
+    describe "can't be destroyed if it has" do
+      it "at least one bond" do
+        @untreasury.bonds << Bond.create!
+        expect {
+          @untreasury.destroy
+        }.to change(Account, :count).by(0)
+        expect {
+          @untreasury.destroy
+        }.to change(Bond, :count).by(0)
+      end
+
+      it "at least one swap" do
+        @untreasury.swaps << Bond.create!
+        expect {
+          @untreasury.destroy
+        }.to change(Account, :count).by(0)
+        expect {
+          @untreasury.destroy
+        }.to change(@untreasury.swaps, :count).by(0)
+      end
+
+      pending "at least one pending line_item" do
+        expect {
+          @untreasury.destroy
+        }.to change(Account, :count).by(0)
+        expect {
+          @untreasury.destroy
+        }.to change(Order, :count).by(0)        
+      end
+    end
+
     describe "having no bonds cannot" do
 
       it "create a bond from thin air" do
@@ -89,6 +142,7 @@ describe Account do
           @untreasury.sell_bond!(@buyer)
         }.to_not change {@buyer.bonds.sum(:qty)}
       end  
+
     end
 
     describe "having one bond" do
@@ -134,7 +188,6 @@ describe Account do
         }.to change {Bond.count}.by 1
         assert_equal 1, @buyer.bonds.where(:goal_id => @goal).sum(:qty)    
       end
-      
     end
   end
 end

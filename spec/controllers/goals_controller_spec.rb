@@ -57,18 +57,18 @@ describe GoalsController do
       @goals.last.save!
 
       @user.follow_goal(@goals.second)
-      
+
       @followed_goals = @user.followed_goals
       @unfollowed_goals = @goals - @followed_goals
 
-      get :index, {}#, valid_session
+      get :index, {}#
     end
 
     describe "assigns" do
       it "all goals as @goals" do
         assigns(:goals).should eq(@goals)
       end
-      
+
       it "followed goals as @followed_goals" do
         assigns(:followed_goals).should eq(@followed_goals)
       end
@@ -94,7 +94,6 @@ describe GoalsController do
         response.should have_selector ".unfollowed_goals .goal", :content => @unfollowed_goals.first.title
       end
     end
-
   end
 
   describe "GET show" do
@@ -105,40 +104,75 @@ describe GoalsController do
       @goal.posts << @post1
       @goal.posts << @post2
       @goal.posts.count.should eq 2
-      get :show, {:id => @goal.to_param}, valid_session
+      sign_in @user = Factory.create(:user)
     end
-
-    describe "assigns" do
-      it "its goal as @goal" do
-        assigns(:goal).should eq(@goal)
-      end
-
-      it "its posts as @posts" do
-        assigns(:posts).should eq @goal.posts
-      end
-    end
-
-    describe "shows" do
-      it "all child posts" do
-        response.should have_selector ".feed"
-        response.should have_selector ".feed .post"
-        response.should have_selector 'h3', :content => @post1.title
-        response.should have_selector '.feed .post .content', :content => @post1.content
-        response.should have_selector 'h3', :content => @post2.title
-        response.should have_selector '.feed .post .content', :content => @post2.content
+    
+    describe "if user is following" do
+      before :each do
+        @user.follow_goal(@goal)
+        @account = @user.accounts.find_by_goal_id(@goal)
+        get :show, {:id => @goal.to_param}
       end
       
-      it "only its posts" do
-        not_my_post = Factory.create(:post, :content => "not mine.")
-        response.should_not have_selector '.feed .post .content', :content => not_my_post.content
+      it "assigns the user account" do
+        assigns(:account).should eq @account
       end
+      
+      describe "shows" do
+        it "a button to unfollow the goal" do
+          response.should have_selector 'form', :method => "post", :action => goal_account_path(@goal, @account), :class => "button_to"
+        end      
+        
+        it "a link to this user's account" do
+          response.should have_selector 'a', :href => goal_account_path(@goal, @account), :content => 'Account'
+        end
+      end
+    end
+    
+    describe "if the user is not following" do
+      before :each do
+        get :show, {:id => @goal.to_param}
+      end
+      
+      describe "shows" do
+        it "a link to follow the goal" do
+          response.should have_selector 'a', :href => new_goal_account_path(@goal), :content => "Follow This Goal"
+        end
+      
+        it "a link to create a new account" do
+          response.should have_selector 'a', :href => new_goal_account_path(@goal), :content => 'Account'
+        end
+      end
+    end
+    
+    describe "" do
+      before :each do
+        get :show, {:id => @goal.to_param}
+      end
+      
+      describe "shows" do
+        it "all child posts" do
+          response.should have_selector ".feed"
+          response.should have_selector ".feed .post"
+          response.should have_selector 'h3', :content => @post1.title
+          response.should have_selector '.feed .post .content', :content => @post1.content
+          response.should have_selector 'h3', :content => @post2.title
+          response.should have_selector '.feed .post .content', :content => @post2.content
+        end
+        
+        it "assigns the right stuff" do
+          assigns(:goal).should eq(@goal)
+          assigns(:posts).should eq @goal.posts
+        end
 
-      it "a link to follow the goal" do
-        response.should have_selector 'a', :content => "Follow This Goal"
-      end      
+        it "only its posts" do
+          not_my_post = Factory.create(:post, :content => "not mine.")
+          response.should_not have_selector '.feed .post .content', :content => not_my_post.content
+        end
 
-      it "a link to support this goal" do
-        response.should have_selector 'a', :content => "Support This Goal"
+        it "a link to support this goal" do
+          response.should have_selector 'a', :content => "Support This Goal"
+        end
       end
     end
   end
@@ -146,7 +180,7 @@ describe GoalsController do
   describe "GET new" do
     before :each do
       @goal = Goal.new 
-      get :new, {}, valid_session
+      get :new, {}
     end
 
     it "assigns a new goal as @goal" do
@@ -163,7 +197,7 @@ describe GoalsController do
   describe "GET edit" do
     before :each do
       @goal = Factory.create(:goal)
-      get :edit, {:id => @goal.to_param}, valid_session
+      get :edit, {:id => @goal.to_param}
     end
 
     it "assigns the requested goal as @goal" do
@@ -182,18 +216,18 @@ describe GoalsController do
     describe "with valid params" do
       it "creates a new Goal" do
         expect {
-          post :create, {:goal => valid_attributes}, valid_session
+          post :create, {:goal => valid_attributes}
         }.to change(Goal, :count).by(1)
       end
 
       it "assigns a newly created goal as @goal" do
-        post :create, {:goal => valid_attributes}, valid_session
+        post :create, {:goal => valid_attributes}
         assigns(:goal).should be_a(Goal)
         assigns(:goal).should be_persisted
       end
 
       it "redirects to the created goal" do
-        post :create, {:goal => valid_attributes}, valid_session
+        post :create, {:goal => valid_attributes}
         response.should redirect_to(Goal.last)
       end
     end
@@ -202,14 +236,14 @@ describe GoalsController do
       it "assigns a newly created but unsaved goal as @goal" do
         # Trigger the behavior that occurs when invalid params are submitted
         Goal.any_instance.stub(:save).and_return(false)
-        post :create, {:goal => {}}, valid_session
+        post :create, {:goal => {}}
         assigns(:goal).should be_a_new(Goal)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Goal.any_instance.stub(:save).and_return(false)
-        post :create, {:goal => {}}, valid_session
+        post :create, {:goal => {}}
         response.should render_template("new")
       end
     end
@@ -224,18 +258,18 @@ describe GoalsController do
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
         Goal.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:id => goal.to_param, :goal => {'these' => 'params'}}, valid_session
+        put :update, {:id => goal.to_param, :goal => {'these' => 'params'}}
       end
 
       it "assigns the requested goal as @goal" do
         goal = Goal.create! valid_attributes
-        put :update, {:id => goal.to_param, :goal => valid_attributes}, valid_session
+        put :update, {:id => goal.to_param, :goal => valid_attributes}
         assigns(:goal).should eq(goal)
       end
 
       it "redirects to the goal" do
         goal = Goal.create! valid_attributes
-        put :update, {:id => goal.to_param, :goal => valid_attributes}, valid_session
+        put :update, {:id => goal.to_param, :goal => valid_attributes}
         response.should redirect_to(goal)
       end
 
@@ -244,7 +278,7 @@ describe GoalsController do
         goal.update_from_feed
         posts = goal.posts.all
         goal.blog_url = 'http://dunkbonds.blogspot.com/feeds/posts/default'
-        put :update, {:id => goal.to_param, :goal => valid_attributes}, valid_session
+        put :update, {:id => goal.to_param, :goal => valid_attributes}
         goal.posts.reload
         assert !goal.posts.include?(posts)
         posts.should_not eq(goal.posts.all)
@@ -256,7 +290,7 @@ describe GoalsController do
         goal = Goal.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Goal.any_instance.stub(:save).and_return(false)
-        put :update, {:id => goal.to_param, :goal => {}}, valid_session
+        put :update, {:id => goal.to_param, :goal => {}}
         assigns(:goal).should eq(goal)
       end
 
@@ -264,7 +298,7 @@ describe GoalsController do
         goal = Goal.create! valid_attributes
         # Trigger the behavior that occurs when invalid params are submitted
         Goal.any_instance.stub(:save).and_return(false)
-        put :update, {:id => goal.to_param, :goal => {}}, valid_session
+        put :update, {:id => goal.to_param, :goal => {}}
         response.should render_template("edit")
       end
     end
@@ -274,13 +308,13 @@ describe GoalsController do
     it "destroys the requested goal" do
       goal = Goal.create! valid_attributes
       expect {
-        delete :destroy, {:id => goal.to_param}, valid_session
+        delete :destroy, {:id => goal.to_param}
       }.to change(Goal, :count).by(-1)
     end
 
     it "redirects to the goals list" do
       goal = Goal.create! valid_attributes
-      delete :destroy, {:id => goal.to_param}, valid_session
+      delete :destroy, {:id => goal.to_param}
       response.should redirect_to(goals_url)
     end
   end

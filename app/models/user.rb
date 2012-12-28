@@ -2,6 +2,7 @@ class User < ActiveRecord::Base
   has_many :accounts
   has_many :followed_goals, :through => :accounts, :source => :goal #class_name => "Goal"
   has_many :orders
+  has_many :line_items, :through => :orders
 
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
@@ -16,6 +17,10 @@ class User < ActiveRecord::Base
     true
   rescue ActiveRecord::RecordNotUnique
     false
+  end
+
+  def following?(goal)
+    self.followed_goals.include?(goal)
   end
 
 end
