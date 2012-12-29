@@ -29,7 +29,7 @@ describe LineItemsController do
   # LineItem. As you add validations to LineItem, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {:qty => 2}
   end
 
   # This should return the minimal set of values that should be in the session
@@ -79,6 +79,10 @@ describe LineItemsController do
     describe "shows" do
       it "a heading Support <goal.title>" do 
         response.should have_selector 'h3', :content => "Support #{@goal.title}?" 
+      end
+
+      it "a qty input field" do
+        response.should have_selector 'form', :content => "Quantity"
       end
     end
   end

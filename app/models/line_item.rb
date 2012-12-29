@@ -12,38 +12,65 @@ class LineItem < ActiveRecord::Base
               "executed",
               "cancelled"]
   
-  after_create :set_new_status
+  validate :qty_is_valid
 
-  def set_new_status
-    self.status = "new" 
-    self.save!
+  def account
+    self.user.account.find_by_goal(self.goal)
   end
 
-  def find_matching_ask
-    LineItem.where(:type_of => "bond ask", 
-                   :goal_id => self.goal_id, 
-                   :status => "pending").first
+  def find_matching_asks
+    #first match by ask, goal, and pending status
+    matches = LineItem.where(:type_of => "bond ask", 
+                             :goal_id => self.goal_id, 
+                             :status => "pending")
+
+    #then pare down by price
+    matches = matches.where('max_bid_min_ask <= ?', self.max_bid_min_ask).order(:created_at)
+
+    #quit if there aren't enough
+    return [] if matches.sum(:qty) < self.qty
+
+    bestmatches =[]
+    qty = self.qty
+    matches.each do |m|
+      if qty == m.qty
+        bestmatches << m
+        return bestmatches
+      elsif (qty > m.qty) 
+        qty -= m.qty
+        bestmatches << m
+      else  #(qty < m.qty), create a new lineitem of qty and decrement m.qty by qty
+        firstqty = LineItem.create! m.attributes.merge(:qty => qty)
+        m.qty -= qty
+        m.save!
+        bestmatches << firstqty
+        return bestmatches
+      end    
+    end    
+    return bestmatches                   
   end
 
-  def find_matching_bid
+  def find_matching_bids
     LineItem.where(:type_of => "bond bid", 
                    :goal_id => self.goal_id, 
-                   :status => "pending").first
+                   :status => "pending")
   end
 
   def execute!
     unless status == "executed"
       self.status = "pending"
       if type_of == "bond bid"
-        match = find_matching_ask
-        unless match.nil?
-          match.account.sell_bond!(self.account)
-          self.status = match.status = "executed"
-          match.save!
+        matches = find_matching_asks
+        unless matches.emtpy?
+          matches.each do |m|
+            m.account.sell_bond!(self.account)
+            self.status = match.status = "executed"
+            match.save!
+          end
         end
         
       elsif type_of == "bond ask"
-        match = find_matching_bid
+        matches = find_matching_bids
         unless match.nil?
           account.sell_bond!(match.account)
           self.status = match.status = "executed"
@@ -56,6 +83,12 @@ class LineItem < ActiveRecord::Base
       end
       self.save!
     end
+  end
+
+  private
+
+  def qty_is_valid
+    !self.qty.nil? && self.qty > 0 && self.qty <= 100
   end
 
 end
