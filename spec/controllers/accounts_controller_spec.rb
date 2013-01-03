@@ -32,6 +32,10 @@ describe AccountsController do
     {:is_treasury => false}
   end
 
+  def valid_line_item_attributes
+    {:qty => 1}
+  end
+
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # AccountsController. Be sure to keep this updated too.
@@ -72,8 +76,8 @@ describe AccountsController do
       wrong_line_items = []
       3.times do
         o = @user.orders.create!
-        2.times {o.line_items << @goal.line_items.create!}
-        wrong_line_items << o.line_items.create! #other goals
+        2.times { o.line_items << @goal.line_items.create!( valid_line_item_attributes )}
+        wrong_line_items << o.line_items.create!( valid_line_item_attributes ) #other goals
       end
       line_items = @user.line_items.where(:goal_id => @goal)
       order_line_items = line_items.group_by {|li| li.order.id }

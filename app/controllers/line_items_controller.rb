@@ -83,6 +83,7 @@ class LineItemsController < ApplicationController
       @line_item.destroy
       redirect_to(cart, :notice => 'Successfully updated cart.') 
     else #the line_item is already part of an order
+      @line_item.cancel! if @line_item.status == "pending"
       redirect_to @line_item.order
     end
   end

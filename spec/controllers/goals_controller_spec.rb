@@ -273,12 +273,11 @@ describe GoalsController do
         response.should redirect_to(goal)
       end
 
-      pending "updates feed if blog_url changes" do
+      it "updates feed if blog_url changes" do
         goal = Factory.create(:goal)
         goal.update_from_feed
         posts = goal.posts.all
-        goal.blog_url = 'http://dunkbonds.blogspot.com/feeds/posts/default'
-        put :update, {:id => goal.to_param, :goal => valid_attributes}
+        put :update, {:id => goal.to_param, :goal => {:blog_url => 'http://dunkbonds.blogspot.com/feeds/posts/default'} }
         goal.posts.reload
         assert !goal.posts.include?(posts)
         posts.should_not eq(goal.posts.all)

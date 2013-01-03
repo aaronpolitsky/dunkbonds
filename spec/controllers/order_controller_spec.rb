@@ -48,8 +48,7 @@ describe OrdersController do
       @orders = @user.orders
       @order_line_items = Hash.new      
       @user.orders.each do |o| 
-        o.line_items << @goal.line_items.create!
-        o.line_items << @goal.line_items.create!
+        2.times { o.line_items << Factory.create(:line_item, :goal => @goal) }
         @order_line_items.store o, o.line_items
       end
     end
@@ -93,7 +92,7 @@ describe OrdersController do
 
     it "displays a list of its line items if it has any" do
       order = @user.orders.create! valid_attributes
-      2.times {order.line_items.create!(:goal => Factory.create(:goal))}
+      2.times { order.line_items << Factory.create(:line_item, :goal => Factory.create(:goal)) }
       get :show, {:id => order.to_param}
       response.should have_selector ".line_items .line_item"      
     end

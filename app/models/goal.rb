@@ -11,7 +11,9 @@ class Goal < ActiveRecord::Base
   validates :title, :description, :presence => true
   validates :starts_at, :presence => true
   validates :ends_at, :presence => true
+
   validate :dates_and_period_are_appropriate
+  validate :blog_url_is_valid
 
   after_create :create_treasury
   
@@ -95,6 +97,12 @@ class Goal < ActiveRecord::Base
     end
   end
   
+  def blog_url_is_valid
+    unless self.blog_url.nil? || self.blog_url.empty? #blog CAN be empty
+      Feedzirra::Feed.fetch_and_parse(self.blog_url, :on_failure => lambda { errors.add(:blog_url, "Double check that blog url.") } )
+    end
+  end
+
 end
 
 

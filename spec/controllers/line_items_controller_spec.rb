@@ -52,7 +52,7 @@ describe LineItemsController do
       @user = Factory.create(:user)
       sign_in @user
       @user.follow_goal(@goal)
-      @line_item = @goal.line_items.create!
+      @line_item = @goal.line_items.create!  valid_attributes
       get :show, {:goal_id => @goal.to_param, :id => @line_item.to_param}, valid_session
     end
 
@@ -92,7 +92,7 @@ describe LineItemsController do
       @user = Factory.create(:user)
       sign_in @user
       @user.follow_goal @goal
-      @line_item = @goal.line_items.create!
+      @line_item = @goal.line_items.create!  valid_attributes
       get :edit, { :goal_id => @goal.to_param, :id => @line_item.to_param }
     end
 
@@ -154,7 +154,7 @@ describe LineItemsController do
         @user = Factory.create(:user)
         sign_in @user
         @user.follow_goal(@goal)
-        @line_item = @goal.line_items.create!
+        @line_item = @goal.line_items.create!  valid_attributes
         @cart = subject.send(:current_cart)
         @cart.line_items << @line_item
       end
@@ -184,7 +184,7 @@ describe LineItemsController do
         @user = Factory.create(:user)
         sign_in @user
         @user.follow_goal(@goal)
-        @line_item = @goal.line_items.create!
+        @line_item = @goal.line_items.create!  valid_attributes 
         @order = Factory.create(:order)
         @order.line_items << @line_item
       end
@@ -215,7 +215,7 @@ describe LineItemsController do
       @user = Factory.create(:user)
       sign_in @user
       @user.follow_goal(@goal)
-      @line_item = @goal.line_items.create!
+      @line_item = @goal.line_items.create!  valid_attributes
     end
 
     describe "of a line_item that's in the cart" do
@@ -254,8 +254,12 @@ describe LineItemsController do
         }.to change(LineItem, :count).by(0)
       end
 
-      pending "cancels the line item if possible" do
-
+      it "cancels a pending line item" do
+        @line_item.status = "pending"
+        @line_item.save!
+        delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}
+        @line_item.reload
+        @line_item.status.should eq "cancelled"
       end
     
       it  "redirects to its order" do

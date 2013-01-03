@@ -37,15 +37,15 @@ describe Account do
     describe "line_items" do
       it "responds to line_items" do
         o = @user.orders.create!
-        li = @goal.line_items.create!
+        li = Factory.create(:line_item, :goal => @goal)
         o.line_items << li
         @buyer.should respond_to(:line_items)
       end
 
       it "yields only its goal's line_items" do
         o = @user.orders.create!
-        li = @goal.line_items.create!
-        li2 = LineItem.create!(:goal => Factory.create(:goal))
+        li = Factory.create(:line_item, :goal => @goal)
+        li2 = Factory.create(:line_item, :goal => Factory.create(:goal))
         o.line_items << li
         o.line_items << li2
         @buyer.line_items.should eq([li])
@@ -156,7 +156,7 @@ describe Account do
         }.to change {@buyer.bonds.sum(:qty)}.by(1)
         assert_equal 0, @untreasury.bonds.where(:goal_id => @goal).sum(:qty)
       end
-      
+
     end
     
     describe "having more than one bond" do

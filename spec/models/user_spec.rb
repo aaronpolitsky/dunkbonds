@@ -20,7 +20,7 @@ describe User do
       it "responds to line_items" do
         u = Factory.create(:user)
         o = Factory.create(:order)
-        li= o.line_items.create!
+        o.line_items << li = Factory.create(:line_item)
         u.orders << o
         u.should respond_to(:line_items)
         u.line_items.should eq [li]

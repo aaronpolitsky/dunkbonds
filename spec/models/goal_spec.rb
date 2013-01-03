@@ -67,7 +67,7 @@ describe Goal do
     end
   end
 
-  describe "changes to the blog_url" do
+  describe "a change to the blog_url" do
     before :each do
       @goal = Factory.create(:goal)
       @goal.update_from_feed
@@ -78,21 +78,21 @@ describe Goal do
       @goal.reload
     end
     
-    it "delete the old posts" do
+    it "deletes the old posts" do
       assert !@goal.posts.include?(@posts.first)          
     end
     
-    pending "fetch the new posts from new blog feed" do
+    it "fetches the new posts from new blog feed" do
       assert @goal.posts != @posts
       feed = Feedzirra::Feed.fetch_and_parse(@goal.blog_url)
       gs = @goal.posts.all
       fs = feed.entries
-      debugger
-      gs.zip(fs).each do |items|
-        items[0].attributes.each do |a, v|
-          #check for equality
-#          assert items[1](":"+#{a}) == v
-        end
+      gs.zip(fs).each do |pairs|
+        assert pairs[0].title        == pairs[1].title
+        assert pairs[0].url          == pairs[1].url
+        assert pairs[0].content      == pairs[1].content
+        assert pairs[0].published_at == pairs[1].published
+        assert pairs[0].guid         == pairs[1].id
       end
     end
   end
@@ -121,8 +121,10 @@ describe Goal do
   end
   
   describe "has a feed and" do
-    pending "the goal validates the feed" do
-      
+    it "the goal validates the feed" do
+      g = Factory.build(:goal, :blog_url => "www.google.com")
+      g.should_not be_valid
+      g.errors[:blog_url].should include("Double check that blog url.")
     end
     
     describe "retrieval" do
@@ -131,10 +133,10 @@ describe Goal do
       end
       
       describe "of new posts" do 
-        pending "creates new posts" do
+        it "creates new posts" do
           expect {
             @g.update_from_feed
-          }.to change{Post.count} 
+          }.to change{Post.count}
         end
       end
       
@@ -146,7 +148,7 @@ describe Goal do
           }.to_not change{Post.count}
         end
         
-        pending "updates posts" do
+        it "updates posts" do
           @g.update_from_feed
           p = @g.posts.first
           p.title = "XXX"

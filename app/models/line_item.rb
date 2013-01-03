@@ -7,15 +7,21 @@ class LineItem < ActiveRecord::Base
            "swap bid", "swap ask"]
 
   STATUSES = ["new", 
-              "in cart",
               "pending",
               "executed",
               "cancelled"]
   
-  validate :qty_is_valid
+  validates :qty, :presence => true, :numericality => {:greater_than => 0, :less_than => 101}
 
   def account
     self.user.account.find_by_goal(self.goal)
+  end
+
+  def cancel!
+    if self.status == "pending"
+      self.status = "cancelled"
+      self.save!
+    end
   end
 
   def find_matching_asks
@@ -33,10 +39,10 @@ class LineItem < ActiveRecord::Base
     bestmatches =[]
     qty = self.qty
     matches.each do |m|
-      if qty == m.qty
+      if qty == m.qty  #if qty is exact
         bestmatches << m
         return bestmatches
-      elsif (qty > m.qty) 
+      elsif (qty > m.qty)  #if we still need more than m.qty
         qty -= m.qty
         bestmatches << m
       else  #(qty < m.qty), create a new lineitem of qty and decrement m.qty by qty
@@ -63,9 +69,11 @@ class LineItem < ActiveRecord::Base
         matches = find_matching_asks
         unless matches.emtpy?
           matches.each do |m|
-            m.account.sell_bond!(self.account)
-            self.status = match.status = "executed"
-            match.save!
+            m.qty.times do #easier to call it mult times than to build qty into it
+              m.account.sell_bond!(self.account)
+            end
+            self.status = m.status = "executed"
+            m.save!
           end
         end
         
@@ -83,12 +91,6 @@ class LineItem < ActiveRecord::Base
       end
       self.save!
     end
-  end
-
-  private
-
-  def qty_is_valid
-    !self.qty.nil? && self.qty > 0 && self.qty <= 100
   end
 
 end
