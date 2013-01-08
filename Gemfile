@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.11'
+gem 'rails', '3.1.0'
 gem 'devise'
 
 # Bundle edge Rails instead:
@@ -15,7 +15,7 @@ gem 'sqlite3'
 # gem 'capistrano'
 
 # To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
-gem 'ruby-debug'
+gem 'ruby-debug19'
 #gem 'ruby-debug19', :require => 'ruby-debug'
 
 # Bundle the extra gems:
@@ -32,7 +32,7 @@ group :development, :test do
   gem 'rspec-rails'
   gem 'autotest-rails'
   gem 'webrat'
-  gem 'factory_girl_rails'
+  gem 'factory_girl_rails', '1.0'
 end
 
-gem 'feedzirra', '0.1.1'
+gem 'feedzirra'
