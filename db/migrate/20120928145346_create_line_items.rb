@@ -7,7 +7,7 @@ class CreateLineItems < ActiveRecord::Migration
       t.integer :goal_id
       t.integer :cart_id
       t.integer :order_id
-      t.decimal :price, :precision => 8, :scale => 2
+      t.integer :qty
 
       t.timestamps
     end

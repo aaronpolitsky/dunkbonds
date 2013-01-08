@@ -4,6 +4,7 @@ class CreateAccounts < ActiveRecord::Migration
       t.integer :goal_id
       t.boolean :is_treasury
       t.decimal :balance, :precision => 8, :scale => 2, :default => 0.0
+      t.integer :user_id
 
       t.timestamps
     end

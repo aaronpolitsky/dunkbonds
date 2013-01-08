@@ -17,9 +17,9 @@ ActiveRecord::Schema.define(:version => 20121228180958) do
     t.integer  "goal_id"
     t.boolean  "is_treasury"
     t.decimal  "balance",     :precision => 8, :scale => 2, :default => 0.0
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "user_id"
   end
 
   add_index "accounts", ["user_id", "goal_id"], :name => "user_goal", :unique => true
@@ -59,16 +59,15 @@ ActiveRecord::Schema.define(:version => 20121228180958) do
     t.integer  "goal_id"
     t.integer  "cart_id"
     t.integer  "order_id"
-    t.decimal  "price",           :precision => 8, :scale => 2
+    t.integer  "qty"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "qty"
   end
 
   create_table "orders", :force => true do |t|
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "user_id"
   end
 
   create_table "posts", :force => true do |t|
@@ -84,12 +83,12 @@ ActiveRecord::Schema.define(:version => 20121228180958) do
   end
 
   create_table "users", :force => true do |t|
-    t.string   "email",                                 :default => "", :null => false
-    t.string   "encrypted_password",     :limit => 128, :default => "", :null => false
+    t.string   "email",                  :default => "", :null => false
+    t.string   "encrypted_password",     :default => "", :null => false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",                         :default => 0
+    t.integer  "sign_in_count",          :default => 0
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
