@@ -123,6 +123,7 @@ describe Goal do
   describe "has a feed and" do
     it "the goal validates the feed" do
       g = Factory.build(:goal, :blog_url => "www.google.com")
+      debugger
       g.should_not be_valid
       g.errors[:blog_url].should include("Double check that blog url.")
     end
