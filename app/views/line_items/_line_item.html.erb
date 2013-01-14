@@ -2,9 +2,9 @@
   <td><%= line_item.status %></td>
   <td><%= line_item.type_of %></td>
   <td><%= line_item.max_bid_min_ask %></td>
-  <td><%= line_item.goal.id %></td>
+  <td><%= line_item.account.id %></td>
   <td><%= line_item.qty %></td>
-  <td><%= link_to 'Show', goal_line_item_path(line_item.goal, line_item) %></td>
-  <td><%= link_to 'Edit', edit_goal_line_item_path(line_item.goal, line_item) %></td>
-  <td><%= link_to 'Destroy', [line_item.goal, line_item], :confirm => 'Are you sure?', :method => :delete %></td>
+  <td><%= link_to 'Show', account_line_item_path(line_item.account, line_item) %></td>
+  <td><%= link_to 'Edit', edit_account_line_item_path(line_item.account, line_item) %></td>
+  <td><%= link_to 'Destroy', [line_item.account, line_item], :confirm => 'Are you sure?', :method => :delete %></td>
 </tr>

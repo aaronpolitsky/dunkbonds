@@ -34,22 +34,11 @@ describe Account do
       end
     end
 
-    describe "line_items" do
+    describe "line_items and" do
       it "responds to line_items" do
-        o = @user.orders.create!
-        li = Factory.create(:line_item, :goal => @goal)
-        o.line_items << li
         @buyer.should respond_to(:line_items)
-      end
-
-      it "yields only its goal's line_items" do
-        o = @user.orders.create!
-        li = Factory.create(:line_item, :goal => @goal)
-        li2 = Factory.create(:line_item, :goal => Factory.create(:goal))
-        o.line_items << li
-        o.line_items << li2
-        @buyer.line_items.should eq([li])
-        @buyer.line_items.should_not eq([li2])
+        li = @buyer.line_items.create!(:qty => 1, :type_of => "bond bid")
+        @buyer.line_items.last.should eq li
       end
     end
   end
@@ -92,6 +81,22 @@ describe Account do
     @treasury.swaps.first.qty.should eq 2
   end
   
+  describe "the treasury" do
+    before :each do 
+      @treasury = @goal.accounts.create!(:is_treasury => true, :balance => 0.0)
+    end
+
+    it "can have line_items that do not have an order" do
+      bid = Factory.create(:bid)
+      @treasury.line_items << bid
+      @treasury.reload.line_items.first.should eq bid
+    end
+
+    it "does not have a user" do
+      @treasury.user.should be_nil
+    end 
+  end
+
   describe "A regular account" do
     before :each do
       @untreasury = @goal.accounts.create!(:is_treasury => false, :balance => 0.0)

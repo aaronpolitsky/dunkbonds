@@ -76,10 +76,10 @@ describe AccountsController do
       wrong_line_items = []
       3.times do
         o = @user.orders.create!
-        2.times { o.line_items << @goal.line_items.create!( valid_line_item_attributes )}
+        2.times { o.line_items << @account.line_items.create!( valid_line_item_attributes )}
         wrong_line_items << o.line_items.create!( valid_line_item_attributes ) #other goals
       end
-      line_items = @user.line_items.where(:goal_id => @goal)
+      line_items = @account.line_items
       order_line_items = line_items.group_by {|li| li.order.id }
       get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
       assigns(:line_items).should eq(line_items)

@@ -1,12 +1,11 @@
 class LineItemsController < ApplicationController
-  before_filter :authenticate_user!, :only => :create
-  before_filter :follow_goal, :only => :create
-  before_filter :load_goal
+  before_filter :authenticate_user!
+  before_filter :load_account
 
   # GET /line_items/1
   # GET /line_items/1.xml
   def show
-    @line_item = @goal.line_items.find(params[:id])
+    @line_item = @account.line_items.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -17,7 +16,7 @@ class LineItemsController < ApplicationController
   # GET /line_items/new
   # GET /line_items/new.xml
   def new
-    @line_item = @goal.line_items.new
+    @line_item = @account.line_items.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -27,14 +26,14 @@ class LineItemsController < ApplicationController
 
   # GET /line_items/1/edit
   def edit
-    @line_item = @goal.line_items.find(params[:id])
+    @line_item = @account.line_items.find(params[:id])
   end
 
   # POST /line_items
   # POST /line_items.xml
   def create
     @cart = current_cart
-    @line_item = @goal.line_items.build(params[:line_item])
+    @line_item = @account.line_items.build(params[:line_item])
 
     respond_to do |format|
       if @line_item.save
@@ -51,7 +50,7 @@ class LineItemsController < ApplicationController
   # PUT /line_items/1
   # PUT /line_items/1.xml
   def update
-    @line_item = @goal.line_items.find(params[:id])
+    @line_item = @account.line_items.find(params[:id])
 
     unless @line_item.cart.nil?
       cart = @line_item.cart 
@@ -67,7 +66,7 @@ class LineItemsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to([@goal, @line_item], :notice => 'You cannot update this item.') }
+        format.html { redirect_to([@account, @line_item], :notice => 'You cannot update this item.') }
         format.xml  { head :ok }
       end
     end
@@ -76,8 +75,7 @@ class LineItemsController < ApplicationController
   # DELETE /line_items/1
   # DELETE /line_items/1.xml
   def destroy
-    @line_item = @goal.line_items.find(params[:id])
-
+    @line_item = @account.line_items.find(params[:id])
     unless @line_item.cart.nil?
       cart = @line_item.cart 
       @line_item.destroy
@@ -90,12 +88,9 @@ class LineItemsController < ApplicationController
 
   private
 
-  def load_goal
-    @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
+  def load_account
+    @account = Account.find(params[:account_id]) 
   end
 
-  def follow_goal
-    current_user.follow_goal(load_goal)
-  end
 end
 

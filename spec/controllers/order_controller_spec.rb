@@ -26,6 +26,7 @@ describe OrdersController do
     @user = Factory.create(:user)
     sign_in @user
     @user.follow_goal(@goal)
+    @account = @user.accounts.last
   end
 
   # This should return the minimal set of attributes required to create a valid
@@ -48,7 +49,7 @@ describe OrdersController do
       @orders = @user.orders
       @order_line_items = Hash.new      
       @user.orders.each do |o| 
-        2.times { o.line_items << Factory.create(:line_item, :goal => @goal) }
+        2.times { o.line_items << Factory.create(:line_item, :account => @account) }
         @order_line_items.store o, o.line_items
       end
     end
@@ -92,7 +93,7 @@ describe OrdersController do
 
     it "displays a list of its line items if it has any" do
       order = @user.orders.create! valid_attributes
-      2.times { order.line_items << Factory.create(:line_item, :goal => Factory.create(:goal)) }
+      2.times { order.line_items << Factory.create(:line_item, :account => @account) }
       get :show, {:id => order.to_param}
       response.should have_selector ".line_items .line_item"      
     end

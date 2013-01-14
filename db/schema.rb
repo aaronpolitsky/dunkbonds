@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121228180958) do
+ActiveRecord::Schema.define(:version => 20130111164629) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -56,7 +56,7 @@ ActiveRecord::Schema.define(:version => 20121228180958) do
     t.string   "status",                                        :default => "new"
     t.string   "type_of"
     t.decimal  "max_bid_min_ask", :precision => 8, :scale => 2
-    t.integer  "goal_id"
+    t.integer  "account_id"
     t.integer  "cart_id"
     t.integer  "order_id"
     t.integer  "qty"
@@ -81,6 +81,17 @@ ActiveRecord::Schema.define(:version => 20121228180958) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "trades", :force => true do |t|
+    t.integer  "bid_id"
+    t.integer  "ask_id"
+    t.integer  "qty"
+    t.decimal  "price",      :precision => 8, :scale => 2
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "trades", ["bid_id", "ask_id"], :name => "bid_ask"
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "", :null => false

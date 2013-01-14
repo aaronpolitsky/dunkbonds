@@ -170,7 +170,7 @@ describe GoalsController do
           response.should_not have_selector '.feed .post .content', :content => not_my_post.content
         end
 
-        it "a link to support this goal" do
+        pending "a link to support this goal" do
           response.should have_selector 'a', :content => "Support This Goal"
         end
       end

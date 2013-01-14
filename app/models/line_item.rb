@@ -1,7 +1,9 @@
 class LineItem < ActiveRecord::Base
   belongs_to :cart
   belongs_to :order
-  belongs_to :goal
+  belongs_to :account
+  has_many :buys, :class_name => "Trade", :foreign_key => :bid_id
+  has_many :sells, :class_name => "Trade", :foreign_key => :ask_id
 
   TYPES = ["bond bid", "bond ask",
            "swap bid", "swap ask"]
@@ -13,10 +15,6 @@ class LineItem < ActiveRecord::Base
   
   validates :qty, :presence => true, :numericality => {:greater_than => 0, :less_than => 101}
 
-  def account
-    self.user.account.find_by_goal(self.goal)
-  end
-
   def cancel!
     if self.status == "pending"
       self.status = "cancelled"
@@ -26,13 +24,12 @@ class LineItem < ActiveRecord::Base
 
   def find_matching_asks
     #first match by ask, goal, and pending status
-    matches = LineItem.where(:type_of => "bond ask", 
-                             :goal_id => self.goal_id, 
-                             :status => "pending")
+    matches = self.account.goal.line_items.where(:type_of => "bond ask", :status => "pending").where("account_id != ?", self.account)
 
     #then pare down by price
     matches = matches.where('max_bid_min_ask <= ?', self.max_bid_min_ask).order(:created_at)
 
+    return [] if matches.empty?
     #quit if there aren't enough
     return [] if matches.sum(:qty) < self.qty
 
@@ -67,16 +64,17 @@ class LineItem < ActiveRecord::Base
       self.status = "pending"
       if type_of == "bond bid"
         matches = find_matching_asks
-        unless matches.emtpy?
-          matches.each do |m|
-            m.qty.times do #easier to call it mult times than to build qty into it
-              m.account.sell_bond!(self.account)
-            end
-            self.status = m.status = "executed"
-            m.save!
-          end
+        matches.each do |m|
+
+          self.buys.create!(:ask => m, :qty => m.qty, :price => m.max_bid_min_ask)        
+
+          # m.qty.times do #easier to call it mult times than to build qty into it
+          #   m.account.sell_bond!(self.account)
+          # end
+          # self.status = m.status = "executed"
+          # m.save!
         end
-        
+      
       elsif type_of == "bond ask"
         matches = find_matching_bids
         unless match.nil?

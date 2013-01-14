@@ -22,7 +22,11 @@ describe LineItemsController do
   render_views
 
   before :each do
+    @user = Factory.create(:user)
+    sign_in @user
     @goal = Factory.create(:goal)
+    @user.follow_goal(@goal)
+    @account = @user.accounts.last
   end
 
   # This should return the minimal set of attributes required to create a valid
@@ -32,28 +36,11 @@ describe LineItemsController do
     {:qty => 2}
   end
 
-  # This should return the minimal set of values that should be in the session
-  # in order to pass any filters (e.g. authentication) defined in
-  # LineItemsController. Be sure to keep this updated too.
-  def valid_session
-    {}
-  end
-
-#  describe "GET index" do
-#    it "assigns all line_items as @line_items" do
-#      line_item = @goal.line_items.create! valid_attributes
-#      get :index, {:goal_id => @goal.to_param, }, valid_session
-#      assigns(:line_items).should eq([line_item])
-#    end
-#  end
 
   describe "GET show" do
     before :each do
-      @user = Factory.create(:user)
-      sign_in @user
-      @user.follow_goal(@goal)
-      @line_item = @goal.line_items.create!  valid_attributes
-      get :show, {:goal_id => @goal.to_param, :id => @line_item.to_param}, valid_session
+      @line_item = @account.line_items.create!  valid_attributes
+      get :show, {:account_id => @account.to_param  , :id => @line_item.to_param}
     end
 
     it "assigns the requested line_item as @line_item" do
@@ -67,7 +54,7 @@ describe LineItemsController do
 
   describe "GET new" do
     before :each do
-      get :new, {:goal_id => @goal.to_param}
+      get :new, {:account_id => @account.to_param }
     end
     
     describe "assigns" do
@@ -89,11 +76,8 @@ describe LineItemsController do
 
   describe "GET edit" do
     before :each do
-      @user = Factory.create(:user)
-      sign_in @user
-      @user.follow_goal @goal
-      @line_item = @goal.line_items.create!  valid_attributes
-      get :edit, { :goal_id => @goal.to_param, :id => @line_item.to_param }
+      @line_item = @account.line_items.create!  valid_attributes
+      get :edit, { :account_id => @account.to_param , :id => @line_item.to_param }
     end
 
     describe "assigns" do
@@ -106,20 +90,18 @@ describe LineItemsController do
 
   describe "POST create" do
     before :each do
-      @user = Factory.create(:user)
-      sign_in @user
       @cart = subject.send(:current_cart)
     end
     
     it "creates a new LineItem" do
       expect {
-        post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
+        post :create, {:account_id => @account.to_param , :line_item => valid_attributes}#
       }.to change(LineItem, :count).by(1)
     end
     
     describe "assigns" do
       it "a newly created line_item as @line_item" do
-        post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
+        post :create, {:account_id => @account.to_param , :line_item => valid_attributes}#
         assigns(:line_item).should be_a(LineItem)
         assigns(:line_item).should be_persisted
       end
@@ -127,34 +109,26 @@ describe LineItemsController do
     
     it "adds the new line_item to the user's cart" do
       expect {
-        post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
+        post :create, {:account_id => @account.to_param , :line_item => valid_attributes}#
       }.to change(@cart.line_items, :count).by(1)
     end
     
     it "redirects to the user's cart" do
-      post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
-      response.should redirect_to(@cart) #[@goal, @goal.line_items.last])
+      post :create, {:account_id => @account.to_param , :line_item => valid_attributes}#
+      response.should redirect_to(@cart) 
     end
     
     it "should notify that the item is in the cart" do
-      post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session
+      post :create, {:account_id => @account.to_param , :line_item => valid_attributes}#
       flash[:notice].should contain "We added the item to your cart."
     end
   
-    it "creates the user's account the user isn't already following the goal" do
-      expect {
-        post :create, {:goal_id => @goal.to_param, :line_item => valid_attributes}#, valid_session          
-      }.to change(@user.followed_goals, :count).by 1
-    end
   end
 
   describe "PUT update" do
     describe "of a line_item that's in the cart" do
       before :each do
-        @user = Factory.create(:user)
-        sign_in @user
-        @user.follow_goal(@goal)
-        @line_item = @goal.line_items.create!  valid_attributes
+        @line_item = @account.line_items.create!  valid_attributes
         @cart = subject.send(:current_cart)
         @cart.line_items << @line_item
       end
@@ -165,26 +139,23 @@ describe LineItemsController do
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
         LineItem.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:goal_id => @goal.to_param, :id => @line_item.to_param, :line_item => {'these' => 'params'}}
+        put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => {'these' => 'params'}}
       end
       
       it "assigns the requested line_item as @line_item" do
-        put :update, {:goal_id => @goal.to_param, :id => @line_item.to_param, :line_item => valid_attributes}
+        put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => valid_attributes}
         assigns(:line_item).should eq(@line_item)
       end
 
       it "redirects to the user's cart" do
-        put :update, {:goal_id => @goal.to_param, :id => @line_item.to_param, :line_item => valid_attributes}
-        response.should redirect_to(@cart) #[@goal, @goal.line_items.last])
+        put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => valid_attributes}
+        response.should redirect_to(@cart)
       end
     end
     
     describe "of a line_item already in an order" do
       before :each do
-        @user = Factory.create(:user)
-        sign_in @user
-        @user.follow_goal(@goal)
-        @line_item = @goal.line_items.create!  valid_attributes 
+        @line_item = @account.line_items.create!  valid_attributes 
         @order = Factory.create(:order)
         @order.line_items << @line_item
       end
@@ -195,27 +166,24 @@ describe LineItemsController do
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
         LineItem.any_instance.should_not_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:goal_id => @goal.to_param, :id => @line_item.to_param, :line_item => {'these' => 'params'}}
+        put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => {'these' => 'params'}}
       end
       
       it "assigns the requested line_item as @line_item" do
-        put :update, {:goal_id => @goal.to_param, :id => @line_item.to_param, :line_item => valid_attributes}
+        put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => valid_attributes}
         assigns(:line_item).should eq(@line_item)
       end
       
       it "redirects back to the line_item" do
-        put :update, {:goal_id => @goal.to_param, :id => @line_item.to_param, :line_item => valid_attributes}
-        response.should redirect_to([@goal, @line_item]) #[@goal, @goal.line_items.last])
+        put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => valid_attributes}
+        response.should redirect_to([@account, @line_item])
       end      
     end
   end
 
   describe "DELETE destroy" do
     before :each do
-      @user = Factory.create(:user)
-      sign_in @user
-      @user.follow_goal(@goal)
-      @line_item = @goal.line_items.create!  valid_attributes
+      @line_item = @account.line_items.create!  valid_attributes
     end
 
     describe "of a line_item that's in the cart" do
@@ -226,17 +194,17 @@ describe LineItemsController do
 
       it "destroys the requested line_item" do
         expect {
-          delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}
+          delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         }.to change(LineItem, :count).by(-1)
       end
 
       it "removes it from its cart" do
-        delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}, {:cart_id => @cart.id}
+        delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         assert @cart.line_items.empty?
       end
 
       it "redirects to its cart" do
-        delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}, {:cart_id => @cart.id}
+        delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         response.should redirect_to(@cart)
         flash[:notice].should contain "Successfully updated cart."
       end
@@ -250,20 +218,20 @@ describe LineItemsController do
 
       it "does not destroy the requested line_item " do
         expect {
-          delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}
+          delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         }.to change(LineItem, :count).by(0)
       end
 
       it "cancels a pending line item" do
         @line_item.status = "pending"
         @line_item.save!
-        delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}
+        delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         @line_item.reload
         @line_item.status.should eq "cancelled"
       end
     
       it  "redirects to its order" do
-        delete :destroy, {:goal_id => @goal.to_param, :id => @line_item.to_param}
+        delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         response.should redirect_to(@order)
       end
     end

@@ -7,18 +7,22 @@ class Account < ActiveRecord::Base
   has_many :orders, :through => :user
   has_many :bonds, :foreign_key => :creditor_id # a creditor owns bonds and collects payments from debtors
   has_many :swaps, :class_name => "Bond", :foreign_key => :debtor_id # a debtor pays a creditor periodically, also the same as a swap
+  has_many :line_items
 
   before_destroy :empty_account?, :order => :first
 
-  def line_items
-    line_items = []
-    orders.all.each do |o|
-      o.line_items.where(:goal_id => self.goal).each do |li|
-        line_items << li
-      end
-    end
-    line_items
+
+
+  def credit!(amt)
+    self.balance += amt
+    self.save!
   end
+
+  def debit!(amt)
+    self.balance -= amt
+    self.save!
+  end
+
 
   def sell_swap(buyer)
 

@@ -4,7 +4,7 @@ class CreateLineItems < ActiveRecord::Migration
       t.string :status, :default => "new"
       t.string :type_of
       t.decimal :max_bid_min_ask, :precision => 8, :scale => 2
-      t.integer :goal_id
+      t.integer :account_id
       t.integer :cart_id
       t.integer :order_id
       t.integer :qty

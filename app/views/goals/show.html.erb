@@ -38,11 +38,12 @@
 </div>
 
 <% if user_signed_in? && current_user.following?(@goal) %>
-  <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete %> <p>
+  <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete %> | 
+  <%= link_to 'Support This Goal', new_account_line_item_path(@account) %> 
 <% else %>
   <%= link_to 'Follow This Goal', new_goal_account_path(@goal) %> | 
 <% end %>
-<%= link_to 'Support This Goal', new_goal_line_item_path(@goal) %> 
+
 
 <div class="feed">
   <% @posts.each do |post| %>

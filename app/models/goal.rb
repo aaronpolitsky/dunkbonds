@@ -2,7 +2,7 @@ class Goal < ActiveRecord::Base
   has_many :accounts
   has_many :posts
   has_many :followers, :through => :accounts, :class_name => "User"
-  has_many :line_items
+  has_many :line_items, :through => :accounts
   
   PERIODS = ['none', '1 day', '1 week', '1 month']
   BLOG_SERVICES = ['other', 'Blogger (blogspot)']

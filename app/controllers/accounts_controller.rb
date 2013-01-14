@@ -21,9 +21,8 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.xml
   def show
-    @user = current_user
     @account = @goal.accounts.find(params[:id])
-    @line_items = @user.line_items.where(:goal_id => @goal)
+    @line_items = @account.line_items
     @order_line_items = @line_items.group_by { |li| li.order.id }
 
     respond_to do |format|
