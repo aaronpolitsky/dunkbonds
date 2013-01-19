@@ -64,28 +64,165 @@ describe Account do
     a.balance.should eq 0.0
   end
 
-  it "the first bond between accounts should create a new bond row" do
-    @treasury.sell_bond!(@buyer)
-    @buyer.bonds.count.should eq 1
-    @treasury.swaps.count.should eq 1
-    @buyer.bonds.first.qty.should eq 1
-    @treasury.swaps.first.qty.should eq 1
-  end
-  
-  it "the second bond between accounts should increment bond quantity rather than create a new bond row" do
-    @treasury.sell_bond!(@buyer)
-    @treasury.sell_bond!(@buyer)
-    @buyer.bonds.count.should eq 1
-    @treasury.swaps.count.should eq 1
-    @buyer.bonds.first.qty.should eq 2
-    @treasury.swaps.first.qty.should eq 2
-  end
-  
-  describe "the treasury" do
-    before :each do 
-      @treasury = @goal.accounts.create!(:is_treasury => true, :balance => 0.0)
+  describe "transfer_bond_to!" do
+    describe "called by treasury" do
+      it "creates a bond for buyer and a swap for treasury" do
+        @treasury.swaps.count.should eq 0
+        @buyer.bonds.count.should eq 0
+        @treasury.transfer_bond_to!(@buyer)
+        @buyer.bonds.count.should eq 1
+        @treasury.swaps.count.should eq 1
+      end
+
+      it "increases treasury swap qty" do
+        @treasury.swaps.sum(:qty).should eq 0
+        @buyer.bonds.sum(:qty).should eq 0
+        @treasury.transfer_bond_to!(@buyer)
+        @treasury.swaps.sum(:qty).should eq 1
+        @buyer.bonds.sum(:qty).should eq 1
+      end
+
+      it "increases treasury swap count and buyer bond count only if unique" do
+        @treasury.transfer_bond_to!(@buyer)
+        @buyer.bonds.count.should eq 1
+        @treasury.swaps.count.should eq 1
+        @buyer.bonds.first.qty.should eq 1
+        @treasury.swaps.first.qty.should eq 1
+
+        @treasury.transfer_bond_to!(@buyer)
+        @buyer.bonds.count.should eq 1
+        @treasury.swaps.count.should eq 1
+        @buyer.bonds.last.qty.should eq 2
+        @treasury.swaps.last.qty.should eq 2
+      end
     end
 
+    describe "called by reg account" do
+      before :each do
+        @untreasury = @goal.accounts.create!(:is_treasury => false, :balance => 0.0)
+        @debtor = @goal.accounts.create!
+      end
+
+      describe "with no bonds to sell" do
+        it "doesn't create a new bond" do
+          expect {
+            @untreasury.transfer_bond_to!(@buyer)  
+          }.to_not change(@buyer.bonds, :count)
+          @untreasury.swaps.count.should eq 0
+          @buyer.bonds.sum(:qty).should eq 0
+          @untreasury.swaps.sum(:qty).should eq 0
+        end
+      end
+
+      describe "with a bond to sell" do
+        describe "having qty > 1" do
+          before :each do
+            @untreasury.bonds.create!(:debtor => @debtor, :qty => 10)
+          end
+
+          it "doesn't create swaps for itself" do
+            @untreasury.transfer_bond_to!(@buyer)  
+            @untreasury.swaps.empty?.should be true
+          end
+
+          it "doesn't change debtor swap qty" do
+            @debtor.swaps.sum(:qty).should eq 10
+            @untreasury.transfer_bond_to!(@buyer)
+            @debtor.swaps.sum(:qty).should eq 10
+          end
+
+          it "does change debtor swap count" do
+            @debtor.swaps.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @debtor.swaps.count.should eq 2
+          end
+
+          it "decrements its sellable bond by 1" do
+            @untreasury.transfer_bond_to!(@buyer)
+            @untreasury.bonds.first.qty.should eq 9
+          end
+
+          it "increases its buyers bond qty by 1" do
+            @buyer.bonds.sum(:qty).should eq 0
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.sum(:qty).should eq 1
+          end
+
+          it "increases bond count of buyer by 1 if unique" do 
+            @buyer.bonds.count.should eq 0
+            @treasury.transfer_bond_to!(@buyer) #buyer has a bond
+            @buyer.bonds.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.count.should eq 2
+          end
+
+          it "doesn't increase bond count of buyer if not unique" do
+            @buyer.bonds.count.should eq 0
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.count.should eq 1
+          end          
+        end
+
+        describe "having qty 1" do
+          before :each do
+            @untreasury.bonds.create!(:debtor => @debtor, :qty => 1)
+          end
+
+          it "doesn't create swaps for itself" do
+            @untreasury.transfer_bond_to!(@buyer)  
+            @untreasury.swaps.empty?.should be true
+          end
+
+          it "doesn't change debtor swap qty" do
+            @debtor.swaps.sum(:qty).should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @debtor.swaps.sum(:qty).should eq 1
+          end
+
+          it "doesn't change debtor swap count" do
+            @debtor.swaps.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @debtor.swaps.count.should eq 1
+          end
+
+          it "transfers its sellable bond to buyer" do
+            @untreasury.bonds.first.qty.should eq 1
+            @untreasury.bonds.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @untreasury.bonds.count.should eq 0
+            @buyer.bonds.count.should eq 1
+          end
+
+          it "increases its buyers bond qty by 1" do
+            @buyer.bonds.sum(:qty).should eq 0
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.sum(:qty).should eq 1
+          end
+
+          it "increases bond count of buyer by 1 if unique" do 
+            @buyer.bonds.count.should eq 0
+            @treasury.transfer_bond_to!(@buyer) #buyer has a bond
+            @buyer.bonds.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.count.should eq 2
+          end
+
+          it "doesn't increase bond count of buyer if not unique" do
+            @buyer.bonds.count.should eq 0
+            @buyer.bonds.create(:debtor => @debtor, :qty => 1)
+            @buyer.bonds.count.should eq 1
+            @untreasury.transfer_bond_to!(@buyer)
+            @buyer.bonds.count.should eq 1
+          end        
+
+        end
+      end
+    end
+  end
+
+  describe "the treasury" do
     it "can have line_items that do not have an order" do
       bid = Factory.create(:bid)
       @treasury.line_items << bid
@@ -99,12 +236,12 @@ describe Account do
 
   describe "A regular account" do
     before :each do
-      @untreasury = @goal.accounts.create!(:is_treasury => false, :balance => 0.0)
+        @untreasury = @goal.accounts.create!(:is_treasury => false, :balance => 0.0)
     end
 
     describe "can't be destroyed if it has" do
       it "at least one bond" do
-        @untreasury.bonds << Bond.create!
+        @untreasury.bonds.create!
         expect {
           @untreasury.destroy
         }.to change(Account, :count).by(0)
@@ -114,7 +251,7 @@ describe Account do
       end
 
       it "at least one swap" do
-        @untreasury.swaps << Bond.create!
+        @untreasury.swaps.create!
         expect {
           @untreasury.destroy
         }.to change(Account, :count).by(0)
@@ -123,75 +260,14 @@ describe Account do
         }.to change(@untreasury.swaps, :count).by(0)
       end
 
-      pending "at least one pending line_item" do
+      it "at least one pending line_item" do
+        @untreasury.line_items.create!(:qty => 1, :status => "pending")
         expect {
           @untreasury.destroy
         }.to change(Account, :count).by(0)
         expect {
           @untreasury.destroy
         }.to change(Order, :count).by(0)        
-      end
-    end
-
-    describe "having no bonds cannot" do
-
-      it "create a bond from thin air" do
-        expect {
-          @untreasury.sell_bond!(@buyer)
-        }.to_not change {Bond.count}
-        @untreasury.swaps.count.should eq 0
-      end
-      
-      it "sell a bond" do
-        expect {
-          @untreasury.sell_bond!(@buyer)
-        }.to_not change {@buyer.bonds.sum(:qty)}
-      end  
-
-    end
-
-    describe "having one bond" do
-      before :each do
-        @treasury.sell_bond!(@untreasury)
-      end
-      
-      it "can sell a bond" do
-        expect {
-          @untreasury.sell_bond!(@buyer)
-        }.to change {@buyer.bonds.sum(:qty)}.by(1)
-        assert_equal 0, @untreasury.bonds.where(:goal_id => @goal).sum(:qty)
-      end
-
-    end
-    
-    describe "having more than one bond" do
-      before :each do
-        @treasury.sell_bond!(@untreasury)
-        @treasury.sell_bond!(@untreasury)
-      end
-      
-      it "when selling a bond decrements its bond qty" do
-        expect {
-          @untreasury.sell_bond!(@buyer)
-        }.to change {@untreasury.bonds.sum(:qty)}.by(-1)
-        assert_equal 1, @untreasury.bonds.where(:goal_id => @goal).sum(:qty)    
-      end
-      
-      it "when selling a bond and the buyer has > 0 increments buyer's qty" do
-        @treasury.sell_bond!(@buyer)
-        assert_equal 1, @buyer.bonds.where(:goal_id => @goal).sum(:qty)    
-        expect {
-          @untreasury.sell_bond!(@buyer)
-        }.to change {@buyer.bonds.sum(:qty)}.by 1
-        assert_equal 2, @buyer.bonds.where(:goal_id => @goal).sum(:qty)    
-      end
-      
-      it "selling a bond when you have > 1 and the buyer has none creates the buyer's bond" do
-        assert_equal 0, @buyer.bonds.where(:goal_id => @goal).sum(:qty)    
-        expect {
-          @untreasury.sell_bond!(@buyer)
-        }.to change {Bond.count}.by 1
-        assert_equal 1, @buyer.bonds.where(:goal_id => @goal).sum(:qty)    
       end
     end
   end

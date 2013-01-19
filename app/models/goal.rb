@@ -19,17 +19,15 @@ class Goal < ActiveRecord::Base
   
   before_update :purge_old_posts_and_update_feed_on_blog_changes
 
-  def update_from_feed
+  def update_from_feed()
     unless self.blog_url.nil? || self.blog_url.empty?
       feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)
-      add_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
-#    rescue ActiveRecord::NoMethodError
-#      flash[:notice] = "Feed doesn't exist.  Double check that blog url."
+      add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
     end
   end
 
-  def add_entries(entries)
-    entries.each do |entry|
+  def add_or_update_entries(entries)
+    (entries.sort_by { |e| e.published }).each do |entry|
       unless self.posts.exists? :guid => entry.id
         self.posts.create!(
                            :title        => entry.title,
@@ -37,15 +35,16 @@ class Goal < ActiveRecord::Base
                            :url          => entry.url,
                            :published_at => entry.published,
                            :guid         => entry.id
-                           )
+        )
       else
-        found_post = self.posts.find_by_guid(entry.id)
-        found_post.update_attributes!(
-                                      :title        => entry.title,
-                                      :content      => entry.content,
-                                      :url          => entry.url,
-                                      :published_at => entry.published
-                                      )
+        post = self.posts.find_by_guid(entry.id)
+        post.update_attributes!(
+                               :title        => entry.title,
+                               :content      => entry.content,
+                               :url          => entry.url,
+                               :published_at => entry.published,
+                               :guid         => entry.id
+                               )
       end
     end
   end
@@ -99,8 +98,9 @@ class Goal < ActiveRecord::Base
   
   def blog_url_is_valid
     unless self.blog_url.nil? || self.blog_url.empty? #blog CAN be empty
-      Feedzirra::Feed.fetch_and_parse(self.blog_url, :on_failure => lambda { errors.add(:blog_url, "Double check that blog url.") } )
+      Feedzirra::Feed.fetch_and_parse(self.blog_url, :on_failure => lambda { self.errors.add(:blog_url, "Double check that blog url.") } )
     end
+    errors.blank?
   end
 
 end

@@ -11,8 +11,6 @@ class Account < ActiveRecord::Base
 
   before_destroy :empty_account?, :order => :first
 
-
-
   def credit!(amt)
     self.balance += amt
     self.save!
@@ -23,67 +21,45 @@ class Account < ActiveRecord::Base
     self.save!
   end
 
+  
+  def transfer_swap_to!(buyer)
 
-  def sell_swap(buyer)
 
   end
 
-  def sell_bond!(buyer)
-#    Account.transaction do
-      if self.is_treasury?
-        # increment qty if bond relationship already exists
-        if Bond.exists?(:creditor_id => buyer.id,
-                        :debtor_id => self.id, 
-                        :goal_id => self.goal.id)
-          bond = buyer.bonds.where(:debtor_id => self.id, :goal_id => self.goal.id).first
-          bond.qty += 1
+  def transfer_bond_to!(buyer)
+    if self.is_treasury?
+      #find or create unique bond and increment
+      buyer_bond = Bond.find_or_create_by_creditor_id_and_debtor_id(buyer.id, self.id)
+      buyer_bond.qty += 1 
+      buyer_bond.save!
+    else #regular accounts, secondary market
+    #these sell their bond end of the bond-swap relationship, if they have any to sell
+      if (self.bonds.sum(:qty) > 0)
+        bond = self.bonds.first #any will do
+        if (bond.qty > 1)
+          bond.qty -= 1
           bond.save!
-        else
-          #create a new bond-swap relationship
-          bond = buyer.bonds.create!(:debtor_id => self.id, 
-                                     :goal_id => self.goal.id, 
-                                     :qty => 1)
-          bond.save!
-        end
-#        self.balance += 10.0
-#        buyer.balance -= 10.0
-#        self.save!
-#        buyer.save!
-      else #regular accounts, secondary market
-        #these sell their end of the bond-swap relationship, if they have any to sell
-        if (self.bonds.sum(:qty) > 0)
-          bond = self.bonds.where(:goal_id => self.goal.id).first
-          if (bond.qty > 1)
-            bond.qty -= 1
-            bond.save!
-            if (buyer.bonds.where(:goal_id => self.goal.id).sum(:qty) == 0)
-              bond = buyer.bonds.create!(:debtor_id => self.id, 
-                                         :goal_id => self.goal.id, 
-                                         :qty => 1)
-              bond.save!
-            else
-              buyer_bond = buyer.bonds.where(:goal_id => self.goal.id).first
-              buyer_bond.qty += 1              
-              buyer_bond.save!
-            end
-          else #if only one left, transfer it
-            buyer.bonds << bond
-          end
-
-        else
-          #this is the error case, just to make sure my test tests the right thing. 
-#          bond = buyer.bonds.create!(:debtor_id => buyer.goal(:treasury), 
-#                                     :goal_id => buyer.goal.id, 
-#                                     :qty => 1)
+          buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
+          buyer_bond.qty += 1            
+          buyer_bond.save!
+        else #if only one left, transfer it
+          buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
+          buyer_bond.qty += 1            
+          buyer_bond.save!
+          bond.destroy
         end
       end
-#    end
+    end
   end
 
   private
   
   def empty_account?
-    self.bonds.empty? && self.swaps.empty? && self.orders.empty?
+    errors.add(:base, "This account cannot be closed because it has bonds.") unless self.bonds.empty?
+    errors.add(:base, "This account cannot be closed because it has swaps.") unless self.swaps.empty?
+    errors.add(:base, "This account cannot be closed because it has pending orders.") unless self.line_items.where(:status => "pending").empty?
+    errors.blank?
   end
 
 

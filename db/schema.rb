@@ -27,13 +27,12 @@ ActiveRecord::Schema.define(:version => 20130111164629) do
   create_table "bonds", :force => true do |t|
     t.integer  "creditor_id"
     t.integer  "debtor_id"
-    t.integer  "qty"
-    t.integer  "goal_id"
+    t.integer  "qty",         :default => 0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "bonds", ["creditor_id", "debtor_id", "goal_id"], :name => "creditor_debtor_goal", :unique => true
+  add_index "bonds", ["creditor_id", "debtor_id"], :name => "creditor_debtor", :unique => true
 
   create_table "carts", :force => true do |t|
     t.datetime "created_at"
@@ -81,6 +80,8 @@ ActiveRecord::Schema.define(:version => 20130111164629) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "posts", ["guid"], :name => "index_posts_on_guid"
 
   create_table "trades", :force => true do |t|
     t.integer  "bid_id"

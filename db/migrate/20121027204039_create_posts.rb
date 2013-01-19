@@ -11,7 +11,10 @@ class CreatePosts < ActiveRecord::Migration
 
       t.timestamps
     end
+
+    add_index :posts, [:guid]
   end
+
 
   def self.down
     drop_table :posts

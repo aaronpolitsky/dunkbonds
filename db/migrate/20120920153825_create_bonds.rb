@@ -3,9 +3,8 @@ class CreateBonds < ActiveRecord::Migration
     create_table :bonds do |t|
       t.integer :creditor_id
       t.integer :debtor_id
-      t.integer :qty
-      t.integer :goal_id
-
+      t.integer :qty, :default => 0
+      
       t.timestamps
     end
   end
