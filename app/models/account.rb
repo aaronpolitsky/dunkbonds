@@ -23,8 +23,35 @@ class Account < ActiveRecord::Base
 
   
   def transfer_swap_to!(buyer)
-
-
+    if self.is_treasury?
+      buyer_swap = Bond.find_or_create_by_creditor_id_and_debtor_id(buyer.id, buyer.id)
+      buyer_swap.qty += 1
+      buyer_swap.save!
+    else
+      if self.swaps.count > 0
+        # if self.swaps.exists?(:creditor_id => buyer.id)
+        #   debugger
+        #   bondswap = self.swaps.find_by_creditor_id(buyer.id)
+        #   if bondswap.qty == 1
+        #     bondswap.destroy
+        #   else 
+        #   #   bondswap.qty -= 1
+        #   #   bondswap.save!
+        #   end
+        # else  
+        seller_swap = self.swaps.first
+        buyer_swap = buyer.swaps.find_or_create_by_creditor_id(seller_swap.creditor_id)
+        buyer_swap.qty += 1
+        buyer_swap.save!
+        if (seller_swap.qty > 1)
+          seller_swap.qty -= 1
+          seller_swap.save!
+        else #if qty == 1
+          seller_swap.destroy
+        end
+        # end
+      end
+    end
   end
 
   def transfer_bond_to!(buyer)
@@ -38,9 +65,9 @@ class Account < ActiveRecord::Base
       if (self.bonds.sum(:qty) > 0)
         bond = self.bonds.first #any will do
         if (bond.qty > 1)
+          buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
           bond.qty -= 1
           bond.save!
-          buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
           buyer_bond.qty += 1            
           buyer_bond.save!
         else #if only one left, transfer it
