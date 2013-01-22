@@ -22,8 +22,8 @@ class AccountsController < ApplicationController
   # GET /accounts/1.xml
   def show
     @account = @goal.accounts.find(params[:id])
-    @line_items = @account.line_items
-    @order_line_items = @line_items.group_by { |li| li.order.id }
+    @line_items = @account.line_items.where(:order_id)
+    @order_line_items = @line_items.where(:order_id).group_by { |li| li.order_id } 
 
     respond_to do |format|
       format.html # show.html.erb

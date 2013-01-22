@@ -21,6 +21,17 @@ class Account < ActiveRecord::Base
     self.save!
   end
 
+  def transfer_funds_to!(amount, recipient)
+    self.debit! amount
+    recipient.credit! amount
+  end
+
+  def is_bondholder?
+    self.bonds.count > 0 || 
+    self.swaps.count > 0 || 
+    self.line_items.where(:type_of => "bond ask", :status => "pending").count > 0 || 
+    self.line_items.where(:type_of => "swap bid", :status => "pending").count > 0 
+  end
   
   def transfer_swap_to!(buyer)
     if self.is_treasury?
@@ -64,18 +75,13 @@ class Account < ActiveRecord::Base
     #these sell their bond end of the bond-swap relationship, if they have any to sell
       if (self.bonds.sum(:qty) > 0)
         bond = self.bonds.first #any will do
-        if (bond.qty > 1)
-          buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
-          bond.qty -= 1
-          bond.save!
-          buyer_bond.qty += 1            
-          buyer_bond.save!
-        else #if only one left, transfer it
-          buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
-          buyer_bond.qty += 1            
-          buyer_bond.save!
-          bond.destroy
-        end
+        buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
+        buyer_bond.qty += 1            
+        buyer_bond.save!
+
+        bond.qty -= 1
+        bond.save!
+        bond.destroy if bond.qty.zero?
       end
     end
   end

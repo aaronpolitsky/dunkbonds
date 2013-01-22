@@ -72,26 +72,33 @@ describe AccountsController do
       end
     end
     
-    it "lists [its user's] line items on this goal, grouped by order" do
-      wrong_line_items = []
-      3.times do
-        o = @user.orders.create!
-        2.times { o.line_items << @account.line_items.create!( valid_line_item_attributes )}
-        wrong_line_items << o.line_items.create!( valid_line_item_attributes ) #other goals
+    describe "shows its history" do
+      describe "which contains its" do 
+        it "non-cart line items" do
+          @cart = subject.send(:current_cart)
+          3.times do
+            o = @user.orders.create!
+            2.times { o.line_items << @account.line_items.create!(valid_line_item_attributes) }
+            1.times { @cart.line_items << @account.line_items.create!(valid_line_item_attributes) } 
+          end
+          line_items = @account.line_items
+          order_line_items = line_items.where(:order_id)
+          cart_line_items  = line_items.where(:cart_id)
+          get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
+          assigns(:line_items).should_not include(cart_line_items)
+          response.should have_selector ".line_items .line_item"
+          assigns(:order_line_items).should eq(order_line_items)
+#          assigns(:order_line_items)[@user.orders.first].should eq(order_line_items[@user.orders.first])
+
+          response.should have_selector ".order .line_items .line_item"
+        end
+
+        it "trades" do 
+        end
+        it "payments" do 
+        end
       end
-      line_items = @account.line_items
-      order_line_items = line_items.group_by {|li| li.order.id }
-      get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
-      assigns(:line_items).should eq(line_items)
-      assigns(:line_items).should_not include(wrong_line_items)
-      response.should have_selector ".line_items .line_item"
-      assigns(:order_line_items).should eq(order_line_items)
-      assigns(:order_line_items)[@user.orders.first].should eq(order_line_items[@user.orders.first])
-
-      response.should have_selector ".order .line_items .line_item"
     end
-
-
 
     it "should redirect to sign_in if not signed in" do
       sign_out @user

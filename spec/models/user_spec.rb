@@ -16,12 +16,13 @@ describe User do
       end
     end
 
-    describe "line_items through orders and" do
+    describe "line_items through accounts and" do
       it "responds to line_items" do
         u = Factory.create(:user)
-        o = Factory.create(:order)
-        o.line_items << li = Factory.create(:line_item)
-        u.orders << o
+        g = Factory.create(:goal)
+        u.follow_goal(g)
+        a = u.accounts.last
+        li = Factory.create(:line_item, :account => a)
         u.should respond_to(:line_items)
         u.line_items.should eq [li]
       end

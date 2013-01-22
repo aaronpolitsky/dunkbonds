@@ -66,7 +66,7 @@ describe Account do
 
   describe "the treasury" do
     it "can have line_items that do not have an order" do
-      bid = Factory.create(:bid)
+      bid = Factory.create(:bond_bid)
       @treasury.line_items << bid
       @treasury.reload.line_items.first.should eq bid
     end

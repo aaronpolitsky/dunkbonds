@@ -15,7 +15,7 @@ class Goal < ActiveRecord::Base
   validate :dates_and_period_are_appropriate
   validate :blog_url_is_valid
 
-  after_create :create_treasury
+  after_create :create_treasury_and_escrow
   
   before_update :purge_old_posts_and_update_feed_on_blog_changes
 
@@ -49,6 +49,18 @@ class Goal < ActiveRecord::Base
     end
   end
 
+  def bond_face_value 
+    10 #for now
+  end
+
+  def treasury
+    accounts.find_by_is_treasury(true)
+  end
+
+  def escrow
+    accounts.find_by_is_escrow(true)
+  end
+
   private
   
   def purge_old_posts_and_update_feed_on_blog_changes
@@ -60,10 +72,11 @@ class Goal < ActiveRecord::Base
     end
   end
   
-
-  def create_treasury
-    @treasury = self.accounts.create!(:is_treasury => true, 
-                                      :balance     => 0.0)
+  def create_treasury_and_escrow
+    @treasury = self.accounts.create!
+    @treasury.toggle!(:is_treasury)
+    @escrow   = self.accounts.create!
+    @escrow.toggle!(:is_escrow)
   end
   
   def dates_and_period_are_appropriate
@@ -102,6 +115,8 @@ class Goal < ActiveRecord::Base
     end
     errors.blank?
   end
+
+
 
 end
 

@@ -38,9 +38,16 @@ class LineItemsController < ApplicationController
     respond_to do |format|
       if @line_item.save
         @cart.line_items << @line_item
-        format.html { redirect_to(@cart, :notice => 'We added the item to your cart.') }
-        format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
-      else
+        if @line_item.type_of == "swap bid"
+          @bond_ask = @account.line_items.create!(:qty => @line_item.qty, 
+                                                  :type_of => "bond ask")
+          @cart.line_items << @bond_ask
+          format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "Swap created.  Please fill in its corresponding Bond Sale order." }
+        else
+          format.html { redirect_to(@cart, :notice => 'We added the item to your cart.') }
+          format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
+        end
+      else  
         format.html { render :action => "new" }
         format.xml  { render :xml => @line_item.errors, :status => :unprocessable_entity }
       end
