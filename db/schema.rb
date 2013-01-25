@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(:version => 20130111164629) do
     t.integer  "cart_id"
     t.integer  "order_id"
     t.integer  "qty"
+    t.integer  "parent_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

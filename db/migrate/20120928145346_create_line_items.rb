@@ -8,7 +8,8 @@ class CreateLineItems < ActiveRecord::Migration
       t.integer :cart_id
       t.integer :order_id
       t.integer :qty
-
+      t.integer :parent_id
+      
       t.timestamps
     end
   end

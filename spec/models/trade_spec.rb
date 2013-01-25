@@ -36,6 +36,11 @@ describe Trade do
     	Factory.build(:trade, :bid_id => @bond_bid).should_not be_valid
     	Factory.build(:trade, :ask_id => @bond_ask).should_not be_valid
     end	
+
+    it "have its bid be either a bond bid or a swap bid" do
+      Factory.build(:trade, :bid => @bond_ask).should_not be_valid
+      Factory.build(:trade, :bid => @swap_ask).should_not be_valid
+    end
 	end
 
 	describe "creation" do
@@ -65,26 +70,20 @@ describe Trade do
 
     describe "of a swap trade" do
       before :each do
-        3.times { @treasury.transfer_swap_to!(@escrow) }
-        @escrow.swaps.sum(:qty).should eq 3
-        @buyer.swaps.count.should eq 0
-        # @buyer.transfer_funds_to(@swap_bid.qty * @swap_bid.price, @escrow)
-        # @buyer.balance.should be @swap_bid.qty * -@swap_bid.price
         @swap_trade = @swap_bid.buys.new(:ask => @swap_ask,
                                          :qty => @swap_bid.qty,
                                          :price => @swap_ask.max_bid_min_ask)
       end
       
-      it "transfers swaps from escrow to buyer" do
+      it "does not transfer swaps from escrow to buyer" do
         @swap_trade.save!
-        @buyer.reload.swaps.sum(:qty).should eq @swap_bid.qty
-        @escrow.reload.swaps.sum(:qty).should eq (3-@swap_bid.qty)
+        @buyer.reload.swaps.sum(:qty).should eq 0
+        @escrow.reload.swaps.sum(:qty).should eq 0
       end
 
-      it "transfers funds from escrow to seller" do
+      it "transfers funds from buyer to treasury" do
         @swap_trade.save!
-        @swap_trade.ask.account.reload.balance.should eq (@swap_trade.price * @swap_trade.qty)
-        @escrow.reload.balance.should eq (-@swap_trade.price * @swap_trade.qty)
+        @swap_trade.ask.account.reload.balance.should eq (@swap_trade.total)
       end
       
       pending "sets the qty and price automatically" do

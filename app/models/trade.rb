@@ -6,11 +6,12 @@ class Trade < ActiveRecord::Base
   validates :price, :presence => true, :numericality => {:greater_than => 0}
   validates :bid, :presence => true
   validates :ask, :presence => true
+  validate :type_of_bid
 
   after_create :execute
 
   def total
-    price * qty
+    self.price * self.qty
   end
 
   private
@@ -23,13 +24,15 @@ class Trade < ActiveRecord::Base
       end
       self.bid.account.goal.escrow.transfer_funds_to!(self.price * self.qty, 
                                                       self.ask.account)
-    else #swap bid
-      self.qty.times do
-        self.bid.account.goal.escrow.transfer_swap_to!(self.bid.account)
-      end
-      self.bid.account.goal.escrow.transfer_funds_to!(self.price * self.qty, 
-                                                      self.ask.account)
+    elsif self.bid.type_of == "swap bid"
+      self.bid.account.transfer_funds_to!(self.total, self.ask.account)
     end
+  end
+
+  def type_of_bid
+    return false if self.bid.nil?
+    return false if self.bid.type_of.nil? 
+    self.bid.type_of == "bond bid" || self.bid.type_of == "swap bid"
   end
 
 end

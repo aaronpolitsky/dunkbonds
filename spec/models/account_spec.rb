@@ -6,8 +6,7 @@ describe Account do
     @goal = Factory.create(:goal)
     @user.follow_goal(@goal)
     @buyer  = @user.accounts.last
-    @treasury = Factory.create(:account, :is_treasury => true)
-    @goal.accounts << @treasury
+    @treasury = @goal.treasury
   end
   
   describe "has many" do

@@ -21,6 +21,16 @@ class Account < ActiveRecord::Base
     self.save!
   end
 
+  def bond_qty
+    return 0 if self.bonds.count.zero?
+    self.bonds.sum(:qty)
+  end
+
+  def swap_qty
+    return 0 if self.swaps.count.zero?
+    self.swaps.sum(:qty)
+  end
+
   def transfer_funds_to!(amount, recipient)
     self.debit! amount
     recipient.credit! amount
@@ -38,30 +48,30 @@ class Account < ActiveRecord::Base
       buyer_swap = Bond.find_or_create_by_creditor_id_and_debtor_id(buyer.id, buyer.id)
       buyer_swap.qty += 1
       buyer_swap.save!
-    else
-      if self.swaps.count > 0
-        # if self.swaps.exists?(:creditor_id => buyer.id)
-        #   debugger
-        #   bondswap = self.swaps.find_by_creditor_id(buyer.id)
-        #   if bondswap.qty == 1
-        #     bondswap.destroy
-        #   else 
-        #   #   bondswap.qty -= 1
-        #   #   bondswap.save!
-        #   end
-        # else  
-        seller_swap = self.swaps.first
-        buyer_swap = buyer.swaps.find_or_create_by_creditor_id(seller_swap.creditor_id)
-        buyer_swap.qty += 1
-        buyer_swap.save!
-        if (seller_swap.qty > 1)
-          seller_swap.qty -= 1
-          seller_swap.save!
-        else #if qty == 1
-          seller_swap.destroy
-        end
-        # end
-      end
+    else  #do we need an else?  treasury may be the only one who can do this. 
+      # if self.swaps.count > 0
+      #   # if self.swaps.exists?(:creditor_id => buyer.id)
+      #   #   debugger
+      #   #   bondswap = self.swaps.find_by_creditor_id(buyer.id)
+      #   #   if bondswap.qty == 1
+      #   #     bondswap.destroy
+      #   #   else 
+      #   #   #   bondswap.qty -= 1
+      #   #   #   bondswap.save!
+      #   #   end
+      #   # else  
+      #   seller_swap = self.swaps.first
+      #   buyer_swap = buyer.swaps.find_or_create_by_creditor_id(seller_swap.creditor_id)
+      #   buyer_swap.qty += 1
+      #   buyer_swap.save!
+      #   if (seller_swap.qty > 1)
+      #     seller_swap.qty -= 1
+      #     seller_swap.save!
+      #   else #if qty == 1
+      #     seller_swap.destroy
+      #   end
+      #   # end
+      # end
     end
   end
 

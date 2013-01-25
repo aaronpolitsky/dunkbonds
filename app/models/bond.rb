@@ -16,6 +16,12 @@ class Bond < ActiveRecord::Base
     end
   end
 
+  def decrement!
+    self.qty -= 1 if self.qty > 0
+    self.save!
+    self.destroy if self.qty.zero?
+  end
+
   private
 
   def goals_agree?
@@ -31,4 +37,5 @@ class Bond < ActiveRecord::Base
       errors.add(:bond, "Either Creditor or Debtor must exist.")
     end 
   end
+
 end

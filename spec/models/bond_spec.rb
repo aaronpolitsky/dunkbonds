@@ -59,6 +59,16 @@ describe Bond do
     end
   end 
 
+  describe "decrement!" do
+    it "decrements qty by 1 if > 1, destroys if 1" do
+      @c.bonds.create!(:debtor => @d, :qty => 3)
+      @c.bonds.first.decrement! 
+      @c.bond_qty.should eq 2
+      2.times { @c.bonds.first.decrement! }
+      @c.bond_qty.should eq 0
+    end
+  end
+
   describe "pays coupons" do
     it "credits creditor and debits debtor" do
       c = Factory.create(:account)
