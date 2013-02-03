@@ -32,8 +32,8 @@ class OrdersController < ApplicationController
   # GET /orders/new
   # GET /orders/new.xml
   def new
-    @order = Order.new
-    @cart = current_cart
+    @order = current_user.orders.new
+    @cart = @order.user.cart
 
     respond_to do |format|
       if @cart.line_items.empty?
@@ -57,10 +57,8 @@ class OrdersController < ApplicationController
     
     respond_to do |format|
       if @order.save
-        @order.get_cart_items(current_cart)
+        @order.get_cart_items
         @order.execute_line_items
-        Cart.destroy(session[:cart_id])
-        session[:cart_id] = nil
         format.html { redirect_to(@order, :notice => 'Order was successfully created.') }
         format.xml  { render :xml => @order, :status => :created, :location => @order }
       else

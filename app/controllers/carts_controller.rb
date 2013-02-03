@@ -3,7 +3,7 @@ class CartsController < ApplicationController
   # GET /carts/1
   # GET /carts/1.xml
   def show
-    @cart = current_cart
+    @cart = current_user.cart
     @line_items = @cart.line_items
 
     respond_to do |format|

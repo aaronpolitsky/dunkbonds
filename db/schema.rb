@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(:version => 20130111164629) do
   add_index "bonds", ["creditor_id", "debtor_id"], :name => "creditor_debtor", :unique => true
 
   create_table "carts", :force => true do |t|
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

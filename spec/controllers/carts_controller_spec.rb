@@ -38,22 +38,23 @@ describe CartsController do
   describe "GET show" do
     before :each do
       @user = Factory.create(:user)
+      sign_in @user
       @goal = Factory.create(:goal)
       @user.follow_goal @goal
       @account = @user.accounts.last
       @goal2 = Factory.create(:goal)
       @user.follow_goal @goal2
       @account2 = @user.accounts.last
-      @cart = subject.send(:current_cart)
+      @cart = @user.cart
     end
 
     it "assigns the requested cart as @cart" do
-      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      get :show, {:id => @cart.to_param}
       assigns(:cart).should eq(@cart)
     end
 
     it "assigns the requested cart's line items as @line_items" do
-      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      get :show, {:id => @cart.to_param}
       @line_items = @cart.line_items
       assigns(:line_items).should eq(@line_items)
     end
@@ -66,14 +67,14 @@ describe CartsController do
                                   :qty => 1,
                                   :max_bid_min_ask => 3,
                                   :cart_id => @cart.id)
-      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      get :show, {:id => @cart.to_param}
       response.should_not have_selector "#flash_error", :content =>  "You don't have enough sellable bonds to cover these sell requests.  \n Edit sell requests so that you don't try to sell more bonds than you own before creating your order."
    
       @account.line_items.create!(:type_of => "bond ask", 
                                   :qty => 2,
                                   :max_bid_min_ask => 3,
                                   :cart_id => @cart.id)
-      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      get :show, {:id => @cart.to_param}
       response.should have_selector "#flash_error", :content =>  "You don't have enough sellable bonds to cover these sell requests.  \n Edit sell requests so that you don't try to sell more bonds than you own before creating your order."
    
       @account2.line_items.create!(:type_of => "bond ask", 
@@ -84,7 +85,7 @@ describe CartsController do
                                    :qty => 3,
                                    :max_bid_min_ask => 3,
                                    :cart_id => @cart.id)  
-      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      get :show, {:id => @cart.to_param}
       response.should have_selector "#flash_error", :content =>  "You don't have enough sellable bonds to cover these sell requests.  \n Edit sell requests so that you don't try to sell more bonds than you own before creating your order."
     end
   end

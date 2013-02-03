@@ -11,6 +11,9 @@ class User < ActiveRecord::Base
   has_many :line_items, :through => :accounts
   has_many :followed_goals, :through => :accounts, :source => :goal #class_name => "Goal"
   has_many :orders
+  has_one :cart
+
+  after_create {self.create_cart!}
 
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable

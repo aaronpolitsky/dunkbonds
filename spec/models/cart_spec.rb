@@ -12,7 +12,7 @@ describe Cart do
     @buyer2  = @user.accounts.last    
     @treasury1 = @goal1.treasury
     @treasury2 = @goal2.treasury
-		@cart = Cart.create!
+		@cart = @user.cart
 	end
 
   describe "has many" do
@@ -28,6 +28,19 @@ describe Cart do
       @cart.should respond_to :line_items
       @cart.line_items.should include li1
       @cart.line_items.should include li2
+    end
+  end
+
+  describe "belongs to" do
+    describe "its user" do
+      it "and responds to user" do
+        @cart.should respond_to :user
+        @cart.user.should eq @user
+      end
+
+      it "and is automatically created when a user is created" do
+        Factory.create(:asdf).cart.should_not be nil
+      end
     end
   end
 

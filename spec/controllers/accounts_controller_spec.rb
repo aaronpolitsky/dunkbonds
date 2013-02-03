@@ -93,7 +93,7 @@ describe AccountsController do
         describe "which contains its" do 
 
           before :each do
-            @cart = subject.send(:current_cart)
+            @cart = @user.cart
             3.times do
               o = @user.orders.create!
               2.times { o.line_items << @account.line_items.create!(valid_line_item_attributes) }

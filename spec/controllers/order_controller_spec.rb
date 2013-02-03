@@ -132,6 +132,21 @@ describe OrdersController do
         post :create, {:order => valid_attributes}
         response.should redirect_to(Order.last)
       end
+
+      it "gets all the cart line_items" do
+        li = @account.line_items.create!(:qty => 1,
+                                         :max_bid_min_ask => 10,
+                                        :type_of => "bond bid")
+        @user.cart.line_items << li
+        post :create, {:order => valid_attributes}
+        @user.cart.line_items.empty?.should eq true
+        Order.last.line_items.should include li
+      end
+
+      it "does not delete the user's cart" do
+        post :create, {:order => valid_attributes}        
+        @user.cart.should_not be nil
+      end
     end
 
     describe "with invalid params" do

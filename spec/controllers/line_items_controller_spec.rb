@@ -105,7 +105,7 @@ describe LineItemsController do
 
   describe "POST create" do
     before :each do
-      @cart = subject.send(:current_cart)
+      @cart = @user.cart
     end
     
     it "creates a new LineItem" do
@@ -144,7 +144,7 @@ describe LineItemsController do
     describe "of a line_item that's in the cart" do
       before :each do
         @line_item = @account.line_items.create!  valid_attributes
-        @cart = subject.send(:current_cart)
+        @cart = @user.cart
         @cart.line_items << @line_item
       end
       
@@ -203,7 +203,7 @@ describe LineItemsController do
 
     describe "of a line_item that's in the cart" do
       before :each do
-        @cart = subject.send(:current_cart)
+        @cart = @user.cart
         @cart.line_items << @line_item
       end
 
