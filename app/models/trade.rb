@@ -11,7 +11,7 @@ class Trade < ActiveRecord::Base
   after_create :execute
 
   def total
-    self.price * self.qty
+    self.price.to_s.to_d * self.qty.to_s.to_d
   end
 
   private
@@ -19,11 +19,14 @@ class Trade < ActiveRecord::Base
   def execute
   	#do whatever changing of hands the trade requires here
     if self.bid.type_of == "bond bid"
+      escrow = self.bid.account.goal.escrow
       self.qty.times do
-        self.bid.account.goal.escrow.transfer_bond_to!(self.bid.account)
+        escrow.transfer_bond_to!(self.bid.account)
       end
-      self.bid.account.goal.escrow.transfer_funds_to!(self.price * self.qty, 
-                                                      self.ask.account)
+      escrow.transfer_funds_to!(self.total, 
+                                self.ask.account)
+      escrow.transfer_funds_to!(self.qty * (self.bid.max_bid_min_ask - self.price), 
+                                self.bid.account)
     elsif self.bid.type_of == "swap bid"
       self.bid.account.transfer_funds_to!(self.total, self.ask.account)
     end

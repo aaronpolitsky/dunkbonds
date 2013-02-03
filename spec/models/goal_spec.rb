@@ -142,7 +142,6 @@ describe Goal do
       
       describe "of existing posts" do
         pending "does not create a new post" do
-          debugger
           @g.update_from_feed
           expect {
             @g.update_from_feed

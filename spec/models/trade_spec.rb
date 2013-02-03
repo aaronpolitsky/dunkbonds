@@ -48,22 +48,28 @@ describe Trade do
       before :each do
         3.times { @treasury.transfer_bond_to!(@escrow) }
         @escrow.bonds.sum(:qty).should eq 3
+        @escrow.balance = @bond_bid.qty * @bond_bid.max_bid_min_ask
+        @escrow.save!
+        @buyer.balance = -@escrow.balance
+        @buyer.save!
         @buyer.bonds.count.should eq 0
         @bond_trade = @bond_bid.buys.new(:ask => @bond_ask,
-                                         :qty => @bond_bid.qty,
-                                         :price => @bond_ask.max_bid_min_ask)
+                                         :qty => @bond_ask.qty,
+                                         :price => @bond_ask.max_bid_min_ask/2)
       end
       
       it "transfers bonds from escrow to buyer" do
         @bond_trade.save!
-        @buyer.reload.bonds.sum(:qty).should eq @bond_bid.qty
-        @escrow.reload.bonds.sum(:qty).should eq (3-@bond_bid.qty)
+        @buyer.reload.bonds.sum(:qty).should eq @bond_ask.qty
+        @escrow.reload.bonds.sum(:qty).should eq (3-@bond_ask.qty)
       end
 
-      it "transfers funds from escrow to seller" do
+      it "transfers trade total from escrow to seller and returns change to buyer" do
+        bb = @buyer.balance
         @bond_trade.save!
-        @bond_trade.ask.account.reload.balance.should eq (@bond_trade.price * @bond_trade.qty)
-        @escrow.reload.balance.should eq (-@bond_trade.price * @bond_trade.qty)
+        @bond_trade.ask.account.reload.balance.should eq (@bond_trade.total)
+        (@bond_trade.bid.account.reload.balance - bb).should eq (@bond_trade.total)
+        @escrow.reload.balance.should eq 10
       end
            
     end

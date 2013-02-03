@@ -1,10 +1,37 @@
 <tr class="line_item">
-  <td><%= line_item.status %></td>
-  <td><%= line_item.type_of %></td>
-  <td><%= line_item.max_bid_min_ask %></td>
-  <td><%= line_item.account.id %></td>
-  <td><%= line_item.qty %></td>
-  <td><%= link_to 'Show', account_line_item_path(line_item.account, line_item) %></td>
-  <td><%= link_to 'Edit', edit_account_line_item_path(line_item.account, line_item) %></td>
-  <td><%= link_to 'Destroy', [line_item.account, line_item], :confirm => 'Are you sure?', :method => :delete %></td>
+	<td><%= line_item.status %></td>
+	<td><%= line_item.type_of %></td>
+	<td><%= line_item.qty %></td>
+	<td><%= line_item.max_bid_min_ask %></td>
+	<td>
+		<% if line_item.status == "executed" %>
+		  <% if line_item.type_of == "bond bid" || line_item.type_of == "swap bid" %>
+			  <%= line_item.buys.inject(0){|sum, e| sum += e.qty*e.price } %>
+			<% else %>
+		  	<%= line_item.sells.inject(0){|sum, e| sum += e.qty*e.price } %>
+		  <% end %>
+	  <% end %>
+	</td>
+	<td><%= link_to 'Show', account_line_item_path(line_item.account, line_item) %></td>
+	<td><%= link_to 'Edit', edit_account_line_item_path(line_item.account, line_item) %></td>
+	<td><%= link_to 'Destroy', [line_item.account, line_item], :method => :delete, :confirm => 'Are you sure?'  %></td>
+	<% if (line_item.buys.exists? || line_item.sells.exists?) %>
+	<div class="trades">
+		<!-- <tr>
+			<th></th>
+			<th></th>			
+			<th></th>	 		
+			<th></th>	 		
+			<th></th>
+		</tr> -->
+		<% if line_item.type_of == "bond bid" || line_item.type_of == "swap bid" %>
+		<%= render :partial => "line_items/trade", :collection => line_item.buys %>
+		<% else %>
+		<%= render :partial => "line_items/trade", :collection => line_item.sells %>
+		<% end %>
+
+	</div>
+	<% end %>
 </tr>
+
+

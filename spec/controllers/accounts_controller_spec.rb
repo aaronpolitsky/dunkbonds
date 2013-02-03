@@ -29,11 +29,18 @@ describe AccountsController do
   # Account. As you add validations to Account, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {:is_treasury => false}
+    {
+      :is_treasury => false,
+      :is_escrow => false
+    }
   end
 
   def valid_line_item_attributes
-    {:qty => 1}
+    {
+      :qty => 2,
+      :max_bid_min_ask => @goal.bond_face_value,
+      :type_of => "bond bid"
+    }
   end
 
   # This should return the minimal set of values that should be in the session
@@ -72,33 +79,55 @@ describe AccountsController do
       end
     end
     
-    describe "shows its history" do
-      describe "which contains its" do 
-        it "non-cart line items" do
-          @cart = subject.send(:current_cart)
-          3.times do
-            o = @user.orders.create!
-            2.times { o.line_items << @account.line_items.create!(valid_line_item_attributes) }
-            1.times { @cart.line_items << @account.line_items.create!(valid_line_item_attributes) } 
+    describe "shows" do
+
+      it "its bonds and swaps counts" do
+        @account.bonds.create!(:debtor => @treasury, :qty => 5)
+        @account.swaps.create!(:creditor => Factory.create(:account, :goal => @goal), :qty => 6)        
+        get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
+        response.should have_selector ".bonds", :content => "Bonds:  5"
+        response.should have_selector ".swaps", :content => "Swaps:  6"
+      end
+      
+      describe "its history" do
+        describe "which contains its" do 
+
+          before :each do
+            @cart = subject.send(:current_cart)
+            3.times do
+              o = @user.orders.create!
+              2.times { o.line_items << @account.line_items.create!(valid_line_item_attributes) }
+              1.times { @cart.line_items << @account.line_items.create!(valid_line_item_attributes) } 
+            end
           end
-          line_items = @account.line_items
-          order_line_items = line_items.where(:order_id)
-          cart_line_items  = line_items.where(:cart_id)
-          get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
-          assigns(:line_items).should_not include(cart_line_items)
-          response.should have_selector ".line_items .line_item"
-          assigns(:order_line_items).should eq(order_line_items)
-#          assigns(:order_line_items)[@user.orders.first].should eq(order_line_items[@user.orders.first])
 
-          response.should have_selector ".order .line_items .line_item"
-        end
+          it "ordered line items" do          
+            line_items = @account.line_items.where("order_id")
+            cart_line_items  = @account.line_items.where(:cart_id)
+            get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
+            assigns(:line_items).should_not include(cart_line_items)
+            response.should have_selector ".line_items .line_item"
+            assigns(:line_items).should eq(line_items)
+            response.should have_selector ".line_items .line_item"
+          end
 
-        it "trades" do 
-        end
-        it "payments" do 
+          it "trades" do 
+            pending "tested by line items controller"
+            @account.line_items.where(:order_id).each do |li|
+              li.execute!
+            end
+            get :show, {:goal_id => @goal.to_param, :id => @account.to_param} 
+            response.should have_selector ".trades .trade" 
+          end
+          it "payments" do 
+          end
+
         end
       end
+
     end
+    
+  
 
     it "should redirect to sign_in if not signed in" do
       sign_out @user

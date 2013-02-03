@@ -33,13 +33,18 @@ describe LineItemsController do
   # LineItem. As you add validations to LineItem, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {:qty => 2}
+    {
+      :qty => 2,
+      :max_bid_min_ask => 10,
+      :type_of => "bond bid"
+    }
   end
 
 
   describe "GET show" do
     before :each do
       @line_item = @account.line_items.create!  valid_attributes
+      @line_item.execute!
       get :show, {:account_id => @account.to_param  , :id => @line_item.to_param}
     end
 
@@ -49,6 +54,16 @@ describe LineItemsController do
     
     it "displays the line_item's details" do
       response.should have_selector ".line_items .line_item"
+    end
+
+    it "displays the line_item's trades" do
+      response.should have_selector ".line_items .line_item .trades .trade"
+    end
+
+    it "does not display trades for line_items without trades" do
+      @line_item = @account.line_items.create! valid_attributes
+      get :show, {:account_id => @account.to_param, :id => @line_item.to_param }
+      response.should_not have_selector ".line_items .line_item .trades"
     end
   end
 
@@ -69,7 +84,7 @@ describe LineItemsController do
       end
 
       it "a qty input field" do
-        response.should have_selector 'form', :content => "Quantity"
+        response.should have_selector 'form', :content => "What quantity?"
       end
     end
   end
@@ -203,10 +218,32 @@ describe LineItemsController do
         assert @cart.line_items.empty?
       end
 
+      it "removes both it and its parent from the cart" do
+        c = @line_item.create_child(:type_of => "bond ask",
+                                    :account_id => @line_item.account.id,
+                                    :qty => @line_item.qty,
+                                    :cart_id => @line_item.cart_id,
+                                    :max_bid_min_ask => @line_item.account.goal.bond_face_value)
+        delete :destroy, {:account_id => @account.to_param  , :id => c.to_param}
+        assert @cart.line_items.empty?
+        LineItem.all.should eq []
+      end
+
+      it "removes both it and its child from the cart" do
+        c = @line_item.create_child(:type_of => "bond ask",
+                                    :account_id => @line_item.account.id,
+                                    :qty => @line_item.qty,
+                                    :cart_id => @line_item.cart_id,
+                                    :max_bid_min_ask => @line_item.account.goal.bond_face_value)
+        delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
+        assert @cart.line_items.empty?
+        LineItem.all.should eq []
+      end 
+
       it "redirects to its cart" do
         delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
         response.should redirect_to(@cart)
-        flash[:notice].should contain "Successfully updated cart."
+        flash[:notice].should contain "Trade request removed from cart."
       end
     end
 

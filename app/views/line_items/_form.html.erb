@@ -13,15 +13,15 @@
 
   <div class="field">
     <%= f.label :type_of %><br />
-    <%= f.select :type_of, LineItem::TYPES %>
+    <%= f.select :type_of, LineItem::UI_TYPES %>
   </div>
   <div class="field">
-    <%= f.label :max_bid_min_ask %><br />
-    <%= f.text_field :max_bid_min_ask %>
-  </div>
-  <div class="field">
-    <%= f.label "Quantity" %><br />
+    <%= f.label "What Quantity?" %><br />
     <%= f.text_field :qty %>
+  </div>
+  <div class="field">
+    <%= f.label "What Price?" %><br />
+    <%= f.text_field :max_bid_min_ask %>
   </div>
   <div class="actions">
     <%= f.submit %>

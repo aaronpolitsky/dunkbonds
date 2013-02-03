@@ -19,6 +19,7 @@ require 'spec_helper'
 # that an instance is receiving a specific message.
 
 describe CartsController do
+  render_views
 
   # This should return the minimal set of attributes required to create a valid
   # Cart. As you add validations to Cart, be sure to
@@ -34,139 +35,57 @@ describe CartsController do
     {}
   end
 
-  describe "GET index" do
-    it "assigns all carts as @carts" do
-      cart = Cart.create! valid_attributes
-      get :index, {}, valid_session
-      assigns(:carts).should eq([cart])
-    end
-  end
-
   describe "GET show" do
     before :each do
+      @user = Factory.create(:user)
+      @goal = Factory.create(:goal)
+      @user.follow_goal @goal
+      @account = @user.accounts.last
+      @goal2 = Factory.create(:goal)
+      @user.follow_goal @goal2
+      @account2 = @user.accounts.last
       @cart = subject.send(:current_cart)
-      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
-      @line_items = @cart.line_items
     end
 
     it "assigns the requested cart as @cart" do
+      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
       assigns(:cart).should eq(@cart)
     end
 
     it "assigns the requested cart's line items as @line_items" do
+      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      @line_items = @cart.line_items
       assigns(:line_items).should eq(@line_items)
     end
 
-  end
-
-  describe "GET new" do
-    it "assigns a new cart as @cart" do
-      get :new, {}, valid_session
-      assigns(:cart).should be_a_new(Cart)
-    end
-  end
-
-  describe "GET edit" do
-    it "assigns the requested cart as @cart" do
-      cart = Cart.create! valid_attributes
-      get :edit, {:id => cart.to_param}, valid_session
-      assigns(:cart).should eq(cart)
-    end
-  end
-
-  describe "POST create" do
-    describe "with valid params" do
-      it "creates a new Cart" do
-        expect {
-          post :create, {:cart => valid_attributes}, valid_session
-        }.to change(Cart, :count).by(1)
-      end
-
-      it "assigns a newly created cart as @cart" do
-        post :create, {:cart => valid_attributes}, valid_session
-        assigns(:cart).should be_a(Cart)
-        assigns(:cart).should be_persisted
-      end
-
-      it "redirects to the created cart" do
-        post :create, {:cart => valid_attributes}, valid_session
-        response.should redirect_to(Cart.last)
-      end
-    end
-
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved cart as @cart" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Cart.any_instance.stub(:save).and_return(false)
-        post :create, {:cart => {}}, valid_session
-        assigns(:cart).should be_a_new(Cart)
-      end
-
-      it "re-renders the 'new' template" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Cart.any_instance.stub(:save).and_return(false)
-        post :create, {:cart => {}}, valid_session
-        response.should render_template("new")
-      end
-    end
-  end
-
-  describe "PUT update" do
-    describe "with valid params" do
-      it "updates the requested cart" do
-        cart = Cart.create! valid_attributes
-        # Assuming there are no other carts in the database, this
-        # specifies that the Cart created on the previous line
-        # receives the :update_attributes message with whatever params are
-        # submitted in the request.
-        Cart.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, {:id => cart.to_param, :cart => {'these' => 'params'}}, valid_session
-      end
-
-      it "assigns the requested cart as @cart" do
-        cart = Cart.create! valid_attributes
-        put :update, {:id => cart.to_param, :cart => valid_attributes}, valid_session
-        assigns(:cart).should eq(cart)
-      end
-
-      it "redirects to the cart" do
-        cart = Cart.create! valid_attributes
-        put :update, {:id => cart.to_param, :cart => valid_attributes}, valid_session
-        response.should redirect_to(cart)
-      end
-    end
-
-    describe "with invalid params" do
-      it "assigns the cart as @cart" do
-        cart = Cart.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Cart.any_instance.stub(:save).and_return(false)
-        put :update, {:id => cart.to_param, :cart => {}}, valid_session
-        assigns(:cart).should eq(cart)
-      end
-
-      it "re-renders the 'edit' template" do
-        cart = Cart.create! valid_attributes
-        # Trigger the behavior that occurs when invalid params are submitted
-        Cart.any_instance.stub(:save).and_return(false)
-        put :update, {:id => cart.to_param, :cart => {}}, valid_session
-        response.should render_template("edit")
-      end
-    end
-  end
-
-  describe "DELETE destroy" do
-    it "destroys the requested cart" do
-      cart = Cart.create! valid_attributes
-      expect {
-        delete :destroy, {:id => cart.to_param}, valid_session
-      }.to change(Cart, :count).by(-1)
-    end
-
-    it "redirects to the carts list" do
-      cart = Cart.create! valid_attributes
-      delete :destroy, {:id => cart.to_param}, valid_session
-      response.should redirect_to(carts_url)
+    it "squawks if any account's total ask qty exceed that account's sellable bond qty" do
+      pending "moved this check to the line item validation"
+      @account.bonds.create!(:debtor => @goal.treasury, :qty => 2)
+      @account2.bonds.create!(:debtor => @goal2.treasury, :qty => 5)
+      @account.line_items.create!(:type_of => "bond ask", 
+                                  :qty => 1,
+                                  :max_bid_min_ask => 3,
+                                  :cart_id => @cart.id)
+      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      response.should_not have_selector "#flash_error", :content =>  "You don't have enough sellable bonds to cover these sell requests.  \n Edit sell requests so that you don't try to sell more bonds than you own before creating your order."
+   
+      @account.line_items.create!(:type_of => "bond ask", 
+                                  :qty => 2,
+                                  :max_bid_min_ask => 3,
+                                  :cart_id => @cart.id)
+      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      response.should have_selector "#flash_error", :content =>  "You don't have enough sellable bonds to cover these sell requests.  \n Edit sell requests so that you don't try to sell more bonds than you own before creating your order."
+   
+      @account2.line_items.create!(:type_of => "bond ask", 
+                                   :qty => 3,
+                                   :max_bid_min_ask => 3,
+                                   :cart_id => @cart.id)      
+      @account2.line_items.create!(:type_of => "bond ask", 
+                                   :qty => 3,
+                                   :max_bid_min_ask => 3,
+                                   :cart_id => @cart.id)  
+      get :show, {:id => @cart.to_param}, {:cart_id => @cart.id}
+      response.should have_selector "#flash_error", :content =>  "You don't have enough sellable bonds to cover these sell requests.  \n Edit sell requests so that you don't try to sell more bonds than you own before creating your order."
     end
   end
 

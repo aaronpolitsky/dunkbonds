@@ -9,6 +9,7 @@ class LineItem < ActiveRecord::Base
 
 
   TYPES = ["bond bid", "bond ask", "swap bid", "swap ask"]
+  UI_TYPES = ["bond bid", "bond ask", "swap bid", "swap ask"]  
 
   STATUSES = ["new", "pending", "executed", "cancelled"]
 
@@ -16,6 +17,8 @@ class LineItem < ActiveRecord::Base
   validates :max_bid_min_ask, :presence => true, :numericality => {:greater_than => 0}
   validates :account, :presence => true
 
+  validate :enough_bonds_to_cover_cart_asks, :only => [:create, :update]
+  
   after_create :create_bond_ask_for_swap_bid
 
   def cancel!
@@ -54,7 +57,7 @@ class LineItem < ActiveRecord::Base
 
 
   def find_matching_bond_asks
-
+    matches = []
     asks = self.account.goal.line_items.where(:type_of => "bond ask",
                                               :status => "pending").where(
                                               "account_id != ?", self.account_id).where(
@@ -64,53 +67,25 @@ class LineItem < ActiveRecord::Base
     used_bond_asks = asks.where(:parent_id => nil)
     swap_bond_asks = asks - used_bond_asks
     if self.max_bid_min_ask < self.account.goal.bond_face_value
+      # add in logic to only include used_bond_asks if is_bondholder
       matches = swap_bond_asks + used_bond_asks
     else
-    #   sbaqty = swap_bond_asks.inject(0){|sum, e| sum += e.qty }
-    #   treasury_ask = self.account.goal.treasury.line_items.create!(:type_of => "bond ask",
-    #                                                                 :qty => self.qty - sbaqty,
-    #                                                                 :max_bid_min_ask => self.account.goal.bond_face_value)
-    #   treasury_ask.execute!
-    #   matches = swap_bond_asks + [treasury_ask]
+      sbaqty = swap_bond_asks.inject(0){|sum, e| sum += e.qty }
+      if sbaqty < self.qty
+        treasury_ask = self.account.goal.treasury.line_items.create!(:type_of => "bond ask",
+                                                                      :qty => self.qty - sbaqty,
+                                                                      :max_bid_min_ask => self.account.goal.bond_face_value)
+        treasury_ask.execute!
+        matches = [treasury_ask]
+      end
+      matches = swap_bond_asks + matches
     end
   
-# ######### thoughts
-#     # matches = swap_bids # to start
-
-#     # # if offering $face, treasury can sell bonds, so add them
-#     # if self.max_bid_min_ask >= @goal.bond_face_value 
-#     #   # how many does treasury need to fill, total?
-#     #   qty_needed = self.qty - swap_bids.sum(:qty) - used_bonds.sum(:qty)
-
-#     #   unless self.account.is_bondholder? 
-#     #     #gotta buy at least one from treasury before you buy used bonds
-#     #     matches += @treasury.line_items.create!(:qty => 1,
-#     #                                             :type_of => "bond ask",
-#     #                                             :status => "pending",
-#     #                                             :max_bid_min_ask => @goal.bond_face_value)
-
-
-#     #   end
-
-#     #   if qty_needed > 0 
-
-#     #   end
-#     # end
-
-
-#     # matches ++ bond_asks #in that order
-
-
-#     #  
-#     ######### / thoughts
-
+    #quit if there aren't enough
     return [] if matches.empty?
 
-    #quit if there aren't enough
     mqty = matches.inject(0){|sum, e| sum += e.qty}
-    # matches.each do |m|
-    #   mqty += m.qty
-    # end
+    
     return [] if mqty < self.qty
 
     bestmatches =[]
@@ -123,14 +98,18 @@ class LineItem < ActiveRecord::Base
         q -= m.qty
         bestmatches << m
       else # (qty < m.qty), create a new lineitem of qty and decrement m.qty by qty
-        firstqty = LineItem.create! m.attributes.merge(:qty => q)
-        m.qty -= q
-        m.save!
-        bestmatches << firstqty
-        return bestmatches
+      #   firstqty = LineItem.create! m.attributes.merge(:qty => q)
+      #   m.qty -= q
+      #   m.save!
+      #   bestmatches << firstqty
+      #   return bestmatches
       end    
     end    
-    return bestmatches                   
+    if q == 0 
+      return bestmatches                   
+    else
+      return []
+    end
   end
 
   def find_matching_bond_bids
@@ -143,7 +122,7 @@ class LineItem < ActiveRecord::Base
   end
 
   def execute!
-    unless self.status == "executed" || !self.cart.nil?
+    unless self.status == "executed" || self.status == "cancelled" || !self.cart.nil?
 
       if type_of == "bond bid"
         if self.status == "new"
@@ -156,6 +135,7 @@ class LineItem < ActiveRecord::Base
           self.buys.create!(:ask => m, :qty => m.qty, :price => m.max_bid_min_ask)
           m.status = "executed"  
           m.save!
+          m.parent.execute! unless m.parent.nil?
         end
         self.status = "executed" unless matches.empty?
         self.save!
@@ -164,7 +144,7 @@ class LineItem < ActiveRecord::Base
         if self.status == "new"
           # in case child attempts execution first, 
           #   check if it has a parent, attempt to execute parent so it pends first
-          if !self.parent.nil? && self.parent.status == "new"
+          if !self.parent.nil? && self.parent.reload.status == "new"
             self.parent.execute! 
             return self
           end
@@ -174,7 +154,7 @@ class LineItem < ActiveRecord::Base
         end
         matches = find_matching_bond_bids
         matches.each do |m|
-          self.sells.create!(:bid => m, :qty => m.qty, :price => m.max_bid_min_ask)
+          self.sells.create!(:bid => m, :qty => m.qty, :price => self.max_bid_min_ask)
         end
         self.status = "executed" unless matches.empty?
         self.save!
@@ -212,9 +192,19 @@ class LineItem < ActiveRecord::Base
   def create_bond_ask_for_swap_bid
     if self.type_of == "swap bid" 
       self.create_child(:type_of => "bond ask",
-                       :account_id => self.account.id,
-                       :qty => self.qty,
-                       :max_bid_min_ask => self.account.goal.bond_face_value)
+                        :account_id => self.account.id,
+                        :qty => self.qty,
+                        :max_bid_min_ask => self.account.goal.bond_face_value)
+    end
+  end
+
+  def enough_bonds_to_cover_cart_asks
+    if self.type_of == "bond ask" && self.status == "new" && !self.parent_id && !self.account.is_treasury
+      clis = self.account.line_items.where(:type_of => "bond ask", :parent_id => nil).where("cart_id")
+      cart_qty = clis.sum(:qty)
+      if self.qty + cart_qty > self.account.bond_qty
+        self.errors.add(:qty, "If we added this to your cart, you'd be trying to sell more bonds than you own.")
+      end
     end
   end
 end

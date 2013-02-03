@@ -2,7 +2,10 @@ require 'spec_helper'
 
 describe LineItem do
   before do
+    @user = Factory.create(:user)
     @goal = Factory.create(:goal)
+    @user.follow_goal @goal
+    @account = @user.accounts.last
     @face = @goal.bond_face_value
     @buyer = @goal.accounts.create!
     @seller = @goal.accounts.create!
@@ -52,6 +55,59 @@ describe LineItem do
     it "have an account" do
       LineItem.new(:max_bid_min_ask => 10, :qty => 100).should_not be_valid
     end
+
+    it "not be able to sell bonds it does not have, unless it is linked to a swap" do
+      @buyer.bonds.count.should eq 0
+      @buyer.line_items.new(:type_of => "bond ask",
+                            :max_bid_min_ask => 10,
+                            :qty => 10).should_not be_valid
+      @buyer.line_items.new(:type_of => "bond ask",
+                            :parent_id => 4, #fake
+                            :max_bid_min_ask => 10,
+                            :qty => 10).should be_valid
+
+    end
+
+    it "not be valid if the cart's qty of bond asks would exceed the account's bond qty." do
+      # pending "this might be better checked before order creation"
+      cart = Cart.create!
+      @buyer.bonds.create!(:debtor => @treasury, :qty => 5)
+      @buyer.line_items.create!(:type_of => "bond ask",
+                                :max_bid_min_ask => 10,
+                                :qty => 4)
+      cart.line_items << @buyer.line_items.last
+      @buyer.line_items.new(:type_of => "bond ask",
+                            :max_bid_min_ask => 10,
+                            :qty => 2).should_not be_valid
+      @buyer.line_items.new(:type_of => "bond ask",
+                            :max_bid_min_ask => 10,
+                            :qty => 1).should be_valid
+      @buyer.line_items.new(:type_of => "bond ask",
+                            :max_bid_min_ask => 10,
+                            :parent_id => 1, #swap bond ask
+                            :qty => 1).should be_valid
+    end
+
+    it "must belong to either a cart or an order" do
+      pending "not sure about this"
+      @buyer.line_items.new(:type_of => "bond bid",
+                            :max_bid_min_ask => 4,
+                            :qty => 10).should_not be_valid
+      @buyer.line_items.new(:type_of => "bond bid",
+                            :max_bid_min_ask => 4,
+                            :cart_id => 1,
+                            :qty => 10).should be_valid
+      @buyer.line_items.new(:type_of => "bond bid",
+                            :max_bid_min_ask => 4,
+                            :order_id => 1,
+                            :qty => 10).should be_valid
+      @buyer.line_items.new(:type_of => "bond bid",
+                            :max_bid_min_ask => 4,
+                            :cart_id => 1,
+                            :order_id => 1,
+                            :qty => 10).should_not be_valid
+    end
+
   end
 
   it "should have an initial status of new" do
@@ -84,6 +140,7 @@ describe LineItem do
         @bond_bid = @seller.line_items.create!(:type_of => "bond bid",
                                               :qty => 5, 
                                               :max_bid_min_ask => @bidding)
+        @buyer.bonds.create!(:debtor => @treasury, :qty => 8)
         @bad1 = @buyer.line_items.create!(:type_of => "bond ask",
                                            :qty => 2, 
                                            :max_bid_min_ask => @bidding+1,
@@ -148,7 +205,7 @@ describe LineItem do
     end
 
 
-    describe "when bidding $face value" do
+    describe "when bidding face value" do
       before :each do
         @bidding = @goal.bond_face_value
         t = Time.now
@@ -176,11 +233,12 @@ describe LineItem do
           @good1.save!
         end
         
-        it "matches include the swap-bond_ask and backfills with treasury asks only if needed" do
+        it "matches include all swaps then backfills with the T asks" do
           matches = @bond_bid.find_matching_bond_asks
-          matches.should include @good1
           matches.should include @treasury.line_items.last
-
+          @treasury.line_items.last.qty.should eq 2
+          matches.should include @good1
+          
           @swap_bid.qty = @good1.qty = 5
           @swap_bid.save!
           @good1.save!
@@ -194,16 +252,18 @@ describe LineItem do
           matches[0].should eq @good1
           matches[1].should eq @treasury.line_items.last
         end
+
       end
 
     end 
     
     describe "for qty 1" do
       it "should find the earliest best bond ask" do
-        bestask = Factory.create(:bond_ask, :account => @seller, :created_at => Time.now)
-        laterask = Factory.create(:bond_ask, :account => @seller, :created_at => bestask.created_at + 1.hour)
-        priceyask = Factory.create(:bond_ask, :account => @seller, :max_bid_min_ask => 11, :created_at => bestask.created_at)
-        bid = Factory.create(:bond_bid, :account => @buyer)
+        @seller.bonds.create!(:debtor => @treasury, :qty => 1)
+        bestask = Factory.create(:bond_ask, :status => "pending", :account => @seller, :max_bid_min_ask => @face-2, :created_at => Time.now)
+        laterask = Factory.create(:bond_ask, :status => "pending", :account => @seller, :max_bid_min_ask => @face-2, :created_at => bestask.created_at + 1.hour)
+        priceyask = Factory.create(:bond_ask, :status => "pending", :account => @seller, :max_bid_min_ask => @face-1, :created_at => bestask.created_at)
+        bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-1, :account => @buyer)
         matches = bid.find_matching_bond_asks
         matches.should eq [bestask]
         matches.should_not eq [priceyask]
@@ -213,25 +273,34 @@ describe LineItem do
     
     describe "for qty n > 1" do
       it "should return [] if < n matching asks exist" do
-        ask = Factory.create(:bond_ask, :qty => 1, :account => @seller)
-        bid = Factory.create(:bond_bid, :qty => 2, :account => @buyer)
+        @seller.bonds.create!(:debtor => @treasury, :qty => 1)
+        ask = Factory.create(:bond_ask, :max_bid_min_ask => @face-2, :qty => 1, :status => "pending", :account => @seller)
+        bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-2, :qty => 2, :account => @buyer)
         bid.find_matching_bond_asks.should eq []
       end
       
-      it "should split the last match if it is of greater qty than required" do
-        bid = Factory.create(:bond_bid, :qty => 2, :account => @buyer)
-        ask = Factory.create(:bond_ask, :qty => 3, :account => @seller)
+      it "should ignore any potential match that is of greater qty than required" do
+        bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-2, :qty => 2, :account => @buyer)
+        @seller.bonds.create!(:debtor_id => @treasury, :qty => 5)
+        ask3 = @seller.line_items.create!(:type_of => "bond ask", 
+                                         :max_bid_min_ask => @face-2, 
+                                         :qty => 3, 
+                                         :status => "pending")
+        ask2 = @seller.line_items.create!(:type_of => "bond ask", 
+                                         :max_bid_min_ask => @face-2, 
+                                         :qty => 2, 
+                                         :status => "pending")
         matches = bid.find_matching_bond_asks
-        matches.should_not eq ask
-        matches.last.qty.should eq bid.qty
-        matches.last.should eq LineItem.last
+        matches.should_not include ask3
+        matches.should include ask2
       end
       
       describe "should find n of the earliest best asks" do
         it "even if from > 1 matches" do
-          bid = Factory.create(:bond_bid, :qty => 2, :account => @buyer)
+          bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-2, :qty => 2, :account => @buyer)
           best_asks = []
-          3.times  { best_asks << Factory.create(:bond_ask, :account => @seller) }
+          @seller.bonds.create!(:debtor => @treasury, :qty => 3)
+          3.times  { best_asks << Factory.create(:bond_ask, :max_bid_min_ask => @face-2, :status => "pending", :account => @seller) }
           matches = bid.find_matching_bond_asks
           matches.should eq best_asks[0..1]
           matches.should_not eq best_asks
@@ -243,6 +312,8 @@ describe LineItem do
   describe "find_matching_bond_bids" do
     describe "when asking face" do 
       before :each do
+        @seller.bonds.create!(:debtor_id => @treasury, :qty => 5)
+        
         @bond_ask = @seller.line_items.create!(:type_of => "bond ask",
                                               :qty => 5, 
                                               :max_bid_min_ask => @goal.bond_face_value)
@@ -260,6 +331,7 @@ describe LineItem do
       before :each do
         @asking = @goal.bond_face_value/2
         t = Time.now
+        @seller.bonds.create!(:debtor => @treasury, :qty => 5)
         @bond_ask = @seller.line_items.create!(:type_of => "bond ask",
                                               :qty => 5, 
                                               :max_bid_min_ask => @asking)
@@ -319,7 +391,7 @@ describe LineItem do
 
       describe "that executes" do
         before :each do
-          @seller.bonds.create!
+          @seller.bonds.create!(:debtor => @treasury, :qty => 1)
           @bond_ask = Factory.create(:bond_ask, :account => @seller,
                                      :max_bid_min_ask => @face/2)
           @bond_ask.execute!
@@ -338,6 +410,20 @@ describe LineItem do
           }.to change(@bond_bid, :status).to("executed")
           change(@bond_bid.buys.last.ask.reload, :status).to("executed")
         end
+
+        it "executes its matches parent swap, if exists" do
+          swap = @seller.line_items.create!(:type_of => "swap bid",
+                                            :qty => 1,
+                                            :max_bid_min_ask => @face)
+          bond_ask = swap.child
+          bond_ask.max_bid_min_ask = @face/2
+          bond_ask.save!
+          swap.execute!
+          @bond_bid.execute!
+          @bond_bid.buys.last.ask.reload.status.should eq "executed"
+          @bond_bid.buys.last.ask.parent.reload.status.should eq "executed"
+
+        end
       end
 
       describe "that pends" do
@@ -347,7 +433,7 @@ describe LineItem do
           }.not_to change(Trade, :count)
         end
         
-        it "transfers funds from buyer to escrow" do
+        it "transfers bid $amount from buyer to escrow" do
           expect {
             @bond_bid.execute!
           }.to change(@bond_bid.account.reload, :balance).by (-@bond_bid.max_bid_min_ask)
@@ -366,6 +452,7 @@ describe LineItem do
     describe "of a used bond ask" do
       before :each do
         @seller.bonds.create(:qty => 5, :debtor => @treasury)
+
         @bond_ask = @seller.line_items.create!(:type_of => "bond ask",
                                                :qty => 5,
                                                :max_bid_min_ask => @face/2)
@@ -481,10 +568,10 @@ describe LineItem do
 
         it "transfers funds from buyer to seller" do
 #          expect {
-                        @swap_bid.execute!
+          @swap_bid.execute!
 #         }.to change(@swap_bid.account.reload, :balance).by (-@swap_bid.buys.last.total)
 #         change(@treasury.reload, :balance).by  @swap_bid.buys.last.total
-  @swap_bid.account.reload.balance.should eq -@swap_bid.buys.last.total
+          @swap_bid.account.reload.balance.should eq -@swap_bid.buys.last.total
         end
 
         it "transfer swaps from treasury to buyer if swap was new"  do

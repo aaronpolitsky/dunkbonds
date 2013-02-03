@@ -8,25 +8,31 @@
   <%= @account.balance %>
 </p>
 
-<% @order_line_items.sort.each do |order, line_items| %>
-  <div class="order">
-    <h5>Order #<%= order %></h5>
-    <table class="line_items">
-      <tr>
-	<th>Status</th>
-	<th>Type of</th>
-	<th>Max bid min ask</th>
-	<th>Goal</th>
-	<th>Quantity</th>
-	<th></th>
-	<th></th>
-	<th></th>
-      </tr>
-      <%= render line_items %>
-    </table
-  </div>
-<% end %>
+<div class="bonds">
+  Bonds:  <%= @account.bond_qty %>
+</div>
 
+<div class="swaps">
+  Swaps:  <%= @account.swap_qty %>
+</div>
+
+
+<% unless @line_items.empty? %>
+<h5>Trade Requests</h5>
+<table class="line_items">
+  <tr>
+   <th>Status</th>
+   <th>Type</th>
+   <th>Quantity</th>
+   <th>Price</th>
+   <th>Total</th>
+   <th></th>
+   <th></th>
+   <th></th>
+  </tr>
+  <%= render @line_items %>
+</table>
+<% end %>
 
 
 <%= link_to 'Edit', edit_goal_account_path(@goal, @account) %> |

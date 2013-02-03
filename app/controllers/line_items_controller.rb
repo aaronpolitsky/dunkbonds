@@ -38,15 +38,16 @@ class LineItemsController < ApplicationController
     respond_to do |format|
       if @line_item.save
         @cart.line_items << @line_item
+
         if @line_item.type_of == "swap bid"
-          @bond_ask = @account.line_items.create!(:qty => @line_item.qty, 
-                                                  :type_of => "bond ask")
+          @bond_ask = @line_item.child
           @cart.line_items << @bond_ask
           format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "Swap created.  Please fill in its corresponding Bond Sale order." }
         else
           format.html { redirect_to(@cart, :notice => 'We added the item to your cart.') }
           format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
         end
+        # end
       else  
         format.html { render :action => "new" }
         format.xml  { render :xml => @line_item.errors, :status => :unprocessable_entity }
@@ -83,10 +84,14 @@ class LineItemsController < ApplicationController
   # DELETE /line_items/1.xml
   def destroy
     @line_item = @account.line_items.find(params[:id])
+
     unless @line_item.cart.nil?
       cart = @line_item.cart 
+      relative = @line_item.child if @line_item.child
+      relative = @line_item.parent if @line_item.parent_id
       @line_item.destroy
-      redirect_to(cart, :notice => 'Successfully updated cart.') 
+      relative.destroy if relative
+      redirect_to(cart, :notice => 'Trade request removed from cart.') 
     else #the line_item is already part of an order
       @line_item.cancel! if @line_item.status == "pending"
       redirect_to @line_item.order

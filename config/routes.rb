@@ -2,7 +2,7 @@ TwoODunkbonds::Application.routes.draw do
 
   devise_for :users
 
-  resources :carts
+  resources :carts, :only => :show
   resources :orders 
 
   resources :goals do
