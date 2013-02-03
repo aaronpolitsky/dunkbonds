@@ -137,70 +137,96 @@ describe LineItem do
       before :each do
         @bidding = @goal.bond_face_value/2
         t = Time.now
-        @bond_bid = @seller.line_items.create!(:type_of => "bond bid",
+        @bond_bid = @buyer.line_items.create!(:type_of => "bond bid",
                                               :qty => 5, 
                                               :max_bid_min_ask => @bidding)
-        @buyer.bonds.create!(:debtor => @treasury, :qty => 8)
-        @bad1 = @buyer.line_items.create!(:type_of => "bond ask",
+        @seller.bonds.create!(:debtor => @treasury, :qty => 8)
+        @pricey1 = @seller.line_items.create!(:type_of => "bond ask",
                                            :qty => 2, 
                                            :max_bid_min_ask => @bidding+1,
                                            :status => "pending")
-        @swap_bid = @buyer.line_items.create!(:type_of => "swap bid",
+        @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
                                               :qty => 1,
                                               :max_bid_min_ask => @goal.bond_face_value, 
                                               :status => "pending")
-        @good1 = @swap_bid.child
-        @good1.max_bid_min_ask = @bidding
-        @good1.status = "pending"
-        @good1.save!
+        @swap_bond_ask = @swap_bid.child
+        @swap_bond_ask.max_bid_min_ask = @bidding
+        @swap_bond_ask.status = "pending"
+        @swap_bond_ask.save!
 
-        @good2 = @buyer.line_items.create!(:type_of => "bond ask",
+        @used_bond_ask2 = @seller.line_items.create!(:type_of => "bond ask",
                                            :qty => 1, 
                                            :created_at => t,
                                            :max_bid_min_ask => @bidding,
                                            :status => "pending")
-        @good3 = @buyer.line_items.create!(:type_of => "bond ask",
+        @used_bond_ask3 = @seller.line_items.create!(:type_of => "bond ask",
                                            :qty => 2, 
                                            :created_at => t,
                                            :max_bid_min_ask => @bidding,
                                            :status => "pending")
-        @good4 = @buyer.line_items.create!(:type_of => "bond ask",
+        @used_bond_ask4 = @seller.line_items.create!(:type_of => "bond ask",
                                            :qty => 1, 
                                            :created_at => t + 1.hour,
                                            :max_bid_min_ask => @bidding-1,
                                            :status => "pending")
-        @good5 = @buyer.line_items.create!(:type_of => "bond ask",
+        @used_bond_ask5 = @seller.line_items.create!(:type_of => "bond ask",
                                            :qty => 1, 
                                            :created_at => t + 2.hour,
                                            :max_bid_min_ask => @bidding-1,
                                            :status => "pending")
       end
       
-      describe "includes" do
-        it "asks < bidding" do
-          @matches = @bond_bid.find_matching_bond_asks
-          @matches.should include @good1
-          @matches.should include @good2
-          @matches.should include @good3
-          @matches.should include @good4
+      describe "for a bondholder" do
+        before :each do
+          @buyer.bonds.create!(:debtor => @treasury, :qty => 1)
+        end
+        
+        describe "includes" do
+          it "all asks < bidding" do
+            matches = @bond_bid.find_matching_bond_asks
+            matches.should include @swap_bond_ask
+            matches.should include @used_bond_ask2
+            matches.should include @used_bond_ask3
+            matches.should include @used_bond_ask4
+          end
+        end
+
+        describe "excludes" do
+          it "asks >= bidding" do
+            matches = @bond_bid.find_matching_bond_asks
+            matches.should_not include @pricey1
+            matches.should_not include @used_bond_ask5
+          end
+        end
+        
+        describe "orders matches by" do
+          it "time then price" do
+            matches = @bond_bid.find_matching_bond_asks
+            matches[0].should eq @swap_bond_ask
+            matches[1].should eq @used_bond_ask2
+            matches[2].should eq @used_bond_ask3
+            matches[3].should eq @used_bond_ask4
+            matches.inject(0){|sum, e| sum += e.qty}.should eq @bond_bid.qty
+          end
         end
       end
-      describe "excludes" do
-        it "asks >= bidding" do
-          @matches = @bond_bid.find_matching_bond_asks
-          @matches.should_not include @bad1
-          @matches.should_not include @good5
+
+      describe "for a non-bondholder" do
+        it "only includes swap asks < bidding" do
+          @bond_bid.qty = 2
+          @bond_bid.save!
+          matches = @bond_bid.find_matching_bond_asks
+          matches.should eq [] #:reason => "because there aren't enough matches if you leave out the used bond asks."
         end
-      end
-      describe "orders matches by" do
-        it "time then price" do
-          @matches = @bond_bid.find_matching_bond_asks
-          @matches[0].should eq @good1
-          @matches[1].should eq @good2
-          @matches[2].should eq @good3
-          @matches[3].should eq @good4
-          @matches.inject(0){|sum, e| sum += e.qty}.should eq @bond_bid.qty
+
+        it "excludes used bond asks" do
+          @bond_bid.qty = 2
+          @bond_bid.save!
+          @swap_bond_ask.destroy
+          matches = @bond_bid.find_matching_bond_asks
+          matches.should eq []
         end
+
       end
     end
 
@@ -209,7 +235,7 @@ describe LineItem do
       before :each do
         @bidding = @goal.bond_face_value
         t = Time.now
-        @bond_bid = @seller.line_items.create!(:type_of => "bond bid",
+        @bond_bid = @buyer.line_items.create!(:type_of => "bond bid",
                                               :qty => 5, 
                                               :max_bid_min_ask => @bidding)
       end
@@ -223,7 +249,7 @@ describe LineItem do
 
       describe "when a pending swap_bid exists" do
         before :each do
-          @swap_bid = @buyer.line_items.create!(:type_of => "swap bid",
+          @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
                                                 :qty => 3,
                                                 :max_bid_min_ask => @goal.bond_face_value, 
                                                 :status => "pending")
@@ -263,6 +289,7 @@ describe LineItem do
         bestask = Factory.create(:bond_ask, :status => "pending", :account => @seller, :max_bid_min_ask => @face-2, :created_at => Time.now)
         laterask = Factory.create(:bond_ask, :status => "pending", :account => @seller, :max_bid_min_ask => @face-2, :created_at => bestask.created_at + 1.hour)
         priceyask = Factory.create(:bond_ask, :status => "pending", :account => @seller, :max_bid_min_ask => @face-1, :created_at => bestask.created_at)
+        @buyer.bonds.create!(:debtor => @treasury, :qty => 1)
         bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-1, :account => @buyer)
         matches = bid.find_matching_bond_asks
         matches.should eq [bestask]
@@ -274,12 +301,14 @@ describe LineItem do
     describe "for qty n > 1" do
       it "should return [] if < n matching asks exist" do
         @seller.bonds.create!(:debtor => @treasury, :qty => 1)
+        @buyer.bonds.create!(:debtor => @treasury, :qty => 1)
         ask = Factory.create(:bond_ask, :max_bid_min_ask => @face-2, :qty => 1, :status => "pending", :account => @seller)
         bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-2, :qty => 2, :account => @buyer)
         bid.find_matching_bond_asks.should eq []
       end
       
       it "should ignore any potential match that is of greater qty than required" do
+        @buyer.bonds.create!(:debtor => @treasury, :qty => 1)
         bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-2, :qty => 2, :account => @buyer)
         @seller.bonds.create!(:debtor_id => @treasury, :qty => 5)
         ask3 = @seller.line_items.create!(:type_of => "bond ask", 
@@ -297,6 +326,7 @@ describe LineItem do
       
       describe "should find n of the earliest best asks" do
         it "even if from > 1 matches" do
+          @buyer.bonds.create!(:debtor => @treasury, :qty => 1)
           bid = Factory.create(:bond_bid, :max_bid_min_ask => @face-2, :qty => 2, :account => @buyer)
           best_asks = []
           @seller.bonds.create!(:debtor => @treasury, :qty => 3)
@@ -384,6 +414,7 @@ describe LineItem do
   describe "attempted execution" do
     describe "of a bond bid" do
       before :each do
+        @buyer.bonds.create!(:debtor => @treasury, :qty => 1)
         @bond_bid = @buyer.line_items.create!(:type_of => "bond bid",
                                               :qty => 1,
                                               :max_bid_min_ask => @face/2)
@@ -618,51 +649,51 @@ describe LineItem do
       end
     end
 
-    describe "of a swap ask" do
-      before :each do
-        @seller.swaps.create(:qty => 5, :debtor => @treasury)
-        @swap_ask = Factory.create(:swap_ask, :account => @seller, :qty => 5)
-      end
+    # describe "of a swap ask" do
+    #   before :each do
+    #     @seller.swaps.create(:qty => 5, :debtor => @treasury)
+    #     @swap_ask = Factory.create(:swap_ask, :account => @seller, :qty => 5)
+    #   end
 
-      describe "that executes" do
-        before :each do
-          @swap_bid = Factory.create(:swap_bid, :account => @buyer, :qty => 5)
-        end 
+    #   describe "that executes" do
+    #     before :each do
+    #       @swap_bid = Factory.create(:swap_bid, :account => @buyer, :qty => 5)
+    #     end 
 
-        pending "creates trades called sells" do
-          @swap_ask.execute!
-          @swap_ask.sells.count.should eq 1
-        end
+    #     pending "creates trades called sells" do
+    #       @swap_ask.execute!
+    #       @swap_ask.sells.count.should eq 1
+    #     end
 
-        pending "marks itself and its trades' line_items as executed" do
-          expect {
-            @swap_ask.execute!
-          }.to change(@swap_ask, :status).from("pending").to("executed")
-          change(@swap_ask.sells.last.bid.reload, :status).from("pending").to("executed")
-        end
-      end
+    #     pending "marks itself and its trades' line_items as executed" do
+    #       expect {
+    #         @swap_ask.execute!
+    #       }.to change(@swap_ask, :status).from("pending").to("executed")
+    #       change(@swap_ask.sells.last.bid.reload, :status).from("pending").to("executed")
+    #     end
+    #   end
 
-      describe "that pends" do
-        pending "transfers swaps from seller to escrow" do
-          @swap_ask.execute!
-          @seller.reload.swaps.sum(:qty).should eq 0
-          @escrow.reload.swaps.sum(:qty).should eq 5
-        end
+    #   describe "that pends" do
+    #     pending "transfers swaps from seller to escrow" do
+    #       @swap_ask.execute!
+    #       @seller.reload.swaps.sum(:qty).should eq 0
+    #       @escrow.reload.swaps.sum(:qty).should eq 5
+    #     end
 
-        pending "does not create trades" do
-          expect {
-            @swap_ask.execute!
-          }.not_to change(Trade, :count)
-        end
+    #     pending "does not create trades" do
+    #       expect {
+    #         @swap_ask.execute!
+    #       }.not_to change(Trade, :count)
+    #     end
 
-        pending "keeps its status as pending" do
-          expect {
-            @swap_ask.execute!
-          }.not_to change(@swap_ask, :status).from("pending").to("executed")
-        end
+    #     pending "keeps its status as pending" do
+    #       expect {
+    #         @swap_ask.execute!
+    #       }.not_to change(@swap_ask, :status).from("pending").to("executed")
+    #     end
 
-      end
-    end
+    #   end
+    # end
   end
 
   describe "cancellation" do

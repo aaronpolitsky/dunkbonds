@@ -37,8 +37,8 @@ class Account < ActiveRecord::Base
   end
 
   def is_bondholder?
-    self.bonds.count > 0 || 
-    self.swaps.count > 0 || 
+    self.bond_qty > 0 || 
+    self.swap_qty > 0 || 
     self.line_items.where(:type_of => "bond ask", :status => "pending").count > 0 || 
     self.line_items.where(:type_of => "swap bid", :status => "pending").count > 0 
   end

@@ -69,7 +69,7 @@ describe Goal do
 
   describe "a change to the blog_url" do
     before :each do
-      @goal = Factory.create(:goal)
+      @goal = Factory.create(:goal_w_blog)
       @goal.update_from_feed
       @goal.reload
       @posts = @goal.posts.all
@@ -100,7 +100,7 @@ describe Goal do
   describe "has many" do
     describe "posts and" do
       it "should respond to posts" do
-        g = Factory.build(:goal)
+        g = Factory.build(:goal_w_blog)
         g.should respond_to(:posts)
       end
     end
@@ -122,14 +122,14 @@ describe Goal do
   
   describe "has a feed and" do
     pending "the goal validates the feed" do
-      g = Factory.build(:goal, :blog_url => "www.google.com")
+      g = Factory.build(:goal_w_blog, :blog_url => "www.google.com")
       g.should_not be_valid
       g.errors[:blog_url].should include("Double check that blog url.")
     end
     
     describe "retrieval" do
       before :each do
-        @g = Factory.create(:goal)
+        @g = Factory.create(:goal_w_blog)
       end
       
       describe "of new posts" do 

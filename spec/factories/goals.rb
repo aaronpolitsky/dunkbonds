@@ -4,9 +4,20 @@ Factory.define :goal do |g|
   g.starts_at DateTime.civil(2012, 9, 1)
   g.ends_at DateTime.civil(2013, 9, 1)
   g.period "1 month"
+  g.blog_url ""
+  g.blog_service_provider ''
+end
+
+Factory.define :goal_w_blog, :class => Goal do |g|
+  g.title "blah"
+  g.description "blahblah"
+  g.starts_at DateTime.civil(2012, 9, 1)
+  g.ends_at DateTime.civil(2013, 9, 1)
+  g.period "1 month"
   g.blog_url "http://rsstestdunkbonds.blogspot.com/feeds/posts/default"
   g.blog_service_provider 'Blogger (blogspot)'
 end
+
 
 #from fixtures
 Factory.define :invalid_period, :class => Goal do |g|

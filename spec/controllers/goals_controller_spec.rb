@@ -196,7 +196,7 @@ describe GoalsController do
 
   describe "GET edit" do
     before :each do
-      @goal = Factory.create(:goal)
+      @goal = Factory.create(:goal_w_blog)
       get :edit, {:id => @goal.to_param}
     end
 

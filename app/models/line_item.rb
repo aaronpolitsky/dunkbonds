@@ -66,9 +66,13 @@ class LineItem < ActiveRecord::Base
 
     used_bond_asks = asks.where(:parent_id => nil)
     swap_bond_asks = asks - used_bond_asks
+
     if self.max_bid_min_ask < self.account.goal.bond_face_value
-      # add in logic to only include used_bond_asks if is_bondholder
-      matches = swap_bond_asks + used_bond_asks
+      if self.account.is_bondholder?
+        matches = swap_bond_asks + used_bond_asks
+      else
+        matches = swap_bond_asks  
+      end
     else
       sbaqty = swap_bond_asks.inject(0){|sum, e| sum += e.qty }
       if sbaqty < self.qty
