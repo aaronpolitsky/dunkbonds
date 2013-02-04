@@ -84,11 +84,12 @@ describe GoalsController do
         response.should have_selector ".all_goals .goal", :content => @goals.first.title
       end
       
-      it "a list of followed goals" do
+      it "a list of followed goals and the user's respective accounts" do
         response.should have_selector 'h3', :content => "Followed Goals"
         response.should have_selector ".followed_goals .goal", :content => @followed_goals.first.title
+        response.should have_selector 'a', :href => goal_account_path(@user.accounts.last.goal, @user.accounts.last), :content => 'Account'
       end
-      
+
       it "a list of unfollowed goals" do
         response.should have_selector 'h3', :content => "Other Goals"
         response.should have_selector ".unfollowed_goals .goal", :content => @unfollowed_goals.first.title

@@ -9,7 +9,7 @@ class LineItem < ActiveRecord::Base
 
 
   TYPES = ["bond bid", "bond ask", "swap bid", "swap ask"]
-  UI_TYPES = ["bond bid", "bond ask", "swap bid", "swap ask"]  
+  UI_TYPES = ["bond bid", "bond ask", "swap bid"]  
 
   STATUSES = ["new", "pending", "executed", "cancelled"]
 
@@ -18,8 +18,12 @@ class LineItem < ActiveRecord::Base
   validates :account, :presence => true
 
   validate :enough_bonds_to_cover_cart_asks, :only => [:create, :update]
+  validate :children_rules
+  validate :swap_bids_must_bid_face
   
   after_create :create_bond_ask_for_swap_bid
+  before_validation :sync_swap_bid_qty_to_bond_ask_qty
+  after_update :sync_bond_ask_qty_to_swap_bid_qty
 
   def cancel!
     if self.status == "pending"
@@ -204,11 +208,43 @@ class LineItem < ActiveRecord::Base
 
   def enough_bonds_to_cover_cart_asks
     if self.type_of == "bond ask" && self.status == "new" && !self.parent_id && !self.account.is_treasury
-      clis = self.account.line_items.where(:type_of => "bond ask", :parent_id => nil).where("cart_id")
+      clis = self.account.line_items.where(:type_of => "bond ask", :parent_id => nil).where(:cart_id => self.account.user.cart.id)
       cart_qty = clis.sum(:qty)
       if self.qty + cart_qty > self.account.bond_qty
         self.errors.add(:qty, "If we added this to your cart, you'd be trying to sell more bonds than you own.")
       end
     end
   end
+
+  def children_rules
+    if self.parent_id 
+      if self.type_of == "bond ask"
+        errors.add(:qty, "must equal swap qty of #{self.parent.qty}.") if self.qty != self.parent.reload.qty
+      else
+        errors.add(:type_of, "must be bond ask if linked to a swap bid")
+      end
+    end
+  end
+
+  def sync_bond_ask_qty_to_swap_bid_qty
+    if self.status == "new" && self.type_of == "swap bid" && self.changed.include?("qty") && (self.child.qty != self.qty)
+      self.child.update_attributes!(:qty => self.qty)#, :validate => false)
+    end
+  end
+
+  def sync_swap_bid_qty_to_bond_ask_qty
+    if self.status == "new" && self.type_of == "bond ask" && self.parent
+      if self.changed.include?("qty") && self.parent.qty != self.qty
+        self.parent.qty = self.qty 
+        self.parent.save!
+      end
+    end
+  end
+
+  def swap_bids_must_bid_face
+    if self.type_of == "swap bid" && self.max_bid_min_ask < self.account.goal.bond_face_value
+      errors.add(:max_bid_min_ask, "must be face value ($#{self.account.goal.bond_face_value})")
+    end
+  end
+
 end

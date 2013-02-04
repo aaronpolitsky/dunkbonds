@@ -27,6 +27,7 @@ describe LineItemsController do
     @goal = Factory.create(:goal)
     @user.follow_goal(@goal)
     @account = @user.accounts.last
+    request.env["HTTP_REFERER"] = "where_i_came_from"
   end
 
   # This should return the minimal set of attributes required to create a valid
@@ -156,6 +157,34 @@ describe LineItemsController do
         LineItem.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
         put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => {'these' => 'params'}}
       end
+
+      describe "that's a swap bid" do
+        it "updates its child ask qty if changed" do
+          swap = @account.line_items.create!(:type_of => "swap bid",
+                                             :qty => 1,
+                                             :max_bid_min_ask => @goal.bond_face_value)
+          child = swap.child
+          @cart.line_items << swap
+          @cart.line_items << child          
+          put :update, {:account_id => @account.to_param  , :id => swap.to_param, :line_item => {:qty => 2}}
+          swap.reload.qty.should eq 2
+          swap.child.reload.qty.should eq 2
+        end
+      end
+
+      describe "that's a child bond ask" do
+        it "updates its qty and its parent's swap qty" do
+          swap = @account.line_items.create!(:type_of => "swap bid",
+                                             :qty => 1,
+                                             :max_bid_min_ask => @goal.bond_face_value)
+          child = swap.child
+          @cart.line_items << swap
+          @cart.line_items << child          
+          put :update, {:account_id => @account.to_param  , :id => child.to_param, :line_item => {:qty => 2}}
+          swap.reload.qty.should eq 2
+          swap.reload.child.qty.should eq 2
+        end
+      end
       
       it "assigns the requested line_item as @line_item" do
         put :update, {:account_id => @account.to_param  , :id => @line_item.to_param, :line_item => valid_attributes}
@@ -267,9 +296,9 @@ describe LineItemsController do
         @line_item.status.should eq "cancelled"
       end
     
-      it  "redirects to its order" do
+      it  "redirects back" do
         delete :destroy, {:account_id => @account.to_param  , :id => @line_item.to_param}
-        response.should redirect_to(@order)
+        response.should redirect_to("where_i_came_from")
       end
     end
   end

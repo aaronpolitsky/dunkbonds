@@ -42,7 +42,7 @@ class LineItemsController < ApplicationController
         if @line_item.type_of == "swap bid"
           @bond_ask = @line_item.child
           @cart.line_items << @bond_ask
-          format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "Swap created.  Please fill in its corresponding Bond Sale order." }
+          format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "We added the request to your cart.  Now please fill in the details of how you'd like to sell these bonds." }
         else
           format.html { redirect_to(@cart, :notice => 'We added the item to your cart.') }
           format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
@@ -94,7 +94,7 @@ class LineItemsController < ApplicationController
       redirect_to(cart, :notice => 'Trade request removed from cart.') 
     else #the line_item is already part of an order
       @line_item.cancel! if @line_item.status == "pending"
-      redirect_to @line_item.order
+      redirect_to(:back, :notice => 'Trade request canceled.')
     end
   end
 

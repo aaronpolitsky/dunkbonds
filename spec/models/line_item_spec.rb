@@ -3,12 +3,14 @@ require 'spec_helper'
 describe LineItem do
   before do
     @user = Factory.create(:user)
+    @user2 = Factory.create(:asdf)
     @goal = Factory.create(:goal)
-    @user.follow_goal @goal
     @account = @user.accounts.last
     @face = @goal.bond_face_value
-    @buyer = @goal.accounts.create!
-    @seller = @goal.accounts.create!
+    @user.follow_goal @goal
+    @user2.follow_goal @goal
+    @buyer = @user.accounts.last
+    @seller = @user2.accounts.last
     @escrow   = @goal.escrow
     @treasury = @goal.treasury
   end
@@ -43,6 +45,25 @@ describe LineItem do
     end
   end 
 
+  describe "updating" do
+    it "a new swap bid qty updates its child qty automatically" do
+      swap = @seller.line_items.create!(:type_of => "swap bid",
+                                        :qty => 1,
+                                        :max_bid_min_ask => @goal.bond_face_value)
+      swap.update_attributes!(:qty => 2)
+      swap.child.reload.qty.should eq swap.qty
+    end
+
+    it "a new swap bond ask's qty updates its swap qty automatically " do
+      swap = @seller.line_items.create!(:type_of => "swap bid",
+                                        :qty => 1,
+                                        :max_bid_min_ask => @goal.bond_face_value)
+      child = swap.child
+      child.qty = 2
+      child.save!
+      swap.reload.qty.should eq child.qty
+    end
+  end
 
   describe "must" do #validations
     it "have a valid quantity" do
@@ -61,16 +82,15 @@ describe LineItem do
       @buyer.line_items.new(:type_of => "bond ask",
                             :max_bid_min_ask => 10,
                             :qty => 10).should_not be_valid
-      @buyer.line_items.new(:type_of => "bond ask",
-                            :parent_id => 4, #fake
+      swapbid = @buyer.line_items.create!(:type_of => "swap bid",
                             :max_bid_min_ask => 10,
-                            :qty => 10).should be_valid
-
+                            :qty => 10)
+      swapbid.child.should be_valid
     end
 
     it "not be valid if the cart's qty of bond asks would exceed the account's bond qty." do
       # pending "this might be better checked before order creation"
-      cart = Cart.create!
+      cart = @user.cart
       @buyer.bonds.create!(:debtor => @treasury, :qty => 5)
       @buyer.line_items.create!(:type_of => "bond ask",
                                 :max_bid_min_ask => 10,
@@ -82,13 +102,13 @@ describe LineItem do
       @buyer.line_items.new(:type_of => "bond ask",
                             :max_bid_min_ask => 10,
                             :qty => 1).should be_valid
-      @buyer.line_items.new(:type_of => "bond ask",
+      swapbid = @buyer.line_items.create!(:type_of => "swap bid",
                             :max_bid_min_ask => 10,
-                            :parent_id => 1, #swap bond ask
-                            :qty => 1).should be_valid
+                            :qty => 1)
+      swapbid.child.should be_valid
     end
 
-    it "must belong to either a cart or an order" do
+    it "belong to either a cart or an order" do
       pending "not sure about this"
       @buyer.line_items.new(:type_of => "bond bid",
                             :max_bid_min_ask => 4,
@@ -108,26 +128,59 @@ describe LineItem do
                             :qty => 10).should_not be_valid
     end
 
+    it "have an initial status of new" do
+      l = @buyer.line_items.create!(:qty => 1,
+                                    :max_bid_min_ask => 10)
+      l.status.should eq "new"
+    end
+
+    it "creation of a swap bid should create its child bond ask" do
+      swap_bid = @seller.line_items.new(:type_of => "swap bid",
+                                        :qty => 5,
+                                        :max_bid_min_ask => @face)
+      expect { swap_bid.save! }.to change(LineItem, :count).by 2
+
+      swap_bid.child.should eq LineItem.last
+      swap_bid.child.parent.should eq swap_bid
+      swap_bid.child.type_of.should eq "bond ask"
+      swap_bid.child.qty.should eq swap_bid.qty
+    end
+
   end
 
-  it "should have an initial status of new" do
-    l = @buyer.line_items.create!(:qty => 1,
-                                  :max_bid_min_ask => 10)
-    l.status.should eq "new"
+  describe "swap bids must" do
+    it "bid at least face value" do
+      swap_bid = @seller.line_items.new(:type_of => "swap bid",
+                                        :qty => 5,
+                                        :max_bid_min_ask => @face/2)
+      swap_bid.should_not be_valid
+    end
   end
 
-  it "creation of a swap bid should create its child bond ask" do
-    swap_bid = @seller.line_items.new(:type_of => "swap bid",
-                                      :qty => 5,
-                                      :max_bid_min_ask => @face)
-    expect {
-      swap_bid.save!
-    }.to change(LineItem, :count).by 2
+  describe "line_items having a parent must" do #validations
+    before :each do
+      @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
+                                             :qty => 5,
+                                             :max_bid_min_ask => @face)
+      @child = @swap_bid.child
+    end
+    
+    it "be bond asks"  do 
+      @child.type_of = "bond bid"
+      @child.should_not be_valid
+      @child.type_of = "swap bid"      
+      @child.should_not be_valid
+      @child.type_of = "swap ask"      
+      @child.should_not be_valid
+    end
 
-    swap_bid.child.should eq LineItem.last
-    swap_bid.child.parent.should eq swap_bid
-    swap_bid.child.type_of.should eq "bond ask"
-    swap_bid.child.qty.should eq swap_bid.qty
+    xit "inherit qty from parent" do
+      @child.qty = @swap_bid.qty-1
+      @child.should_not be_valid      
+      @child.qty = @swap_bid.qty+1      
+      @child.should_not be_valid      
+    end
+
   end
 
 
@@ -267,6 +320,7 @@ describe LineItem do
           
           @swap_bid.qty = @good1.qty = 5
           @swap_bid.save!
+          @good1.parent.reload
           @good1.save!
           matches = @bond_bid.find_matching_bond_asks
           matches.should include @good1

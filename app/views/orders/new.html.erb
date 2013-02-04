@@ -1,15 +1,11 @@
-<h1>New order</h1>
+<h1>Preview Your Order</h1>
 
-
-<table>
-  <tr>
-    <th>Line Item Account</th>
+<table> Trade Requests
+  <tr> 
     <th>Status</th>
     <th>Type of</th>
-    <th>Max bid min ask</th>
-    <th>Goal</th>
-    <th>Cart</th>
-    <th>Order</th>
+    <th>Quantity</th>    
+    <th>Bid/Ask Price</th>
     <th></th>
     <th></th>
     <th></th>
@@ -18,10 +14,6 @@
 <%= render current_cart.line_items %>
 </table>
 
-
-<h4>
-Finalize Order
-</h4>
 <%= render 'form' %>
 
 <%= link_to 'Back', @order %>
