@@ -10,7 +10,8 @@ class AccountsController < ApplicationController
 #  before_filter :is_admin?, :only => [:index, :edit, :update]
 
   def index
-    @accounts = @goal.accounts.where('user_id') #is non-nil
+    @accounts = @goal.accounts.where("user_id IS NOT NULL")#:is_treasury => false, 
+#                                     :is_escrow => false)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -22,7 +23,7 @@ class AccountsController < ApplicationController
   # GET /accounts/1.xml
   def show
     @account = @goal.accounts.find(params[:id])
-    @line_items = @account.line_items.where("order_id")
+    @line_items = @account.line_items.where("order_id IS NOT NULL")
 #    @order_line_items = @line_items.where(:order_id).group_by { |li| li.order_id } 
 
     respond_to do |format|

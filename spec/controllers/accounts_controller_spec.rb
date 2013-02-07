@@ -102,8 +102,8 @@ describe AccountsController do
           end
 
           it "ordered line items" do          
-            line_items = @account.line_items.where("order_id")
-            cart_line_items  = @account.line_items.where(:cart_id)
+            line_items = @account.line_items.where("order_id IS NOT NULL")
+            cart_line_items  = @account.line_items.where("cart_id IS NOT NULL")
             get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
             assigns(:line_items).should_not include(cart_line_items)
             response.should have_selector ".line_items .line_item"
