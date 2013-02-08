@@ -46,7 +46,7 @@ describe LineItemsController do
     before :each do
       @line_item = @account.line_items.create!  valid_attributes
       @line_item.execute!
-      get :show, {:account_id => @account.to_param  , :id => @line_item.to_param}
+      get :show, {:account_id => @account.to_param, :id => @line_item.to_param}
     end
 
     it "assigns the requested line_item as @line_item" do
@@ -62,8 +62,9 @@ describe LineItemsController do
     end
 
     it "does not display trades for line_items without trades" do
-      @line_item = @account.line_items.create! valid_attributes
-      get :show, {:account_id => @account.to_param, :id => @line_item.to_param }
+      line_item = @account.line_items.create! valid_attributes.merge(:max_bid_min_ask => @goal.bond_face_value/2)
+      line_item.execute!
+      get :show, {:account_id => @account.to_param, :id => line_item.to_param }
       response.should_not have_selector ".line_items .line_item .trades"
     end
   end

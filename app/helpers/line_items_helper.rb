@@ -1,2 +1,3 @@
 module LineItemsHelper
+
 end
