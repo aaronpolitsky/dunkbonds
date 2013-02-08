@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130111164629) do
+ActiveRecord::Schema.define(:version => 20130208190606) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -34,6 +34,12 @@ ActiveRecord::Schema.define(:version => 20130111164629) do
   end
 
   add_index "bonds", ["creditor_id", "debtor_id"], :name => "creditor_debtor", :unique => true
+
+  create_table "cancellations", :force => true do |t|
+    t.integer  "line_item_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "carts", :force => true do |t|
     t.integer  "user_id"

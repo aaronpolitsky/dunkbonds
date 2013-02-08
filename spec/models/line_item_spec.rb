@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe LineItem do
-  before do
+  before :each do
     @user = Factory.create(:user)
     @user2 = Factory.create(:asdf)
     @goal = Factory.create(:goal)
@@ -31,19 +31,27 @@ describe LineItem do
     end
   end  
 
-  describe "can have many trades" do
-    it "and responds to buys" do
+  describe "can have" do
+    it "one cancellation" do
       l = @buyer.line_items.create!(:qty => 1,
                                     :max_bid_min_ask => 10)
-      l.should respond_to(:buys)   
+      l.should respond_to :cancellation
     end
-    
-    it "and responds to sells" do
-      l = @buyer.line_items.create!(:qty => 1,
-                                    :max_bid_min_ask => 10)
-      l.should respond_to(:sells)   
-    end
-  end 
+
+    describe "many trades" do
+      it "and responds to buys" do
+        l = @buyer.line_items.create!(:qty => 1,
+                                      :max_bid_min_ask => 10)
+        l.should respond_to(:buys)   
+      end
+      
+      it "and responds to sells" do
+        l = @buyer.line_items.create!(:qty => 1,
+                                      :max_bid_min_ask => 10)
+        l.should respond_to(:sells)   
+      end
+    end 
+  end
 
   describe "updating" do
     it "a new swap bid qty updates its child qty automatically" do
@@ -145,7 +153,6 @@ describe LineItem do
       swap_bid.child.type_of.should eq "bond ask"
       swap_bid.child.qty.should eq swap_bid.qty
     end
-
   end
 
   describe "swap bids must" do
@@ -703,56 +710,10 @@ describe LineItem do
       end
     end
 
-    # describe "of a swap ask" do
-    #   before :each do
-    #     @seller.swaps.create(:qty => 5, :debtor => @treasury)
-    #     @swap_ask = Factory.create(:swap_ask, :account => @seller, :qty => 5)
-    #   end
-
-    #   describe "that executes" do
-    #     before :each do
-    #       @swap_bid = Factory.create(:swap_bid, :account => @buyer, :qty => 5)
-    #     end 
-
-    #     pending "creates trades called sells" do
-    #       @swap_ask.execute!
-    #       @swap_ask.sells.count.should eq 1
-    #     end
-
-    #     pending "marks itself and its trades' line_items as executed" do
-    #       expect {
-    #         @swap_ask.execute!
-    #       }.to change(@swap_ask, :status).from("pending").to("executed")
-    #       change(@swap_ask.sells.last.bid.reload, :status).from("pending").to("executed")
-    #     end
-    #   end
-
-    #   describe "that pends" do
-    #     pending "transfers swaps from seller to escrow" do
-    #       @swap_ask.execute!
-    #       @seller.reload.swaps.sum(:qty).should eq 0
-    #       @escrow.reload.swaps.sum(:qty).should eq 5
-    #     end
-
-    #     pending "does not create trades" do
-    #       expect {
-    #         @swap_ask.execute!
-    #       }.not_to change(Trade, :count)
-    #     end
-
-    #     pending "keeps its status as pending" do
-    #       expect {
-    #         @swap_ask.execute!
-    #       }.not_to change(@swap_ask, :status).from("pending").to("executed")
-    #     end
-
-    #   end
-    # end
   end
 
   describe "cancellation" do
     it "only cancels pending line_items" do
-
       l = @buyer.line_items.create!(:type_of => "bond bid",
                                     :qty => 1,
                                     :max_bid_min_ask => @goal.bond_face_value-2)
@@ -776,7 +737,7 @@ describe LineItem do
       }.to change(l, :status).to "cancelled"
     end
 
-    describe "of a swap ask" do
+    describe "of a swap bid" do
       before :each do
         @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
                                                :qty => 7,
@@ -791,6 +752,14 @@ describe LineItem do
         @seller.swap_qty.should eq 0
         Bond.count.should eq 0
       end
+
+      it "creates its and its child's cancellation" do
+        expect {
+          @swap_bid.cancel!
+        }.to change(Cancellation, :count).by 2
+        @swap_bid.cancellation.should eq Cancellation.first
+        @swap_bid.child.cancellation.should eq Cancellation.last
+      end 
 
       it "only destroys qty swaps if more than a few exist" do
         other_swap_bid = @seller.line_items.create!(:type_of => "swap bid",
@@ -809,6 +778,55 @@ describe LineItem do
 
     describe "of a bond ask" do
 
+      describe "that has a parent swap" do
+        before :each do
+          @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
+                                                 :qty => 7,
+                                                 :max_bid_min_ask => @goal.bond_face_value)
+          @bond_ask = @swap_bid.child
+          @bond_ask.max_bid_min_ask = @goal.bond_face_value/2
+          @bond_ask.save!
+          @swap_bid.execute!
+        end
+
+        it "cancels its parent swap as well" do
+          @bond_ask.cancel!
+          @bond_ask.reload.status.should eq "cancelled"
+          @swap_bid.reload.status.should eq "cancelled"
+        end
+
+        it "gets its bonds back from escrow" do
+          @escrow.bond_qty.should eq 7
+          @bond_ask.cancel!
+          @escrow.reload.bond_qty.should eq 0
+        end
+      end
+
+      describe "that does not have a parent swap" do
+        before :each do
+          @seller.bonds.create!(:debtor => @treasury, :qty => 10)
+          @bond_ask = @seller.line_items.create!(:type_of => "bond ask",
+                                                 :qty => 7,
+                                                 :max_bid_min_ask => @goal.bond_face_value/2)
+          @bond_ask.execute!
+        end
+
+        it "cancels itself and creates its cancellation" do
+          @bond_ask.cancel!
+          @bond_ask.reload.status.should eq "cancelled"
+          @seller.reload.bond_qty.should eq 10
+          @bond_ask.cancellation.should eq Cancellation.last
+        end
+
+        it "removes its bonds from escrow" do
+          @seller.bond_qty.should eq 3
+          @escrow.bond_qty.should eq 7
+          @bond_ask.cancel!
+          @seller.reload.bond_qty.should eq 10
+          @escrow.bond_qty.should eq 0
+        end
+                
+      end
     end
 
     describe "of a bond bid" do
@@ -819,6 +837,13 @@ describe LineItem do
                                                  :max_bid_min_ask => @goal.bond_face_value-1)
           @bond_bid.execute!
         end
+
+        it "creates its cancellation" do
+          expect {
+            @bond_bid.cancel!
+          }.to change(Cancellation, :count).by 1
+          @bond_bid.cancellation.should eq Cancellation.last
+        end 
 
         it "gets its money back from escrow" do
           @escrow.reload.balance.should eq 63

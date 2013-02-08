@@ -6,7 +6,7 @@ class LineItem < ActiveRecord::Base
   has_one    :child, :class_name => "LineItem", :foreign_key => :parent_id
   has_many :buys, :class_name => "Trade", :foreign_key => :bid_id
   has_many :sells, :class_name => "Trade", :foreign_key => :ask_id
-
+  has_one :cancellation
 
   TYPES = ["bond bid", "bond ask", "swap bid", "swap ask"]
   UI_TYPES = ["bond bid", "bond ask", "swap bid"]  
@@ -31,8 +31,10 @@ class LineItem < ActiveRecord::Base
       when "swap bid"
         self.status = "cancelled"
         self.save!
+        self.create_cancellation!
         self.child.status = "cancelled"
         self.child.save!  
+        self.child.create_cancellation!
         swap = Bond.find_by_creditor_id_and_debtor_id(self.account.goal.escrow,
                                                       self.account)                          
         self.qty.times { swap.decrement! }
@@ -42,6 +44,7 @@ class LineItem < ActiveRecord::Base
                                                     self.account)
         self.status = "cancelled"
         self.save!
+        self.create_cancellation!        
       #####################
       when "bond ask"
         if (self.parent && self.parent.status == "pending")
@@ -50,6 +53,7 @@ class LineItem < ActiveRecord::Base
           self.qty.times { self.account.goal.escrow.transfer_bond_to!(self.account) }
           self.status = "cancelled"
           self.save!
+          self.create_cancellation!          
         end 
       #####################
       else    
