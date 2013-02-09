@@ -400,6 +400,95 @@ describe LineItem do
     end
   end
 
+  describe "actual_matches(matches)" do
+    describe "for qty == 1" do
+      before :each do 
+        @bid = @buyer.line_items.create!(:type_of => "bond bid", 
+                                        :qty => 1,
+                                        :max_bid_min_ask => @goal.bond_face_value/2)
+        @seller.bonds.create!(:debtor => @treasury, :qty => 1000) #loads
+      end
+
+      it "should return [] if matches is empty" do
+        @bid.actual_matches([]).should eq []
+      end
+
+      it "should return the first suitable match" do
+        a = @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @goal.bond_face_value/2)
+        b = @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @goal.bond_face_value/2)
+        c = @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @goal.bond_face_value/2)                
+        @bid.actual_matches(@seller.line_items.order(:created_at)).should eq [a]
+      end
+    end
+
+    describe "for qty > 1" do
+      it "should return [] if there isn't enough qty out there" do
+        @bid = @buyer.line_items.create!(:type_of => "bond bid", 
+                                        :qty => 5,
+                                        :max_bid_min_ask => @goal.bond_face_value/2)
+        @bid.actual_matches([]).should eq []
+      end
+
+      describe "should return actual matches only if all can meet their qty" do
+        describe "so a bid of 5 matches to" do
+          before :each do
+            @bid = @buyer.line_items.create!(:type_of => "bond bid", 
+                                        :qty => 5,
+                                        :max_bid_min_ask => @goal.bond_face_value/2)
+            @seller.bonds.create!(:debtor => @treasury, :qty => 1000) #loads
+          end
+          
+          it "asks of 1 and 4" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 4, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)            
+            @bid.actual_matches(@seller.line_items).should eq (@seller.line_items[0..1])
+            @bid.actual_matches(@seller.line_items).should_not include (@seller.line_items.last)
+          end
+          it "asks of 2 and 3" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 2, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 3, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)                        
+            @bid.actual_matches(@seller.line_items).should eq (@seller.line_items[0..1])
+          end
+          it "asks of 3 and 2" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 3, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 2, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @bid.actual_matches(@seller.line_items).should eq (@seller.line_items)
+          end
+          it "asks of 4 and 1" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 4, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @bid.actual_matches(@seller.line_items).should eq (@seller.line_items)
+          end
+          it "asks of 1, 2, and 2" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 2, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 2, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @bid.actual_matches(@seller.line_items).should eq (@seller.line_items)
+          end
+          it "an ask of 5" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 5, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @bid.actual_matches(@seller.line_items).should eq (@seller.line_items)
+          end
+          it "asks of 3, 1, and 1, but skips certain asks" do
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 3, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 3, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 2, :max_bid_min_ask => @bid.max_bid_min_ask)            
+            @seller.line_items.create!(:type_of => "bond ask", :qty => 1, :max_bid_min_ask => @bid.max_bid_min_ask)            
+            ams = @bid.actual_matches(@seller.line_items)
+            ams.should eq ([@seller.line_items[0], @seller.line_items[2], @seller.line_items[4]])
+            ams.should_not include @seller.line_items[1]
+            ams.should_not include @seller.line_items[3]            
+          end
+        end  
+
+      end
+    end
+    
+  end
+
   describe "find_matching_bond_bids" do
     describe "when asking face" do 
       before :each do
@@ -418,6 +507,7 @@ describe LineItem do
         @bond_ask.find_matching_bond_bids.should eq []        
       end      
     end
+
     describe "when asking less than face" do
       before :each do
         @asking = @goal.bond_face_value/2

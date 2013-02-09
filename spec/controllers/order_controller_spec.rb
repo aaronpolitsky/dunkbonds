@@ -117,9 +117,7 @@ describe OrdersController do
   describe "ORDER create" do
     describe "with valid params" do
       it "creates a new Order" do
-        expect {
-          post :create, {:order => valid_attributes}
-        }.to change(Order, :count).by(1)
+        expect { post :create, {:order => valid_attributes} }.to change(Order, :count).by(1)
       end
 
       it "assigns a newly created order as @order" do
@@ -136,7 +134,7 @@ describe OrdersController do
       it "gets all the cart line_items" do
         li = @account.line_items.create!(:qty => 1,
                                          :max_bid_min_ask => 10,
-                                        :type_of => "bond bid")
+                                         :type_of => "bond bid")
         @user.cart.line_items << li
         post :create, {:order => valid_attributes}
         @user.cart.line_items.empty?.should eq true
@@ -147,14 +145,56 @@ describe OrdersController do
         post :create, {:order => valid_attributes}        
         @user.cart.should_not be nil
       end
-    end
 
-    describe "with invalid params" do
-      it "assigns a newly created but unsaved order as @order" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Order.any_instance.stub(:save).and_return(false)
-        post :create, {:order => {}}
-        assigns(:order).should be_a_new(Order)
+      describe "that results in pending line items" do
+
+        it "attempts to execute existing pending line items" do
+          user2 = Factory.create(:asdf)
+          sign_in user2
+          user2.follow_goal(@goal)
+          otheracc = user2.accounts.last
+          otheracc.bonds.create!(:debtor => @goal.treasury, :qty => 2)
+          oli1 = otheracc.line_items.create!(:qty => 2,
+                                             :type_of => "bond ask",
+                                             :max_bid_min_ask => @goal.bond_face_value/2-1)
+          oli1.execute!
+          oli1.status.should eq "pending"
+          otheracc.bonds.create!(:debtor => @goal.treasury, :qty => 2)
+          oli2 = otheracc.line_items.create!(:qty => 2,
+                                             :type_of => "bond ask",
+                                             :max_bid_min_ask => @goal.bond_face_value/2-1)
+          oli2.execute!
+          oli2.status.should eq "pending"
+          sign_out user2
+          sign_in @user
+
+          li1 = @account.line_items.create!(:qty => 1,
+                                            :max_bid_min_ask => @goal.bond_face_value/2,
+                                            :type_of => "bond bid")
+          @user.cart.line_items << li1
+          post :create, {:order => valid_attributes}          
+          oli1.reload.status.should eq "pending"
+          oli2.reload.status.should eq "pending"                    
+          li1.reload.status.should eq "pending"
+          li2 = @account.line_items.create!(:qty => 1,
+                                            :max_bid_min_ask => @goal.bond_face_value/2,
+                                            :type_of => "bond bid")          
+          @user.cart.line_items << li2
+          post :create, {:order => valid_attributes}
+          oli1.reload.status.should eq "executed"
+          oli2.reload.status.should eq "pending"
+          li1.reload.status.should eq "executed"
+          li2.reload.status.should eq "executed"
+        end
+      end
+
+      describe "with invalid params" do
+        it "assigns a newly created but unsaved order as @order" do
+          # Trigger the behavior that occurs when invalid params are submitted
+          Order.any_instance.stub(:save).and_return(false)
+          post :create, {:order => {}}
+          assigns(:order).should be_a_new(Order)
+        end
       end
 
       it "re-renders the 'new' template" do
@@ -213,9 +253,7 @@ describe OrdersController do
   describe "DELETE destroy" do
     it "destroys the requested order" do
       order = @user.orders.create! valid_attributes
-      expect {
-        delete :destroy, {:id => order.to_param}
-      }.to change(Order, :count).by(-1)
+      expect { delete :destroy, {:id => order.to_param} }.to change(Order, :count).by(-1)
     end
 
     it "redirects to the orders list" do

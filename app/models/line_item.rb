@@ -93,35 +93,7 @@ class LineItem < ActiveRecord::Base
       matches = swap_bond_asks + matches
     end
   
-    #quit if there aren't enough
-    return [] if matches.empty?
-
-    mqty = matches.inject(0){|sum, e| sum += e.qty}
-    
-    return [] if mqty < self.qty
-
-    bestmatches =[]
-    q = self.qty
-    matches.each do |m|
-      if q == m.qty  #if qty is exact
-        bestmatches << m
-        return bestmatches
-      elsif (q > m.qty)  #if we still need more than m.qty
-        q -= m.qty
-        bestmatches << m
-      else # (qty < m.qty), create a new lineitem of qty and decrement m.qty by qty
-      #   firstqty = LineItem.create! m.attributes.merge(:qty => q)
-      #   m.qty -= q
-      #   m.save!
-      #   bestmatches << firstqty
-      #   return bestmatches
-      end    
-    end    
-    if q == 0 
-      return bestmatches                   
-    else
-      return []
-    end
+    actual_matches(matches)
   end
 
   def find_matching_bond_bids
@@ -131,8 +103,42 @@ class LineItem < ActiveRecord::Base
                                                  "account_id != ?", self.account_id).where(
                                                  "max_bid_min_ask >= ?", self.max_bid_min_ask).where(
                                                  "qty <= ?", self.qty).order("created_at ASC, max_bid_min_ask DESC")
+    actual_matches(matches)                                                              
   end
 
+  def actual_matches(matches)
+    #quit if there aren't enough
+    return [] if matches.empty?
+
+    mqty = matches.inject(0){|sum, e| sum += e.qty}
+    
+    return [] if mqty < self.qty
+
+    actual_matches =[]
+    q = self.qty
+    matches.each do |m|
+      if q == m.qty  #if qty is exact
+        actual_matches << m
+        return actual_matches
+      elsif (q > m.qty)  #if we still need more than m.qty
+        q -= m.qty
+        actual_matches << m
+      else # (qty < m.qty), create a new lineitem of qty and decrement m.qty by qty
+      #   firstqty = LineItem.create! m.attributes.merge(:qty => q)
+      #   m.qty -= q
+      #   m.save!
+      #   actual_matches << firstqty
+      #   return actual_matches
+      end    
+    end
+    if q == 0 
+      return actual_matches                   
+    else
+      return []
+    end
+  end
+
+  
   def execute!
     unless self.status == "executed" || self.status == "cancelled" || !self.cart.nil?
 
@@ -167,6 +173,8 @@ class LineItem < ActiveRecord::Base
         matches = find_matching_bond_bids
         matches.each do |m|
           self.sells.create!(:bid => m, :qty => m.qty, :price => self.max_bid_min_ask)
+          m.status = "executed"  
+          m.save!
         end
         self.status = "executed" unless matches.empty?
         self.save!

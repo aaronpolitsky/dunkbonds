@@ -59,6 +59,7 @@ class OrdersController < ApplicationController
       if @order.save
         @order.get_cart_items
         @order.execute_line_items
+        @order.attempt_to_execute_all_pending_line_items
         format.html { redirect_to(@order, :notice => 'Order was successfully created.') }
         format.xml  { render :xml => @order, :status => :created, :location => @order }
       else

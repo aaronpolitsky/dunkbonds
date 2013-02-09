@@ -15,4 +15,14 @@ class Order < ActiveRecord::Base
       item.execute!
     end
   end
+
+  def attempt_to_execute_all_pending_line_items 
+    self.line_items.where(:status => "pending").each do |pli|
+      goal = pli.account.goal
+      pending_goal_line_items = goal.line_items.where(:status => "pending").order(:created_at) - [pli]
+      pending_goal_line_items.each do |li|
+        li.execute!
+      end
+    end
+  end
 end
