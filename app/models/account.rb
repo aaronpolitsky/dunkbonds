@@ -12,11 +12,13 @@ class Account < ActiveRecord::Base
   before_destroy :empty_account?, :order => :first
 
   def credit!(amt)
+    self.reload
     self.balance += amt
     self.save!
   end
 
   def debit!(amt)
+    self.reload
     self.balance -= amt
     self.save!
   end

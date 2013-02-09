@@ -59,6 +59,9 @@ class LineItem < ActiveRecord::Base
       else    
         #wrong!
       end 
+      self.account.goal.line_items.where(:status => "pending").order(:created_at).each do |li|
+        li.reload.execute!
+      end
     end
   end
 
@@ -188,10 +191,10 @@ class LineItem < ActiveRecord::Base
           self.status = "pending"
           self.save!
           self.child.execute!
-          return self if self.status == "executed"
+          return self if self.reload.status == "executed"
         end
 
-        if self.child.status == "executed"
+        if self.child.reload.status == "executed"
           m = self.account.goal.treasury.line_items.create!(:qty => self.qty,
                                                         :type_of => "swap ask",
                                                         :status => "pending",

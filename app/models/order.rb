@@ -12,7 +12,7 @@ class Order < ActiveRecord::Base
 
   def execute_line_items
     self.line_items.each do |item|
-      item.execute!
+      item.reload.execute!
     end
   end
 
@@ -21,7 +21,7 @@ class Order < ActiveRecord::Base
       goal = pli.account.goal
       pending_goal_line_items = goal.line_items.where(:status => "pending").order(:created_at) - [pli]
       pending_goal_line_items.each do |li|
-        li.execute!
+        li.reload.execute!
       end
     end
   end

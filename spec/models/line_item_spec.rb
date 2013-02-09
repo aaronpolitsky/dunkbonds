@@ -827,6 +827,24 @@ describe LineItem do
       }.to change(l, :status).to "cancelled"
     end
 
+    it "sees if any pending line items can execute now that it is cancelled" do
+      @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
+                                             :qty => 7,
+                                             :max_bid_min_ask => @goal.bond_face_value)
+      @swap_bid.child.max_bid_min_ask = 5
+      @swap_bid.child.save!
+      @swap_bid.execute!
+      @buyer.line_items.create!(:type_of => "bond bid", :qty => 5, :max_bid_min_ask => 5)
+      @buyer.line_items.create!(:type_of => "bond bid", :qty => 1, :max_bid_min_ask => 5)
+      @buyer.line_items.create!(:type_of => "bond bid", :qty => 2, :max_bid_min_ask => 5) 
+      @buyer.line_items.each {|li| li.execute! }
+      @swap_bid.reload.status.should eq "pending"        
+      @swap_bid.child.reload.status.should eq "pending"
+      @buyer.line_items[1].cancel!
+      @swap_bid.reload.status.should eq "executed"        
+      @swap_bid.child.reload.status.should eq "executed"
+    end
+
     describe "of a swap bid" do
       before :each do
         @swap_bid = @seller.line_items.create!(:type_of => "swap bid",
