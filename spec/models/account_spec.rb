@@ -43,6 +43,28 @@ describe Account do
         @buyer.line_items.last.should eq li
       end
     end
+
+    describe "payments and" do
+      before :each do
+        @p = Payment.create!(:payee => @treasury, 
+                            :recipient => @buyer, 
+                            :amount => 5.50)
+      end
+      
+      it "responds to payments if it is the payee" do
+        @treasury.should respond_to :payments
+        @treasury.payments.last.should eq @p
+        @buyer.payments.should eq []
+        @treasury.receipts.should eq []
+      end
+
+      it "responds to receipts if it is the recipient" do
+        @buyer.should respond_to :receipts
+        @buyer.receipts.last.should eq @p
+        @buyer.payments.should eq []
+        @treasury.receipts.should eq []        
+      end
+    end
   end
 
   describe "belongs to" do

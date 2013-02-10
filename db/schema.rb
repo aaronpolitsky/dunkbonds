@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130208190606) do
+ActiveRecord::Schema.define(:version => 20130210015652) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -74,6 +74,14 @@ ActiveRecord::Schema.define(:version => 20130208190606) do
 
   create_table "orders", :force => true do |t|
     t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "payments", :force => true do |t|
+    t.integer  "payee_id"
+    t.integer  "recipient_id"
+    t.decimal  "amount",       :precision => 8, :scale => 2, :default => 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
