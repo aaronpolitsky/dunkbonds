@@ -1,0 +1,15 @@
+<ul>
+  <% if user_signed_in? %>
+  <li>  <%= link_to('Logout', destroy_user_session_path, :method=>'delete') %></li>
+  <li>  <%= link_to('Settings', edit_user_registration_path) %>  </li>
+  <li>  <% if current_cart.line_items.empty? %>
+    <%= link_to("Cart (Empty)", current_cart) %>
+    <% else %>
+    <%= link_to("Cart (#{pluralize(@cart.line_items.count, 'item')})", current_cart) %>
+    <% end %>
+  </li>
+  <% else %>
+  <li><%= link_to('Log in', new_user_session_path)  %></li>
+  <li>  <%= link_to('Sign up', new_user_registration_path)  %>  </li>
+  <% end %>
+</ul>

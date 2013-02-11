@@ -1,0 +1,232 @@
+.container {
+  width: 710px;
+}
+
+/**
+* A couple of CSS rules to achieve equal-height columns in Blueprint CSS
+*/
+
+/* Apply to the sub-grid container */
+.equalcolumns {
+    overflow: hidden;
+}
+
+/* Note column classes must start with their span-x attribute */
+.equalcolumns *[class|="span"] {
+    /* Adjust values based on what you think their maximum height will be */
+    padding-bottom: 2000px;
+    margin-bottom: -2000px;
+}
+
+/* Usage:
+
+<div class="container">
+<!-- Sub-grid container -->
+<div class="span-24 equalcolumns">
+<div class="span-12 border">
+<p>Left-hand column</p>
+</div>
+<div class="span-12 last">
+<p>Watch</p>
+<p>The</p>
+<p>Border</p>
+<p>Match</p>
+<p>This</p>
+<p>Column's</p>
+<p>Height</p>
+</div>
+</div>
+</div>
+*/
+
+/* box shadows */
+
+header img, header nav, section, footer nav {
+  box-shadow:  0px 0px 40px rgba(0,0,0,.15);  
+}
+
+body {
+  background: #efe;
+}
+
+header {
+  padding-top: 20px;
+}
+
+header img {
+  padding: 1em;
+  background: #fff;
+}
+
+section {
+  margin-top: 1em;
+  font-size: 120%;
+  padding: 20px;
+  background: #fff;
+}
+
+section h1 {
+  font-size: 200%;
+}
+
+/* Links */
+
+a {
+  color: #082;
+  text-decoration: none;
+}
+
+a:hover {
+  color: darkorange;
+  text-decoration: underline;
+}
+
+/* Navigation */
+
+nav {
+  float: right;
+}
+
+nav {
+  background-color: white;
+  padding: 0 0.7em;
+  white-space: nowrap;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li {
+  list-style-type: none;
+  display: inline-block;
+  padding: 0.2em 0;
+}
+
+nav ul li a {
+  padding: 0 5px;
+  font-size: 125%;
+  font-weight: none;
+}
+
+nav ul li a:visited {
+  color: #072;
+}
+
+nav ul li a:hover {
+  color: darkorange;
+  text-decoration: underline;
+}
+
+
+/* Round corners */
+
+.round {
+  -moz-border-radius:    10px;
+  -webkit-border-radius: 10px;
+  border-radius:         10px;
+}
+
+
+/* Sign up button */
+
+a.big_button {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  text-align: center;
+  width: 50%;
+  color: #fff;
+  background: #006400;
+  font-size: 150%;
+  font-weight: bold;
+  padding: 20px;
+  
+  box-shadow: 0px 0px 15px 0px #efe inset;
+}
+
+footer {
+  text-align: center;
+  margin-top: 10px;
+  width: 710px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer nav {
+  float: none;
+}
+
+/* User show page */
+
+table.profile {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+td.main {
+  width: 70%;
+  padding: 1em;
+}
+
+td.sidebar {
+  width: 30%;
+  padding: 1em;
+  vertical-align: top;
+  background: #cdc;
+  box-shadow: 2px 5px 10px 0px #ddd;
+}
+
+sidebar {
+  width: 30%;
+  padding: 1em;
+  vertical-align: top;
+  background: #cdc;
+}
+
+.profile img.gravatar {
+  border: 1px solid #999;
+  margin-bottom: -15px;
+}
+
+/* devise registration */
+ul.hmenu {
+  list-style: none;	
+  margin: 0 0 2em;
+  padding: 0;
+}
+
+ul.hmenu li {
+  display: inline;  
+}
+
+.guest_banner {
+  padding: 5px 5px;
+  margin: 10px 0;
+  background-color: #FFC;
+  border:  solid 1px #DDA;
+  font-size: 125%;
+}
+
+#flash_notice, #flash_alert, #flash_error, #flash_warning, #flash_success{
+  padding: 5px 8px;
+  margin: 10px 0;
+}
+
+#flash_notice, #flash_success {
+  background-color: #CFC;
+  border: solid 1px #6C6;
+}
+
+#flash_error, #flash_alert {
+  background-color: #FCC;
+  border: solid 1px #C66;
+}
+
+#flash_warning {
+  background-color: #FFC;
+  border: solid 1px #CC6;
+}
+
+

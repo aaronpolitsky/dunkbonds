@@ -5,8 +5,4 @@
   <td><%= link_to 'url', post.url %></td>
   <td><%= post.published_at %></td>
   <td><%= post.guid %></td>
-  <td><%= post.is_visible %></td>
-  <td><%= link_to 'Show', goal_post_path(post.goal, post)  %></td>
-  <td><%= link_to 'Edit', edit_goal_post_path(post.goal, post) %></td>
-  <td><%= link_to 'Destroy', goal_post_path(post.goal, post), :confirm => 'Are you sure?', :method => :delete %></td>
 </tr>

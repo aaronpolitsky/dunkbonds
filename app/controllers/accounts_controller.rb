@@ -10,8 +10,7 @@ class AccountsController < ApplicationController
 #  before_filter :is_admin?, :only => [:index, :edit, :update]
 
   def index
-    @accounts = @goal.accounts.where("user_id IS NOT NULL")#:is_treasury => false, 
-#                                     :is_escrow => false)
+    @accounts = current_user.accounts
 
     respond_to do |format|
       format.html # index.html.erb
@@ -85,12 +84,17 @@ class AccountsController < ApplicationController
   # DELETE /accounts/1.xml
   def destroy
     @account = @goal.accounts.find(params[:id])
-    @account.destroy
-
+    
     respond_to do |format|
-      flash[:notice] = 'You are no longer following this goal.'
-      format.html { redirect_to(@goal) }
-      format.xml  { head :ok }
+      if @account.destroy
+        flash[:notice] = 'You are no longer following this goal.'
+        format.html { redirect_to(@goal) }
+        format.xml  { head :ok }
+      else
+        flash[:warning] = "And shank out on your DUNKbonds?  Nice try.  You can't unfollow a goal you are supporting."
+        format.html { redirect_to(@goal) }
+        format.xml  { head :ok }
+      end
     end
   end
 

@@ -27,7 +27,7 @@ http://blueprintcss.org
   padding:0;
 
 }
-.tabs li a {
+.tabs li a{
   background:#cdc;
   border-bottom:none; 
   border-top-left-radius: 3px;

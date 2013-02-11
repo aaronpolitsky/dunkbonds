@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
 
-  before_filter :load_goal
+  before_filter :load_stuff
 
   # GET /posts
   # GET /posts.xml
@@ -86,8 +86,9 @@ class PostsController < ApplicationController
 
   private
   
-  def load_goal
+  def load_stuff
     @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
+    @account = current_user.accounts.find_by_goal_id(@goal.id) if user_signed_in?
   end
 
 end

@@ -1,6 +1,6 @@
 class LineItemsController < ApplicationController
   before_filter :authenticate_user!
-  before_filter :load_account
+  before_filter :load_account_and_goal
 
   # GET /line_items/1
   # GET /line_items/1.xml
@@ -100,8 +100,9 @@ class LineItemsController < ApplicationController
 
   private
 
-  def load_account
+  def load_account_and_goal
     @account = Account.find(params[:account_id]) 
+    @goal = @account.goal
   end
 
 end

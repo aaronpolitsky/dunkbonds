@@ -1,4 +1,34 @@
 module ApplicationHelper
+
+	def within_a_goal?
+		(params[:controller].include? 'goal') && !(current_page?(root_path)) && !(current_page?(goals_path)) || 
+		(params[:controller].include? 'accounts') && !current_page?(accounts_path) || 
+		(params[:controller].include? 'posts') || 		
+		(params[:controller].include? 'line_item')
+	end
+
+	def logo
+    logo = image_tag("logo.png", :alt => "DUNKbonds", :class => "round")
+  end
+
+  def selected?(page)
+  	if current_page?(page)
+  		"selected"
+  	else
+	  	""
+	  end
+  end
+
+	# Return a title on a per-page basis.
+  def title
+    base_title = "DUNKbonds"
+    if @title.nil?
+      base_title
+    else
+      "#{base_title} | #{@title}"
+    end
+  end
+
 	def current_cart
 		current_user.cart
 	end

@@ -100,6 +100,10 @@ class Account < ActiveRecord::Base
     end
   end
 
+  def supporting?
+    self.bond_qty || self.swap_qty || self.line_items.where(:status => "pending")
+  end
+
   private
   
   def empty_account?

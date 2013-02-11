@@ -34,6 +34,12 @@ class User < ActiveRecord::Base
     self.followed_goals.include?(goal)
   end
 
+  def supporting?(goal) 
+    self.following?(goal) && self.accounts.find_by_goal_id(goal.id).supporting?
+  rescue ActiveRecord::RecordNotFound
+    false
+  end
+
 end
 
 

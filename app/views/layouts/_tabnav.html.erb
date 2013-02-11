@@ -1,0 +1,23 @@
+<ul class='tabs'>
+  <li><%= link_to "Home", goals_path, :class => selected?(root_path) %></li>  
+  <li><%= link_to "All Goals", goals_path, :class => selected?(goals_path) %></li>
+  <li><%= link_to "Your Accounts", accounts_path, :class => selected?(accounts_path) %></li>
+  <li><%= link_to "Orders", orders_path, :class => selected?(orders_path) %></li>
+</ul>
+<% if within_a_goal? %>
+<div class="goalheader round"><div class="goalheader round">
+  <ul class="tabs">
+    <h3>You are viewing the goal called:  <%= link_to @goal.title, @goal %></h3>
+    <li><%= link_to "Goal Blog", goal_posts_path(@goal), :class => selected?(goal_posts_path(@goal))  %></li>   
+    <% if user_signed_in? && current_user.following?(@goal) %>
+    <li><%= link_to "Account", goal_account_path(@goal, @account), :class => selected?(goal_account_path(@goal, @account))  %></li>
+    <li><%= link_to "Bonds", new_account_line_item_path(@account) %></li>  
+    <% else %>
+    <li><%= link_to "Account", new_goal_account_path(@goal), :class => selected?(new_goal_account_path(@goal)) %></li>
+    <li><%= link_to "Bonds", new_goal_account_path(@goal), :class => selected?(new_goal_account_path(@goal)) %></li>  
+    <% end %>
+  </ul>
+</div>
+<% end %>
+
+
