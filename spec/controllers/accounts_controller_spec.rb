@@ -85,8 +85,8 @@ describe AccountsController do
         @account.bonds.create!(:debtor => @treasury, :qty => 5)
         @account.swaps.create!(:creditor => Factory.create(:account, :goal => @goal), :qty => 6)        
         get :show, {:goal_id => @goal.to_param, :id => @account.to_param}      
-        response.should have_selector ".bonds", :content => "Bonds:  5"
-        response.should have_selector ".swaps", :content => "Swaps:  6"
+        response.should have_selector ".bonds", :content => "bonds owned:  5"
+        response.should have_selector ".swaps", :content => "swaps owned:  6"
       end
       
       describe "its history" do

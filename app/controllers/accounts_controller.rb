@@ -23,7 +23,9 @@ class AccountsController < ApplicationController
   def show
     @account = @goal.accounts.find(params[:id])
     @line_items = @account.line_items.where("order_id IS NOT NULL")
-#    @order_line_items = @line_items.where(:order_id).group_by { |li| li.order_id } 
+    @pledged = @account.pledged
+    @current_investment = @account.current_investment
+    @pending_investment = @account.pending_investment
 
     respond_to do |format|
       format.html # show.html.erb

@@ -11,6 +11,15 @@ module ApplicationHelper
     logo = image_tag("logo.png", :alt => "DUNKbonds", :class => "round")
   end
 
+  def negate_currency(value)
+  	unless value == 0 
+  		number_to_currency(-value)
+  	else 
+  		"$0.00"
+  	end
+  end
+
+  #tab styling
   def selected?(page)
   	if current_page?(page)
   		"selected"

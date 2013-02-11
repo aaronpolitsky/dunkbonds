@@ -2,6 +2,15 @@ class LineItemsController < ApplicationController
   before_filter :authenticate_user!
   before_filter :load_account_and_goal
 
+  def index
+    @line_items = @account.line_items
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @line_items }
+    end
+  end
+
   # GET /line_items/1
   # GET /line_items/1.xml
   def show

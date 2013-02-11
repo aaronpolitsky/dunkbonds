@@ -11,7 +11,7 @@ TwoODunkbonds::Application.routes.draw do
   end
 
   resources :accounts do
-    resources :line_items, :except => :index
+    resources :line_items
   end 
 
   # The priority is based upon order of creation:

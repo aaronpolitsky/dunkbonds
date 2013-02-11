@@ -474,5 +474,54 @@ describe Account do
       end
     end 
   end
-  
+
+
+  describe "controller view members: " do
+    describe ".pledged sums" do
+      it "the value of its owned bonds" do
+        @buyer.bonds.create!(:debtor => @treasury,
+                             :qty => 15)
+        @buyer.bonds.create!(:debtor => @seller,
+                             :qty => 10)        
+        @buyer.pledged.should eq (25*@buyer.goal.bond_face_value)
+      end
+
+      it "the total price paid for its swaps" do
+        @buyer.swaps.create!(:creditor_id => @buyer,
+                             :qty => 15)
+        @buyer.pledged.should eq 15*@goal.bond_face_value
+      end
+
+      it "the value of its bonds for sale" do
+        @buyer.bonds.create!(:debtor => @treasury,
+                             :qty => 15)
+        @buyer.line_items.create!(:type_of => "bond ask",
+                                  :qty => 15,
+                                  :max_bid_min_ask => 5)
+        @buyer.pledged.should eq 15*10        
+      end
+
+      it "the sum of the above" do
+        @buyer.bonds.create!(:debtor => @treasury,
+                            :qty => 30)
+        @buyer.bonds.create!(:debtor => @seller,
+                            :qty => 10)        
+
+        @buyer.swaps.create!(:creditor_id => @buyer.id+1,
+                            :qty => 15)
+      
+        @buyer.line_items.create!(:type_of => "bond ask",
+                                  :qty => 15,
+                                  :max_bid_min_ask => 5)
+
+        @buyer.pledged.should eq (25+15+15)*@buyer.goal.bond_face_value
+      end
+    end
+
+    describe "current_investment" do
+      it "sums up current balance plus whatever money is in escrow" do
+        pending "DO THIS!"
+      end
+    end
+  end
 end

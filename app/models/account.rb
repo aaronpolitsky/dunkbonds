@@ -104,6 +104,46 @@ class Account < ActiveRecord::Base
     self.bond_qty || self.swap_qty || self.line_items.where(:status => "pending")
   end
 
+
+  #controller view stuff
+  def bond_value
+    self.goal.bond_face_value * self.bond_qty
+  end
+
+  def swap_cost
+    self.goal.bond_face_value * self.swap_qty
+  end
+
+  def bond_value_on_block
+    bond_ask_qty = self.line_items.where(:type_of => "bond ask",
+                                         :status => "pending").sum(:qty)
+    self.goal.bond_face_value * bond_ask_qty
+  end
+
+  def pledged
+    bond_value + swap_cost + bond_value_on_block
+  end
+
+  def current_investment
+    self.balance + 
+    self.line_items.where(:type_of => "bond bid",
+                          :status => "pending").sum(:max_bid_min_ask) + 
+    self.line_items.where(:type_of => "swap bid",
+                          :status => "pending").sum(:max_bid_min_ask)
+  end
+
+  def pending_investment
+    self.balance - self.current_investment
+  end
+
+  def histories
+    # get placed line_items from orders
+    # get cancelled line_items from cancellations
+    # get executed line_items from trades
+    # get payments and receipts
+    # sort by date
+  end
+
   private
   
   def empty_account?

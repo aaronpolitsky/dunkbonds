@@ -1,39 +1,56 @@
-<p>
-  <b>Goal:</b>
-  <%= @goal.title %>
-</p>
+<div class="span-17 equalcolumns">
+  <div class="span-7 colborder">
+    <h3>Account Summary</h3>
+      Total Pledged:&nbsp <%= number_to_currency(@pledged) %>
+      <br>
+      Current Investment:&nbsp<%= negate_currency(@current_investment) %>
+      <br>
+      Pending Investment:&nbsp<%= negate_currency(@pending_investment)%>
 
-<p>
-  <b>Balance:</b>
-  <%= @account.balance %>
-</p>
-
-<div class="bonds">
-  Bonds:  <%= @account.bond_qty %>
+  </div>
+  <div class="span-7 last">
+    <h3>Portfolio Details</h3>
+    <div class="span-7">
+      <div class="span-4">
+        <!-- <h5>Assets</h5> -->
+        <div class="bonds">
+          bonds owned:  <%= @account.bond_qty %>
+          <small><p>(bets <i>against</i> goal)</small>
+        </div>
+      </div>
+      <div class="span-3 last">
+        <!-- <h5>Liabilities</h5> -->
+        <div class="swaps">
+          swaps owned:  <%= @account.swap_qty %>
+          <small><p>(bets <i>for</i> this goal)</small>
+        </div>
+      </div>
+    </div>
+    <div class="span-7 last">
+      <%= link_to("Pending Trade Requests: #{pluralize(@pending_line_items, '')}", account_line_items_path(@account)) %>
+    </div>
+  </div>
 </div>
 
-<div class="swaps">
-  Swaps:  <%= @account.swap_qty %>
+<div>
+  <hr>
+  <h3>Account History</h3>
+
+  <% unless @line_items.empty? %>
+  <h5>Trade Requests</h5>
+  <table class="line_items">
+    <tr>
+     <th>Status</th>
+     <th>Type</th>
+     <th>Quantity</th>
+     <th>Price</th>
+     <th>Total</th>
+     <th></th>
+     <th></th>
+     <th></th>
+   </tr>
+   <%= render @line_items %>
+ </table>
+ <% end %>
+
 </div>
-
-
-<% unless @line_items.empty? %>
-<h5>Trade Requests</h5>
-<table class="line_items">
-  <tr>
-   <th>Status</th>
-   <th>Type</th>
-   <th>Quantity</th>
-   <th>Price</th>
-   <th>Total</th>
-   <th></th>
-   <th></th>
-   <th></th>
-  </tr>
-  <%= render @line_items %>
-</table>
-<% end %>
-
-
-<%= link_to 'Edit', edit_goal_account_path(@goal, @account) %> |
-<%= link_to 'Back', goal_accounts_path(@goal) %>
