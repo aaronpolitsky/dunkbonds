@@ -58,6 +58,12 @@ header img {
   background: #fff;
 }
 
+
+.goalbox {
+  padding: 1em;
+  box-shadow:  0px 0px 0.5em rgba(0,0,0,.15);  
+}
+
 section {
   margin-top: 1em;
   font-size: 120%;

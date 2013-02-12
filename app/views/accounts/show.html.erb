@@ -1,4 +1,4 @@
-<div class="span-17 equalcolumns">
+<div class="span-16 equalcolumns">
   <div class="span-7 colborder">
     <h3>Account Summary</h3>
       Total Pledged:&nbsp <%= number_to_currency(@pledged) %>
@@ -32,8 +32,8 @@
   </div>
 </div>
 
-<div>
-  <hr>
+<div class="append-bottom">
+  <hr class="span-16 last">
   <h3>Account History</h3>
 
   <% unless @line_items.empty? %>

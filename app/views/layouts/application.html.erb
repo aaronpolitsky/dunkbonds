@@ -15,11 +15,18 @@
 <body>
 	<div class="container">
 		<section class="round">			
-			<%= render 'layouts/tabnav' %>
+			<%= render 'layouts/gentabnav' %>
 			<% flash.each do |name, msg| %>
 			<%= content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String) %>
 			<% end %>
+			<% if within_a_goal? %>
+			<div class="goalbox">
+				<%= render 'layouts/goaltabnav' %>
+				<%= yield %>
+			</div>
+			<% else %>
 			<%= yield %>
+			<% end %>
 		</section>
 	</div>
 </body>
