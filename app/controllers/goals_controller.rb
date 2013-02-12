@@ -1,4 +1,5 @@
 class GoalsController < ApplicationController
+  before_filter :load_account, :except => [:index, :new, :create]
 
   # GET /goals
   # GET /goals.xml
@@ -23,7 +24,9 @@ class GoalsController < ApplicationController
   def show
     @goal = Goal.find(params[:id])
     @posts = @goal.posts.all
-    @account = current_user.accounts.find_by_goal_id(@goal) if user_signed_in?
+    @latest_posts = @goal.posts.order("published_at desc")[0...5]
+    @sticky_post = @goal.posts.order(:published_at).first
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @goal }
@@ -34,7 +37,7 @@ class GoalsController < ApplicationController
   # GET /goals/new.xml
   def new
     @goal = Goal.new
-
+    
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @goal }
@@ -89,4 +92,16 @@ class GoalsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  private
+
+  def load_account
+    if user_signed_in?
+      @account = current_user.accounts.find_by_goal_id(params[:id])
+    end
+  end
 end
+
+
+
+

@@ -1,13 +1,26 @@
-<div class="goalheader round">
+<div class="span-10">
+<!-- <div class="goalheader round"> -->
   <h3>Selected Goal:&nbsp<%= link_to @goal.title, @goal %></h3>
 </div>    
-<div class="span-16 last">
+<div class="span-6 last">
   <% if current_user.supporting?(@goal) %>
-  You're supporting this goal! 
+    You're supporting this goal!
+  <% elsif current_user.following?(@goal) %>
+    You're not yet supporting this goal. 
   <% else %>
-  You're not yet supporting this goal. 
+    You're not following this goal.
+  <% end %>
+
+</div>
+<div class="prepend-10 last">
+  <% if current_user.following?(@goal) %>
+    <%= link_to 'Support This Goal', new_account_line_item_path(@account) %> 
+    <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete unless current_user.supporting?(@goal) %> 
+  <% else %>
+    <%= link_to 'Follow This Goal', new_goal_account_path(@goal) %>
   <% end %>
 </div>
+<hr class="space">
 <div class="span-16 last">
   <ul class="tabs">
     <li><%= link_to "Goal Details", @goal, :class => selected?(goal_path(@goal))  %></li>       

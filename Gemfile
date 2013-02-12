@@ -37,4 +37,5 @@ group :development, :test do
   gem 'factory_girl_rails', '1.0'
 end
 
-gem 'feedzirra'
+gem 'feedzirra', :git => 'https://github.com/pauldix/feedzirra.git'
+gem 'nokogiri', '1.5.6'

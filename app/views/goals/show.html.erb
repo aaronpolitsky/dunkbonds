@@ -1,53 +1,46 @@
-<div class="goal">
-  <div class="title">
+<div class="span-10 colborder">
+  <h3>All About this Goal</h3>
+  <p>Here is where you can learn about the details and terms of this goal and stay abreast of progress and any other relevant info a supporter (or challenger) might want to know.<p>
+    <hr>
+    <% unless @sticky_post.nil? %>
+    <% if nil != @sticky_post && @sticky_post.respond_to?(:published_at) %>
+    <%= I18n.l @sticky_post.published_at.to_date, :format => :long %> 
+    <h4><%= link_to @sticky_post.title, goal_post_path(@sticky_post.goal, @sticky_post) %></h4>
+    <%= @sticky_post.content.html_safe %>
+    <hr>
+    <% end %>
+    <% else %>
     <p>
-      <b>Title:</b>
-      <%= @goal.title %>
+      <em>No goal details.</em>
     </p>
-  </div>
-  
-  <div class="description">
+    <% end %>
+    
+    <h3>Latest from this goal's blog</h3>
+    <% unless @latest_posts.empty? %>
+    <%= render :partial => 'shared/shortpost', :collection => @latest_posts %>
+    <h4>Older posts on the <%= link_to "Goalblog", goal_posts_path(@goal) %></h4>
+    <% else %>
     <p>
-      <b>Description:</b>
-      <%= @goal.description %>
+      <em>No blog posts to show.</em>
     </p>
+    <% end %>
+
   </div>
-  
-  <p>
-    <b>Starts at:</b>
-    <%= @goal.starts_at %>
-  </p>
-  
-  <p>
-    <b>Ends at:</b>
-    <%= @goal.ends_at %>
-  </p>
-  
-  <p>
-    <b>Period:</b>
-    <%= @goal.period %>
-  </p>
-</div>
-
-<% if user_signed_in? && current_user.following?(@goal) && !current_user.supporting?(@goal) %>
-  <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete %> | 
-  <%= link_to 'Support This Goal', new_account_line_item_path(@account) %> 
-<% else %>
-  <%= link_to 'Follow This Goal', new_goal_account_path(@goal) %> | 
-<% end %>
-
-
-<div class="feed">
-  <% @posts.each do |post| %>
-  <div class="post">
-    <h3><%= post.title %></h3>
-    <h4><%= post.published_at %></h4>
-    <div class="content">
-      <%= post.content.html_safe %>
+  <div class="span-5 last">
+    <h3>Goal at a Glance</h3>
+    <div class="sidebar round goal">
+      <div class="description">
+        <b>Description:</b>
+        <%= @goal.description %>
+      </div>
+      <br>
+      <b>Begins:</b>
+      <%= @goal.starts_at.to_date %>
+      <br>
+      <b>Target Date:</b>
+      <%= @goal.ends_at.to_date %>
+      <br>
+      <b>Period:</b>
+      <%= @goal.period %>
     </div>
   </div>
-  <% end %>
-</div>
-
-<%= link_to 'Edit', edit_goal_path(@goal) %> |
-<%= link_to 'Back', goals_path %>

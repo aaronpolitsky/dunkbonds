@@ -101,7 +101,7 @@ class Account < ActiveRecord::Base
   end
 
   def supporting?
-    self.bond_qty || self.swap_qty || self.line_items.where(:status => "pending")
+    (self.bond_qty || self.swap_qty || self.line_items.where(:status => "pending", :type_of => "bond ask").sum(:qty)) > 0      
   end
 
 

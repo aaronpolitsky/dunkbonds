@@ -1,0 +1,6 @@
+<% if nil != shortpost && shortpost.respond_to?(:published_at) %>
+  <%= I18n.l shortpost.published_at.to_date, :format => :long %> 
+  <h4><%= link_to shortpost.title, goal_post_path(shortpost.goal, shortpost) %>
+  <hr></h4>
+<% end %>
+
