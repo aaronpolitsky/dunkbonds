@@ -4,7 +4,7 @@ module ApplicationHelper
 		(params[:controller].include? 'goal') && !(current_page?(root_path)) && !(current_page?(goals_path)) || 
 		(params[:controller].include? 'accounts') && !current_page?(accounts_path) || 
 		(params[:controller].include? 'posts') || 		
-		(params[:controller].include? 'line_item')
+		(params[:controller]=='line_items')
 	end
 
 	def logo
