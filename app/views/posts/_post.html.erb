@@ -1,8 +1,11 @@
-<tr class="post">
-  <td><%= post.goal_id %></td>
-  <td><%= post.title %></td>
-  <td><%= post.content %></td>
-  <td><%= link_to 'url', post.url %></td>
-  <td><%= post.published_at %></td>
-  <td><%= post.guid %></td>
-</tr>
+<% unless post.body.nil? %>
+<div>
+<hr>
+<span id="title">
+  <h3><%= link_to post.title, [post.goal, post] %></h3>
+</span>
+<span id="body">
+  <h4><%= post.body %><h4>
+</span>
+</div>
+<% end %>

@@ -19,6 +19,10 @@ class Goal < ActiveRecord::Base
   
   before_update :purge_old_posts_and_update_feed_on_blog_changes
 
+  def to_param
+    "#{id}-#{title.parameterize}"
+  end
+  
   def update_from_feed()
     unless self.blog_url.nil? || self.blog_url.empty?
       feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)

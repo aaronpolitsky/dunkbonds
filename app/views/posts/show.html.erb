@@ -1,20 +1,2 @@
-<p id="notice"><%= notice %></p>
+<%= render :partial => 'shared/post', :object => @post %>
 
-<table class="posts">
-  <tr>
-    <th>Goal</th>
-    <th>Title</th>
-    <th>Content</th>
-    <th>Url</th>
-    <th>Published_at</th>
-    <th>Guid</th>
-    <th>Is visible</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-  <%= render @post %>
-</table>
-
-<%= link_to 'Edit', edit_goal_post_path(@goal, @post) %> |
-<%= link_to 'Back', goal_posts_path(@goal) %>

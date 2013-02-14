@@ -1,19 +1,9 @@
-<h1>Listing posts</h1>
-
-<table class="posts">
-  <tr>
-    <th>Goal</th>
-    <th>Title</th>
-    <th>Content</th>
-    <th>Url</th>
-    <th>Published_at</th>
-    <th>Guid</th>
-    <th>Is visible</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<%= render @posts %>
-</table>
-
+<div class=span-16 last>
+	<% unless @posts.empty? %>
+	<%= render :partial => 'shared/post', :collection => @posts %>
+	<h4><%= will_paginate %></h4>
+	<% else %>
+	<em>No blog posts to show.</em>
+	<% end %>
+</div
+<hr class="space">

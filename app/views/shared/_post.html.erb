@@ -1,0 +1,6 @@
+<% if nil != post && post.respond_to?(:published_at) %>
+  <%= I18n.l post.published_at.to_date, :format => :long %> 
+  <h4><%= link_to post.title, goal_post_path(post.goal, post) %></h4>
+  <%= post.content.html_safe %>
+  <hr>
+<% end %>

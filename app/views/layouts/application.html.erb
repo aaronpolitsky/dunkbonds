@@ -7,18 +7,14 @@
 	<%= javascript_include_tag :all %>
 	<%= csrf_meta_tag %>
 </head>
-<header>
-	<div class="container">
-		<%= render 'layouts/header' %>
-	</div>
-</header>
 <body>
 	<div class="container">
-		<section class="round">			
+		<%= render 'layouts/header' %>		
+			<section class="round">			
 			<%= render 'layouts/gentabnav' %>
-			<% flash.each do |name, msg| %>
+			<%- flash.each do |name, msg| -%>
 			<%= content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String) %>
-			<% end %>
+			<%- end -%>
 			<% if within_a_goal? %>
 			<div class="goalbox">
 				<%= render 'layouts/goaltabnav' %>
