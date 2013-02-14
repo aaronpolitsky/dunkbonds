@@ -3,7 +3,8 @@ class Goal < ActiveRecord::Base
   has_many :posts
   has_many :followers, :through => :accounts, :class_name => "User"
   has_many :line_items, :through => :accounts
-  
+  belongs_to :goalsetter, :class_name => "User", :foreign_key => "goalsetter_id"
+    
   PERIODS = ['none', '1 day', '1 week', '1 month']
   BLOG_SERVICES = ['other', 'Blogger (blogspot)']
 
@@ -21,6 +22,13 @@ class Goal < ActiveRecord::Base
 
   def to_param
     "#{id}-#{title.parameterize}"
+  end
+  
+  def get_sticky_posts
+    unless self.blog_url.nil? || self.blog_url.empty?
+      feed = Feedzirra::Feed.fetch_and_parse(self.blog_url+"/-/sticky")
+      add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
+    end
   end
   
   def update_from_feed()

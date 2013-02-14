@@ -1,10 +1,19 @@
 module ApplicationHelper
 
 	def within_a_goal?
-		(params[:controller].include? 'goal') && !(current_page?(root_path)) && !(current_page?(goals_path)) || 
-		(params[:controller].include? 'accounts') && !current_page?(accounts_path) || 
-		(params[:controller].include? 'posts') || 		
-		(params[:controller]=='line_items')
+		return false if current_page?(root_path)
+		
+		case params[:controller]
+		when "goals"
+			return true unless params[:action]=="index" || params[:action]=="new"
+		when "accounts"
+			return true unless params[:action]=="index"
+		when "posts"
+			return true
+		when "line_items"
+			return true
+		end
+
 	end
 
 	def logo

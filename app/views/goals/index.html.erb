@@ -1,51 +1,10 @@
-<h3>Followed Goals</h3>
-<table class="followed_goals">
-  <tr>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Starts at</th>
-    <th>Ends at</th>
-    <th>Period</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
+<% if user_signed_in? && current_user.followed_goals %>
+<h3>Goals You are Following</h3>
+<div class="followed_goals">
   <%= render @followed_goals %>
-</table>
-
-<h3>Other Goals</h3>
-<table class="unfollowed_goals">
-  <tr>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Starts at</th>
-    <th>Ends at</th>
-    <th>Period</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-  <%= render @unfollowed_goals %>
-</table>
-
-<h3>All Goals</h3>
-<table class="all_goals">
-  <tr>
-    <th>Title</th>
-    <th>Description</th>
-    <th>Starts at</th>
-    <th>Ends at</th>
-    <th>Period</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
+</div>
+<hr>
+<% end %>
+<h3>Check out some of the Goals people have set</h3>
   <%= render @goals %>
-</table>
-
 <br />
-
-<%= link_to 'New Goal', new_goal_path %>

@@ -3,9 +3,9 @@
   <h3>Selected Goal:&nbsp<%= link_to @goal.title, @goal %></h3>
 </div>    
 <div class="span-6 last">
-  <% if current_user.supporting?(@goal) %>
+  <% if user_signed_in? && current_user.supporting?(@goal) %>
     You're supporting this goal!
-  <% elsif current_user.following?(@goal) %>
+  <% elsif user_signed_in? && current_user.following?(@goal) %>
     You're not yet supporting this goal. 
   <% else %>
     You're not following this goal.
@@ -13,7 +13,7 @@
 
 </div>
 <div class="prepend-10 last">
-  <% if current_user.following?(@goal) %>
+  <% if user_signed_in? && current_user.following?(@goal) %>
     <%= link_to 'Support This Goal', new_account_line_item_path(@account) %> 
     <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete unless current_user.supporting?(@goal) %> 
   <% else %>

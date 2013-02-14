@@ -6,10 +6,14 @@ class CreateGoals < ActiveRecord::Migration
       t.datetime :starts_at
       t.datetime :ends_at
       t.string :period
+      t.integer :goalsetter_id
 
       t.timestamps
     end
+
+    add_index :goals, [:goalsetter_id]
   end
+
 
   def self.down
     drop_table :goals

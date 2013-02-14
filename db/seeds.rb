@@ -6,13 +6,21 @@
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
 
-goal1 = Factory.create(:goal)
-goal2 = Factory.create(:certain_date_goal)
-
 user1 = Factory.create(:user)
 user2 = Factory.create(:asdf)
 user3 = Factory.create(:fdsa)
 
-user1.follow_goal goal1
+goal1 = Factory.create(:goal_w_blog, :goalsetter_id => user1.id)
+goal2 = Factory.create(:certain_date_goal, :goalsetter_id => user2.id)
+
+Goal.all.each do |g|
+	g.get_sticky_posts
+	g.update_from_feed
+end
+
+user1.follow_goal goal2
+
 user2.follow_goal goal1
+
 user3.follow_goal goal1
+user3.follow_goal goal2

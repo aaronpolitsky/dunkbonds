@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130210015652) do
+ActiveRecord::Schema.define(:version => 20130214085308) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -53,11 +53,14 @@ ActiveRecord::Schema.define(:version => 20130210015652) do
     t.datetime "starts_at"
     t.datetime "ends_at"
     t.string   "period"
+    t.integer  "goalsetter_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "blog_url"
     t.string   "blog_service_provider"
   end
+
+  add_index "goals", ["goalsetter_id"], :name => "index_goals_on_goalsetter_id"
 
   create_table "line_items", :force => true do |t|
     t.string   "status",                                        :default => "new"
@@ -124,6 +127,8 @@ ActiveRecord::Schema.define(:version => 20130210015652) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "first_name"
+    t.string   "last_name"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   has_many :followed_goals, :through => :accounts, :source => :goal #class_name => "Goal"
   has_many :orders
   has_one :cart
+  has_many :goals, :foreign_key => :goalsetter_id
 
   after_create {self.create_cart!}
 
@@ -23,6 +24,10 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me
   
+  def full_name
+    self.first_name + ' ' + self.last_name
+  end
+
   def follow_goal(goal) #return false if already following goal
     self.followed_goals << goal 
     true

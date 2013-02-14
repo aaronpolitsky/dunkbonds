@@ -1,17 +1,20 @@
-<tr class="goal">
-  <td class="title"><%= goal.title %></td>
-  <td><%= goal.description %></td>
-  <td><%= goal.starts_at %></td>
-  <td><%= goal.ends_at %></td>
-  <td><%= goal.period %></td>
-  <td> 	<% if user_signed_in? %>
-  		<% if Account.exists?(:user_id => current_user, :goal_id => goal) %>
- 	  <%= link_to 'Account', goal_account_path(goal, goal.accounts.where(:user_id => current_user).first) %>
-			<% end %>
-		<% end %>
-
-  </td>
-  <td><%= link_to 'Show', goal %></td>
-  <td><%= link_to 'Edit', edit_goal_path(goal) %></td>
-  <td><%= link_to 'Destroy', goal, :confirm => 'Are you sure?', :method => :delete %></td>
-</tr>
+<div class="goal span-17 last">
+  <div class="goalbox">
+    <div class="title span-11 ">
+      <h3><%= link_to goal.title, goal %></h3>
+      by <%= goal.goalsetter.full_name %>
+      <hr class="space">
+      <%= goal.description %>        
+    </div>
+    <div class="details span-5 last" align="right">
+     <b>Start Date:</b>&nbsp<%= goal.starts_at %><br>
+     <b>Deadline:</b>&nbsp<%= goal.ends_at.to_date  %><br>
+     <b>Bonds Pay:</b>&nbsp<%= number_to_currency(goal.bond_face_value) %><br>
+    </div>
+    <div class="description span-11">
+      <%= goal.description %>
+    </div>    
+    <hr class="space">
+  </div>
+</div>
+<hr class="space">
