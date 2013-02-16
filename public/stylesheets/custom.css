@@ -87,7 +87,34 @@ a:hover {
   text-decoration: underline;
 }
 
-/* Navigation */
+ul.blocklink {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+ul.blocklink li a{
+  display: block;
+  list-style-type: none; 
+}
+
+ul.blocklink li:hover {
+   background: #eee;
+   cursor:pointer;
+   text-decoration: none;
+}
+
+ul.blocklink li a:hover {
+   cursor:pointer;
+   text-decoration: none;
+}
+
+ul.blocklink li a.goalbox, a.title, a.details:hover {
+   cursor:pointer;
+   text-decoration: none;
+}
+
+  /* Navigation */
 
 nav {
   float: right;

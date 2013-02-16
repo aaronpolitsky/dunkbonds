@@ -53,6 +53,7 @@ class GoalsController < ApplicationController
   # POST /goals.xml
   def create
     @goal = Goal.new(params[:goal])
+    @goal.goalsetter = current_user
 
     respond_to do |format|
       if @goal.save

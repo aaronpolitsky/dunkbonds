@@ -1,10 +1,19 @@
 <% if user_signed_in? && current_user.followed_goals %>
-<h3>Goals You are Following</h3>
-<div class="followed_goals">
-  <%= render @followed_goals %>
-</div>
-<hr>
-<% end %>
+	<h3>Goals You are Following</h3>
+	<div class="followed_goals">
+		<ul class="blocklink">
+			<%= render @followed_goals %>
+		</ul>	
+	</div>
+	<hr class="space">
+	<h3>Check out some of the other Goals people have set</h3>
+	<ul class="blocklink">
+		<%= render @unfollowed_goals %>
+	</ul>	
+<% else %>
 <h3>Check out some of the Goals people have set</h3>
-  <%= render @goals %>
+	<ul class="blocklink">
+		<%= render @goals %>
+	</ul>	
+<% end %>
 <br />
