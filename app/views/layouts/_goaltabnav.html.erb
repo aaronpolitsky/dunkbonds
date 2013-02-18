@@ -3,9 +3,9 @@
   <h3>Selected Goal:&nbsp<%= link_to @goal.title, @goal %></h3>
 </div>    
 <div class="span-6 last">
-  <% if user_signed_in? && current_user.supporting?(@goal) %>
+  <% if current_or_guest_user.supporting?(@goal) %>
     You're supporting this goal!
-  <% elsif user_signed_in? && current_user.following?(@goal) %>
+  <% elsif current_or_guest_user.following?(@goal) %>
     You're not yet supporting this goal. 
   <% else %>
     You're not following this goal.
@@ -13,9 +13,9 @@
 
 </div>
 <div class="prepend-10 last">
-  <% if user_signed_in? && current_user.following?(@goal) %>
+  <% if current_or_guest_user.following?(@goal) %>
     <%= link_to 'Support This Goal', new_account_line_item_path(@account) %> 
-    <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete unless current_user.supporting?(@goal) %> 
+    <%= button_to 'Unfollow This Goal', [@goal, @account], :method => :delete unless current_or_guest_user.supporting?(@goal) %> 
   <% else %>
     <%= link_to 'Follow This Goal', new_goal_account_path(@goal) %>
   <% end %>
@@ -25,7 +25,7 @@
   <ul class="tabs">
     <li><%= link_to "Goal Details", @goal, :class => selected?(goal_path(@goal))  %></li>       
     <li><%= link_to "Goal Blog", goal_posts_path(@goal), :class => selected?(goal_posts_path(@goal))  %></li>   
-    <% if user_signed_in? && current_user.following?(@goal) %>
+    <% if current_or_guest_user.following?(@goal) %>
     <li><%= link_to "Account", goal_account_path(@goal, @account), :class => selected?(goal_account_path(@goal, @account))  %></li>
     <li><%= link_to "Bonds", new_account_line_item_path(@account), :class => selected?(new_account_line_item_path(@account)) %></li>  
     <% else %>

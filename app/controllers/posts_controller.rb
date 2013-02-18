@@ -28,7 +28,7 @@ class PostsController < ApplicationController
   
   def load_stuff
     @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
-    @account = current_user.accounts.find_by_goal_id(@goal.id) if user_signed_in?
+    @account = current_or_guest_user.accounts.find_by_goal_id(@goal.id) 
   end
 
 end

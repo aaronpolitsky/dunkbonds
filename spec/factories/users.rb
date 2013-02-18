@@ -28,10 +28,10 @@ end
 Factory.define :mateo, :class => User do |u|
   #attr_accessible :email, :password, :password_confirmation, :remember_me
   u.email "mateo@mateo.mateo"
-  u.password "mateo"
+  u.password "asdfasdf"
   u.first_name "Mateo"
   u.last_name "Rando"  
-  u.password_confirmation "mateo"
+  u.password_confirmation "asdfasdf"
 end
 
 

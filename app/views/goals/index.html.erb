@@ -1,4 +1,4 @@
-<% if user_signed_in? && current_user.followed_goals %>
+<% unless @followed_goals.empty? %>
 	<h3>Goals You are Following</h3>
 	<div class="followed_goals">
 		<ul class="blocklink">

@@ -8,11 +8,11 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me, :first_name, :last_name
 
-  has_many :accounts
+  has_many :accounts, :dependent => :destroy
   has_many :line_items, :through => :accounts
   has_many :followed_goals, :through => :accounts, :source => :goal #class_name => "Goal"
   has_many :orders
-  has_one :cart
+  has_one :cart, :dependent => :destroy
   has_many :goals, :foreign_key => :goalsetter_id
 
   after_create {self.create_cart!}

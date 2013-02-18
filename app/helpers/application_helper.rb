@@ -48,7 +48,7 @@ module ApplicationHelper
   end
 
 	def current_cart
-		current_user.cart
+		current_or_guest_user.cart
 	end
 
 	def line_item_total(line_item)

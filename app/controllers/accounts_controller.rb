@@ -2,19 +2,23 @@ class AccountsController < ApplicationController
   # GET /goals/1/accounts
   # GET /goals/1/accounts.xml
 
-  before_filter :authenticate_user!, :except => [:index, :new]
+  #before_filter :authenticate_user!, :except => [:index, :new]
 
   before_filter :load_goal
   before_filter :correct_user
 
-  #  before_filter :is_admin?, :only => [:index, :edit, :update]
-
   def index
-    @accounts = current_user.accounts.order("created_at DESC")
+    @accounts = current_or_guest_user.accounts.order("created_at DESC")
     
     respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @accounts }
+      if @accounts.empty?
+        flash[:notice] = "You haven't followed any goals."
+        format.html { redirect_to goals_path }
+        format.xml  { render :xml => @goals }
+      else
+        format.html # index.html.erb
+        format.xml  { render :xml => @accounts }
+      end
     end
   end
 
@@ -52,8 +56,8 @@ class AccountsController < ApplicationController
   # POST /accounts
   # POST /accounts.xml
   def create
-    new_follow = current_user.follow_goal(@goal)
-    @account = current_user.accounts.find_by_goal_id(@goal)
+    new_follow = current_or_guest_user.follow_goal(@goal)
+    @account = current_or_guest_user.accounts.find_by_goal_id(@goal)
     
     respond_to do |format|
       if new_follow

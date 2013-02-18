@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130214085308) do
+ActiveRecord::Schema.define(:version => 20130218192042) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "goal_id"
@@ -115,8 +115,8 @@ ActiveRecord::Schema.define(:version => 20130214085308) do
   add_index "trades", ["bid_id", "ask_id"], :name => "bid_ask"
 
   create_table "users", :force => true do |t|
-    t.string   "email",                  :default => "", :null => false
-    t.string   "encrypted_password",     :default => "", :null => false
+    t.string   "email",                  :default => "",    :null => false
+    t.string   "encrypted_password",     :default => "",    :null => false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
@@ -129,6 +129,7 @@ ActiveRecord::Schema.define(:version => 20130214085308) do
     t.datetime "updated_at"
     t.string   "first_name"
     t.string   "last_name"
+    t.boolean  "is_guest",               :default => false
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

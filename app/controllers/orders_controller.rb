@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
 
-  before_filter :authenticate_user!
+  before_filter :authenticate_user!, :except => [:new]
 
   # GET /orders
   # GET /orders.xml
@@ -32,7 +32,7 @@ class OrdersController < ApplicationController
   # GET /orders/new
   # GET /orders/new.xml
   def new
-    @order = current_user.orders.new
+    @order = current_or_guest_user.orders.new
     @cart = @order.user.cart
 
     respond_to do |format|

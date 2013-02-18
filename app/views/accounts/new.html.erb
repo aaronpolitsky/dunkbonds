@@ -1,9 +1,17 @@
 <h3>Follow <%= @goal.title %>?</h3>
 
-Do you want to follow this goal and open an account so that you may support this goal?
+Do you want to follow this goal?  <br>
+<small>What this does:  <br>
+<ul>
+	<li>creates your account with this goal so you can support it by trading its bonds</li>
+	<li>shows the goal's blog posts to your home page</li>
+</ul>
+</small>
 
 <%= render 'form' %>
-<p id="following_explanation">
-  The first step to supporting a goal (by buying or trading its DUNKbonds) is to follow it.  Following a goal automatically creates a shiny new account for you so that you might support the goal.  Don't worry--until you support the goal, you can always unfollow it, and that closes the account.
-</p>
-<%= link_to 'Back', goal_accounts_path(params[:goal]) %>
+<br>
+<hr>
+<div id="following_explanation">
+	<small>
+  The first step to supporting a goal (by buying or trading its DUNKbonds) is to follow it.  Following a goal automatically creates a shiny new account for you so that you might support the goal.  Don't worry--until you support the goal, you can always unfollow it, and that closes the account.</small>
+</div>

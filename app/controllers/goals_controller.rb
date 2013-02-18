@@ -1,17 +1,15 @@
 class GoalsController < ApplicationController
   before_filter :load_account, :except => [:index, :new, :create]
 
+  before_filter :authenticate_user!, :except => [:index, :show]
+  
   # GET /goals
   # GET /goals.xml
   def index
     @goals = Goal.all
 
-    if user_signed_in?
-      @followed_goals = current_user.followed_goals
-      @unfollowed_goals = @goals - @followed_goals
-    else
-      @followed_goals = @unfollowed_goals = []
-    end
+    @followed_goals = current_or_guest_user.followed_goals
+    @unfollowed_goals = @goals - @followed_goals
     
     respond_to do |format|
       format.html # index.html.erb
@@ -97,9 +95,7 @@ class GoalsController < ApplicationController
   private
 
   def load_account
-    if user_signed_in?
-      @account = current_user.accounts.find_by_goal_id(params[:id])
-    end
+    @account = current_or_guest_user.accounts.find_by_goal_id(params[:id])
   end
 end
 

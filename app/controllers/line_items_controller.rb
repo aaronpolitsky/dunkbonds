@@ -1,5 +1,5 @@
 class LineItemsController < ApplicationController
-  before_filter :authenticate_user!
+#  before_filter :authenticate_user!
   before_filter :load_account_and_goal
 
   def index
@@ -41,7 +41,7 @@ class LineItemsController < ApplicationController
   # POST /line_items
   # POST /line_items.xml
   def create
-    @cart = current_user.cart
+    @cart = current_or_guest_user.cart
     @line_item = @account.line_items.build(params[:line_item])
 
     respond_to do |format|
