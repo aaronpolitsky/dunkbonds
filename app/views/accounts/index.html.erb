@@ -1,28 +1,64 @@
-<h1>Here is a summary of your accounts</h1>
+<h3>Here is a summary of your accounts of your followed goals</h3>
 
-<table>
-  <tr>
-    <th>Account</th>
-    <th>Goal</th>
-    <th>Is treasury</th>
-    <th>Balance</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
+<ul class="blocklink">
+  <% @accounts.each do |acc| %>
+  <div class="goal span-17 last">
+    <li class="blocklink">
+      <%= link_to [acc.goal, acc] do %>
+      <div class="goalbox">
+        <div class="title span-16 last">
+          <h3><%= acc.goal.title %></h3>
+          by <%= acc.goal.goalsetter.full_name %><br>
+        </div>
+        <hr class="space">        
 
-<% @accounts.each do |account| %>
-  <tr>
-    <td><%= account.id %></td>
-    <td><%= account.goal_id %></td>
-    <td><%= account.is_treasury %></td>
-    <td><%= account.balance %></td>
-    <td><%= link_to 'Show', goal_account_path(account.goal, account)  %></td>
-    <td><%= link_to 'Edit', edit_goal_account_path(account.goal, account) %></td>
-    <td><%= link_to 'Destroy', goal_account_path(account.goal, account), :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
+        <% if acc.supporting? %>
+        <div class="span-5">
+          Your Position: <%= acc.feel %>
+          <hr>
+          <%= pluralize(acc.swap_qty, 'bet') %> for (<%= pluralize(acc.swap_qty, 'swap') %>) <br>
+          <%= pluralize(acc.bond_qty, 'bet') %> against (<%= pluralize(acc.bond_qty, 'bond') %>) <br>
+        </div>
+        <div class="span-5" align="left">
+          Current Pledge
+          <hr>
+          <div class="span-3" align="left">           
+            If Goal is Met:<br>
+            If Goal Not Met:<br>
+          </div>
+          <div class="span-2 last" align="right">
+            <%= negate_currency(acc.pledge_if_goal_succeeds)%><br>
+            <%= negate_currency(acc.pledge_if_goal_fails)%><br>
+          </div>
+        </div>
+        <div class="span-5 prepend-1 last">
+          <% if acc.pending_qty %>
+          Pending Activity
+          <hr>
+          <%= pluralize(acc.pending_qty, "pending trade request")%><br>
+          Pending Investment: <%= negate_currency(acc.pending_investment)%>
+          <% else %>
+          None
+          <% end %>
+        </div>
 
-<br />
+
+
+
+        <% else %>
+        <div class="span-16 last">
+          You do not have a stake in this goal as of yet.
+        </div>
+        <% end %>
+
+        <hr class="space">           
+      </div>
+      <% end %>
+    </li>
+  </div>
+  <hr class="space">           
+  <% end %>
+</ul>
+
+
 

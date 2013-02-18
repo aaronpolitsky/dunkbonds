@@ -9,9 +9,9 @@
           <%= goal.description %>        
         </div>
         <div class="details span-5 last" align="right">
-         <b>Start Date:</b>&nbsp<%= goal.starts_at %><br>
-         <b>Deadline:</b>&nbsp<%= goal.ends_at.to_date  %><br>
-         <b>Bonds Pay:</b>&nbsp<%= number_to_currency(goal.bond_face_value) %><br>
+         <b>Start Date:</b> <%= goal.starts_at %><br>
+         <b>Deadline:</b> <%= goal.ends_at.to_date  %><br>
+         <b>Bonds Pay:</b> <%= number_to_currency(goal.bond_face_value) %><br>
        </div>
        <hr class="space">
        <% end %>

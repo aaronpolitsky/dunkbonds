@@ -7,11 +7,11 @@ class AccountsController < ApplicationController
   before_filter :load_goal
   before_filter :correct_user
 
-#  before_filter :is_admin?, :only => [:index, :edit, :update]
+  #  before_filter :is_admin?, :only => [:index, :edit, :update]
 
   def index
-    @accounts = current_user.accounts
-
+    @accounts = current_user.accounts.order("created_at DESC")
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @accounts }

@@ -104,14 +104,14 @@ class Account < ActiveRecord::Base
     (self.bond_qty || self.swap_qty || self.line_items.where(:status => "pending", :type_of => "bond ask").sum(:qty)) > 0      
   end
 
-
+  ######################
   #controller view stuff
   def bond_value
     self.goal.bond_face_value * self.bond_qty
   end
 
   def swap_cost
-    self.goal.bond_face_value * self.swap_qty
+    self.line_items.where(:type_of => "swap bid", :status => "executed").sum(:qty) * self.goal.bond_face_value
   end
 
   def bond_value_on_block
@@ -127,13 +127,58 @@ class Account < ActiveRecord::Base
   def current_investment
     self.balance + 
     self.line_items.where(:type_of => "bond bid",
-                          :status => "pending").sum(:max_bid_min_ask) + 
+                          :status => "pending").inject(0){|sum, li| sum += (li.qty * li.max_bid_min_ask)} +
     self.line_items.where(:type_of => "swap bid",
-                          :status => "pending").sum(:max_bid_min_ask)
+                          :status => "pending").inject(0){|sum, li| sum += (li.qty * li.max_bid_min_ask)} 
   end
 
   def pending_investment
     self.balance - self.current_investment
+  end
+
+  def pending_qty
+
+  end
+
+  def pending_qty(type = nil)
+    return self.line_items.where(:status => "pending").sum(:qty) if type.nil?
+    self.line_items.where(:status => "pending", :type_of => type).sum(:qty)
+  end
+
+  def pledge_if_goal_succeeds
+    # if bonds don't pay out
+    self.balance
+  end
+
+  def pledge_if_goal_fails
+    # if bonds do pay out:
+    #   your balance, plus bond payouts, less swap payouts
+    self.balance + bond_value - swap_cost
+  end
+
+  def feel
+    held_swaps = self.line_items.where(:type_of => "swap bid", 
+                                         :status => "executed").sum(:qty)
+    held_bonds = self.line_items.where(:type_of => "bond bid",
+                                         :status => "executed").sum(:qty) 
+    if held_swaps > held_bonds
+      "Optimistic"
+    elsif held_swaps == held_bonds
+      "Neutral"
+    else
+      "Pessimistic"
+    end
+  end
+  
+  def position
+    pos = bond_qty - swap_qty 
+    if (pos > 0)
+      "#{pos} pessimistic"
+    elsif 0
+      "neutral"
+    else
+      "#{pos} optimistic"
+    end
   end
 
   def histories
