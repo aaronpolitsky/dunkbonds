@@ -2,27 +2,36 @@ Factory.define :user do |u|
   #attr_accessible :email, :password, :password_confirmation, :remember_me
   u.email "user@example.org"
   u.password "asdfasdf"
-  u.first_name "User"
-  u.last_name "Loser"
+  u.first_name "Bob"
+  u.last_name "Loblaw"
   u.password_confirmation "asdfasdf"
 end
 
-Factory.define :asdf, :class => User do |u|
+Factory.define :aaron, :class => User do |u|
   #attr_accessible :email, :password, :password_confirmation, :remember_me
-  u.email "asdf@asdf.asdf"
+  u.email "aaron.politsky@gmail.com"
   u.password "asdfasdf"
-  u.first_name "AS"
-  u.last_name "DF"  
+  u.first_name "Aaron"
+  u.last_name "Politsky"  
   u.password_confirmation "asdfasdf"
 end
 
-Factory.define :fdsa, :class => User do |u|
+Factory.define :dad, :class => User do |u|
   #attr_accessible :email, :password, :password_confirmation, :remember_me
-  u.email "fdsa@fdsa.fdsa"
-  u.password "fdsafdsa"
-  u.first_name "Mr. Bob"
-  u.last_name "Dabolina"  
-  u.password_confirmation "fdsafdsa"
+  u.email "dad@dad.dad"
+  u.password "asdfasdf"
+  u.first_name "David"
+  u.last_name "Politsky"  
+  u.password_confirmation "asdfasdf"
+end
+
+Factory.define :mateo, :class => User do |u|
+  #attr_accessible :email, :password, :password_confirmation, :remember_me
+  u.email "mateo@mateo.mateo"
+  u.password "mateo"
+  u.first_name "Mateo"
+  u.last_name "Rando"  
+  u.password_confirmation "mateo"
 end
 
 

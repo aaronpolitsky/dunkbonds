@@ -8,6 +8,37 @@ Factory.define :goal do |g|
   g.blog_service_provider ''
 end
 
+Factory.define :aarondunks do |g|
+  g.title "Aaron DUNKs"
+  g.description "Aaron DUNKs a basketball.  Regulation hoop, no trampoline.  Stickum OK."
+  g.starts_at DateTime.civil(2012, 5, 1)
+  g.ends_at DateTime.civil(2013, 3, 1)
+  g.period "1 month"
+  g.blog_url "http://dunkbonds.blogspot.com/feeds/posts/default"
+  g.blog_service_provider 'blogspot'
+end
+
+
+Factory.define :boston do |g|
+  g.title "Mateo Qualifies for Boston"
+  g.description "Mateo qualifies for this year's Boston marathon."
+  g.starts_at DateTime.civil(2013, 3, 1)
+  g.ends_at DateTime.civil(2013, 6, 15)
+  g.period "no period"
+  g.blog_url "http://rsstestdunkbonds.blogspot.com/feeds/posts/default"
+  g.blog_service_provider 'blogspot'
+end
+
+Factory.define :par do |g|
+  g.title "David Shoots Par"
+  g.description "David shoots par or better at Avalon Lakes."
+  g.starts_at DateTime.civil(2013, 3, 1)
+  g.ends_at DateTime.civil(2014, 1, 1)
+  g.period "no period"
+  g.blog_url "http://rsstestdunkbonds.blogspot.com/feeds/posts/default"
+  g.blog_service_provider 'blogspot'
+end
+
 Factory.define :goal_w_blog, :class => Goal do |g|
   g.title "blah"
   g.description "blahblah"
