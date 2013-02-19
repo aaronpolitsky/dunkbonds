@@ -11,32 +11,29 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130219010705) do
+ActiveRecord::Schema.define(:version => 20130219051322) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id"
-    t.decimal  "balance",         :precision => 8, :scale => 2, :default => 0.0
-    t.boolean  "is_escrow",                                     :default => false
-    t.boolean  "is_treasury",                                   :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.boolean  "is_soft_deleted",                               :default => false
-    t.decimal  "initial_balance", :precision => 8, :scale => 2, :default => 0.0
-    t.integer  "updated_by"
-  end
-
-  create_table "bonds", :force => true do |t|
-    t.integer  "account_id"
-    t.decimal  "maturity_value", :precision => 8, :scale => 2
-    t.datetime "maturity_date"
-    t.datetime "coupon_period"
-    t.decimal  "price",          :precision => 8, :scale => 2
-    t.integer  "updated_by"
-    t.boolean  "is_deleted",                                   :default => false
+    t.decimal  "balance",     :precision => 8, :scale => 2, :default => 0.0
+    t.boolean  "is_escrow",                                 :default => false
+    t.boolean  "is_treasury",                               :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "goal_id"
   end
+
+  add_index "accounts", ["user_id", "goal_id"], :name => "user_goal", :unique => true
+
+  create_table "bonds", :force => true do |t|
+    t.integer  "creditor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "debtor_id"
+    t.integer  "qty",         :default => 0
+  end
+
+  add_index "bonds", ["creditor_id", "debtor_id"], :name => "creditor_debtor", :unique => true
 
   create_table "goals", :force => true do |t|
     t.integer  "goalsetter_id"
