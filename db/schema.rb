@@ -11,19 +11,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130219035548) do
+ActiveRecord::Schema.define(:version => 20130219010705) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id"
-    t.decimal  "balance",     :precision => 8, :scale => 2, :default => 0.0
-    t.boolean  "is_escrow",                                 :default => false
-    t.boolean  "is_treasury",                               :default => false
+    t.decimal  "balance",         :precision => 8, :scale => 2, :default => 0.0
+    t.boolean  "is_escrow",                                     :default => false
+    t.boolean  "is_treasury",                                   :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "goal_id"
+    t.boolean  "is_soft_deleted",                               :default => false
+    t.decimal  "initial_balance", :precision => 8, :scale => 2, :default => 0.0
+    t.integer  "updated_by"
   end
-
-  add_index "accounts", ["user_id", "goal_id"], :name => "user_goal", :unique => true
 
   create_table "bonds", :force => true do |t|
     t.integer  "account_id"

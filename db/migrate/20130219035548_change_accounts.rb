@@ -4,6 +4,11 @@ class ChangeAccounts < ActiveRecord::Migration
 		change_column :accounts, :balance, :decimal, :precision => 8, :scale => 2, :default => 0.0
 		remove_column :accounts, :is_soft_deleted, :initial_balance, :updated_by
 		add_index :accounts, [:user_id, :goal_id], :unique => true, :name => "user_goal"
+
+		Account.all.each do |a|
+			a.goal_id = 1
+			a.save!
+		end
   end
 
   def down
