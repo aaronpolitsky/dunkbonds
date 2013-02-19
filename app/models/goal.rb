@@ -61,8 +61,18 @@ class Goal < ActiveRecord::Base
     end
   end
 
-  def bond_face_value 
-    10 #for now
+  def periods_left(date) 
+    case self.period
+    when "1 month"
+      return (self.ends_at.year - date.year)*12 + self.ends_at.month - date.month
+    when "none"
+      return 10
+    end
+  end
+
+  def bond_face_value
+    [[periods_left(self.starts_at.to_date), periods_left(Date.today)].min, 
+     0].max
   end
 
   def treasury
