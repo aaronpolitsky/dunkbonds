@@ -109,6 +109,10 @@ ul.blocklink li a:hover {
    cursor:pointer;
 }
 
+tr.blocklink a {
+  display: block;
+}
+
   /* Navigation */
 
 nav {

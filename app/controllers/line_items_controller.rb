@@ -36,6 +36,8 @@ class LineItemsController < ApplicationController
   # GET /line_items/1/edit
   def edit
     @line_item = @account.line_items.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to [@account.goal, @account]
   end
 
   # POST /line_items
@@ -70,12 +72,18 @@ class LineItemsController < ApplicationController
     @line_item = @account.line_items.find(params[:id])
 
     unless @line_item.cart.nil?
-      cart = @line_item.cart 
+      @cart = @line_item.cart 
 
       respond_to do |format|
         if @line_item.update_attributes(params[:line_item])
-          format.html { redirect_to(cart, :notice => 'Line item was successfully updated.') }
-          format.xml  { head :ok }
+          if @line_item.type_of == "swap bid"
+            @bond_ask = @line_item.child
+            @cart.line_items << @bond_ask
+            format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "We added the request to your cart.  Now please fill in the details of how you'd like to sell these bonds." }
+          else
+            format.html { redirect_to(@cart, :notice => 'Line item was successfully updated.') }
+            format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
+          end
         else
           format.html { render :action => "edit" }
           format.xml  { render :xml => @line_item.errors, :status => :unprocessable_entity }

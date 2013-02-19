@@ -1,0 +1,8 @@
+<tr class="cart_line_item">
+	<td><%= link_to cart_line_item.type_of, edit_account_line_item_path(cart_line_item.account, cart_line_item) %></td>
+	<td><%= link_to cart_line_item.qty, edit_account_line_item_path(cart_line_item.account, cart_line_item) %></td>
+	<td><%= link_to cart_line_item.max_bid_min_ask, edit_account_line_item_path(cart_line_item.account, cart_line_item) %></td>
+	<td><%= link_to line_item_total(cart_line_item), edit_account_line_item_path(cart_line_item.account, cart_line_item) %></td>
+	<td><%= link_to 'Remove', [cart_line_item.account, cart_line_item], :method => :delete, :confirm => 'Are you sure?'  %></td>
+</tr>
+

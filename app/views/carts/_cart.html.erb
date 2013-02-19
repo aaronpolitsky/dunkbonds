@@ -1,0 +1,27 @@
+<% if current_cart.line_items.empty? %>
+    <h3>Your cart is empty.</h3>
+    <%= link_to "Go Back", :back %>
+<% else %>
+    <% @goal_line_items.sort.each do |goal, line_items| %>
+    <div class="goalbox">
+      <%= link_to goal.title, goal %>
+      <table>
+          <tr>
+            <th>Trade Request Type</th>
+            <th>Asking Price</th>
+            <th>Quantity</th>
+            <th></th>
+        </tr>
+
+        <%= render :partial => "carts/cart_line_item", :collection => line_items %>
+    </table>
+    </div>
+    <hr class="space">
+    <% end %>
+
+    <% if params[:controller] == "orders" %>
+        <%= button_to "Finalize Order", orders_path, :method => :post %>
+    <% else %>
+        <%= button_to "Preview Order", new_order_path, :method => :get %>
+    <% end %>
+<% end %>

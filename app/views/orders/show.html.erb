@@ -1,20 +1,2 @@
-<h3> Order <%= @order.id %> </h3>
+<%= render @order %>
 
-<table class="line_items">
-  <tr>
-    <th>Status</th>
-    <th>Type of</th>
-    <th>Max bid min ask</th>
-    <th>Goal</th>
-    <th>Quantity</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-  <%= render @line_items %>
-</table>
-
-
-<%= link_to 'Edit', edit_order_path(@order) %> |
-<%= link_to 'Back', orders_path %>

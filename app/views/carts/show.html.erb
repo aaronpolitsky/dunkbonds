@@ -1,16 +1,1 @@
-<table>
-  <tr>
-    <th>Status</th>
-    <th>Type of</th>
-    <th>Max bid min ask</th>
-    <th>Goal</th>
-    <th>Quantity</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<%= render @line_items %>
-</table>
-
-<%= button_to "Preview Order", new_order_path, :method => :get %>
+<%= render current_cart %>

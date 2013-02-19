@@ -1,19 +1,2 @@
-<h1>Preview Your Order</h1>
-
-<table> Trade Requests
-  <tr> 
-    <th>Status</th>
-    <th>Type of</th>
-    <th>Quantity</th>    
-    <th>Bid/Ask Price</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<%= render current_cart.line_items %>
-</table>
-
-<%= render 'form' %>
-
-<%= link_to 'Back', @order %>
+<h3>Preview Your Order</h3>
+<%= render :partial => "carts/cart", :item =>  current_cart %>

@@ -6,10 +6,6 @@ class OrdersController < ApplicationController
   # GET /orders.xml
   def index
     @orders = current_user.orders
-    @order_line_items = Hash.new
-    @orders.each do |o|
-      @order_line_items.store o, o.line_items
-    end
     
     respond_to do |format|
       format.html # index.html.erb
@@ -21,7 +17,7 @@ class OrdersController < ApplicationController
   # GET /orders/1.xml
   def show
     @order = current_user.orders.find(params[:id])
-    @line_items = @order.line_items
+    @goal_line_items = @order.line_items.group_by {|li| li.account.goal}
 
     respond_to do |format|
       format.html # show.html.erb
@@ -33,7 +29,9 @@ class OrdersController < ApplicationController
   # GET /orders/new.xml
   def new
     @order = current_or_guest_user.orders.new
-    @cart = @order.user.cart
+    @cart = current_cart
+    @line_items = @cart.line_items
+    @goal_line_items = @line_items.group_by {|li| li.account.goal}
 
     respond_to do |format|
       if @cart.line_items.empty?
@@ -46,9 +44,9 @@ class OrdersController < ApplicationController
   end
 
   # GET /orders/1/edit
-  def edit
-    @order = current_user.orders.find(params[:id])
-  end
+  # def edit
+  #   @order = current_user.orders.find(params[:id])
+  # end
 
   # POST /orders
   # POST /orders.xml
@@ -71,30 +69,30 @@ class OrdersController < ApplicationController
 
   # PUT /orders/1
   # PUT /orders/1.xml
-  def update
-    @order = current_user.orders.find(params[:id])
+  # def update
+  #   @order = current_user.orders.find(params[:id])
 
-    respond_to do |format|
-      if @order.update_attributes(params[:order])
-        format.html { redirect_to(@order, :notice => 'Order was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @order.errors, :status => :unprocessable_entity }
-      end
-    end
-  end
+  #   respond_to do |format|
+  #     if @order.update_attributes(params[:order])
+  #       format.html { redirect_to(@order, :notice => 'Order was successfully updated.') }
+  #       format.xml  { head :ok }
+  #     else
+  #       format.html { render :action => "edit" }
+  #       format.xml  { render :xml => @order.errors, :status => :unprocessable_entity }
+  #     end
+  #   end
+  # end
 
-  # DELETE /orders/1
-  # DELETE /orders/1.xml
-  def destroy
-    @order = current_user.orders.find(params[:id])
-    @order.destroy
+  # # DELETE /orders/1
+  # # DELETE /orders/1.xml
+  # def destroy
+  #   @order = current_user.orders.find(params[:id])
+  #   @order.destroy
 
-    respond_to do |format|
-      format.html { redirect_to(orders_url) }
-      format.xml  { head :ok }
-    end
-  end
+  #   respond_to do |format|
+  #     format.html { redirect_to(orders_url) }
+  #     format.xml  { head :ok }
+  #   end
+  # end
 
 end

@@ -1,16 +1,24 @@
-<tr class="order">
-  <td class="number"><%= link_to "Order #{order.id}", order %></td>
-  <table class="line_items">
+<div class="goalbox">
+<%= link_to "Order #{order.id}", order %>
+<% (order.line_items.group_by {|li| li.account.goal}).sort.each do |goal, line_items| %>
+<div class="goalbox">
+  <%= link_to goal.title, goal %>
+  <table>
     <tr>
       <th>Status</th>
-      <th>Type of</th>
-      <th>Max bid min ask</th>
-      <th>Goal</th>
+      <th>Request Type</th>
       <th>Quantity</th>
-      <th></th>
-      <th></th>
+      <th>Price</th>            
+      <th>Subtotal</th>                        
       <th></th>
     </tr>
-    <%= render order.line_items %>
+    <%= render line_items %>
   </table>
-</tr>
+</div>
+<hr class="space">
+<% end %>
+</div>
+<hr class="space">
+
+
+
