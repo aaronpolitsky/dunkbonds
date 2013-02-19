@@ -1,7 +1,7 @@
 class CreateTheUsersCarts < ActiveRecord::Migration
   def up
 		User.all.each do |u|
-			User.create_cart! if User.cart.nil?
+			u.create_cart! if u.cart.nil?
 		end  	
   end
 
