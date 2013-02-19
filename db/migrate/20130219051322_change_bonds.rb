@@ -9,6 +9,8 @@ class ChangeBonds < ActiveRecord::Migration
 
   	add_index :bonds, [:creditor_id, :debtor_id], :unique => true, :name => "creditor_debtor"
 
+  	Bond.reset_column_information
+
  		#remove treasury's unsold bonds from escrow by finding from order
  		Order.where(:status => "pending",
  		            :account_id => 2,
@@ -22,7 +24,9 @@ class ChangeBonds < ActiveRecord::Migration
 		Account.all.each do |a|
 			bonds = a.bonds
 			qty = bonds.count
-			a.bonds.create!(:debtor_id => 2, :qty => qty)
+      if qty > 0
+  			a.bonds.create!(:debtor_id => 2, :qty => qty)
+      end
 		end
 
   end
