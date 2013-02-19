@@ -2,7 +2,7 @@ class MorphOrdersLineItemsTradesCancellations < ActiveRecord::Migration
 	def up
   	#   for each order
 		#     add a line item to this order of qty 1 when it was created
-		Order.each do |o|
+		Order.all.each do |o|
 			#ignore treasury orders that got cancelled
 			unless (o.account_id == 2 && o.status == "cancelled")
 				li = LineItem.new(:order_id => o.id,
@@ -16,7 +16,7 @@ class MorphOrdersLineItemsTradesCancellations < ActiveRecord::Migration
 			end
 		end			
 		
-		LineItem.each do |li|
+		LineItem.all.each do |li|
 	  	#			if it is cancelled, 
 	  	#				add a cancellation at order's updated time
 			# 			set line item updated at time to order's updated at time  					
