@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130219075718) do
+ActiveRecord::Schema.define(:version => 20130219081133) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id"
@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(:version => 20130219075718) do
     t.integer  "bond_id"
     t.decimal  "price",      :precision => 8, :scale => 2
     t.integer  "match_id"
+    t.integer  "user_id"
   end
 
   create_table "payments", :force => true do |t|
