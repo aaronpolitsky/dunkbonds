@@ -60,10 +60,6 @@ class MorphOrdersLineItemsTradesCancellations < ActiveRecord::Migration
 		  	end
 		  end
 		end
-
-		change_table :orders do |t|
-			remove :account_id, :type_of, :status, :max_bid, :min_ask, :updated_by, :is_deleted, :goal_id, :bond_id, :price, :match_id
-		end
 	end  	
 
 
