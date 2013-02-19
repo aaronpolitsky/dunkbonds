@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130219051322) do
+ActiveRecord::Schema.define(:version => 20130219065956) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id"
@@ -67,6 +67,14 @@ ActiveRecord::Schema.define(:version => 20130219051322) do
     t.integer  "match_id"
   end
 
+  create_table "payments", :force => true do |t|
+    t.integer  "recipient_id"
+    t.integer  "payer_id"
+    t.decimal  "amount",       :precision => 8, :scale => 2, :default => 0.0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "posts", :force => true do |t|
     t.integer  "goal_id"
     t.string   "title"
@@ -78,15 +86,7 @@ ActiveRecord::Schema.define(:version => 20130219051322) do
     t.datetime "updated_at"
   end
 
-  create_table "receipts", :force => true do |t|
-    t.integer  "payee_id"
-    t.integer  "payer_id"
-    t.integer  "goal_id"
-    t.boolean  "is_executed",                               :default => false
-    t.decimal  "amount",      :precision => 8, :scale => 2
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+  add_index "posts", ["guid"], :name => "index_posts_on_guid"
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "",    :null => false

@@ -46,12 +46,12 @@ describe Account do
 
     describe "payments and" do
       before :each do
-        @p = Payment.create!(:payee => @treasury, 
+        @p = Payment.create!(:payer => @treasury, 
                             :recipient => @buyer, 
                             :amount => 5.50)
       end
       
-      it "responds to payments if it is the payee" do
+      it "responds to payments if it is the payer" do
         @treasury.should respond_to :payments
         @treasury.payments.last.should eq @p
         @buyer.payments.should eq []
