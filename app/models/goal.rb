@@ -116,7 +116,7 @@ class Goal < ActiveRecord::Base
         errors.add(:period, "duration must allow for at least 5 periods")
       end
       if (self.starts_at != self.starts_at.beginning_of_month) || (self.ends_at != self.ends_at.beginning_of_month)
-        errors.add(:starts_at, "a monthly goal must start and end at the beginning of the month")
+    #    errors.add(:starts_at, "a monthly goal must start and end at the beginning of the month")
       end
     end
   end
