@@ -16,8 +16,8 @@ class ChangeBonds < ActiveRecord::Migration
  		            :account_id => 2,
  		            :type_of => "ask").each do |o|
 			b = Bond.find(o.bond_id)
-			b.destroy!
-			o.destroy!
+			b.destroy
+			o.destroy
 		end
 
 		#reassign the rest as linking creditor and debtor				
