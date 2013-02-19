@@ -17,13 +17,13 @@ class LineItem < ActiveRecord::Base
   validates :max_bid_min_ask, :presence => true, :numericality => {:greater_than => 0}
   validates :account, :presence => true
 
-  validate :enough_bonds_to_cover_cart_asks, :only => [:create, :update]
-  validate :children_rules
-  validate :swap_bids_must_bid_face
+#  validate :enough_bonds_to_cover_cart_asks, :only => [:create, :update]
+#  validate :children_rules
+#  validate :swap_bids_must_bid_face
   
-  after_create :create_bond_ask_for_swap_bid
-  before_validation :sync_swap_bid_qty_to_bond_ask_qty
-  after_update :sync_bond_ask_qty_to_swap_bid_qty
+  #after_create :create_bond_ask_for_swap_bid
+#  before_validation :sync_swap_bid_qty_to_bond_ask_qty
+#  after_update :sync_bond_ask_qty_to_swap_bid_qty
 
   def cancel!
     if self.status == "pending"
