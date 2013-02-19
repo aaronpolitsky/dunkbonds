@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130219073941) do
+ActiveRecord::Schema.define(:version => 20130219075718) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id"
@@ -35,6 +35,18 @@ ActiveRecord::Schema.define(:version => 20130219073941) do
 
   add_index "bonds", ["creditor_id", "debtor_id"], :name => "creditor_debtor", :unique => true
 
+  create_table "cancellations", :force => true do |t|
+    t.integer  "line_item_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "carts", :force => true do |t|
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "goals", :force => true do |t|
     t.integer  "goalsetter_id"
     t.string   "type_of"
@@ -50,6 +62,19 @@ ActiveRecord::Schema.define(:version => 20130219073941) do
   end
 
   add_index "goals", ["goalsetter_id"], :name => "index_goals_on_goalsetter_id"
+
+  create_table "line_items", :force => true do |t|
+    t.string   "status",                                        :default => "new"
+    t.string   "type_of"
+    t.decimal  "max_bid_min_ask", :precision => 8, :scale => 2
+    t.integer  "account_id"
+    t.integer  "cart_id"
+    t.integer  "order_id"
+    t.integer  "qty"
+    t.integer  "parent_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "orders", :force => true do |t|
     t.integer  "account_id"
@@ -87,6 +112,17 @@ ActiveRecord::Schema.define(:version => 20130219073941) do
   end
 
   add_index "posts", ["guid"], :name => "index_posts_on_guid"
+
+  create_table "trades", :force => true do |t|
+    t.integer  "bid_id"
+    t.integer  "ask_id"
+    t.integer  "qty"
+    t.decimal  "price",      :precision => 8, :scale => 2
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "trades", ["bid_id", "ask_id"], :name => "bid_ask"
 
   create_table "users", :force => true do |t|
     t.string   "email",                  :default => "",    :null => false
