@@ -8,7 +8,7 @@ class Trade < ActiveRecord::Base
   validates :ask, :presence => true
   validate :type_of_bid
 
-  #after_create :execute
+  after_create :execute
 
   def total
     self.price.to_s.to_d * self.qty.to_s.to_d
