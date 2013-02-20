@@ -14,7 +14,10 @@ class MorphOrdersLineItemsTradesCancellations < ActiveRecord::Migration
 				                  :updated_at => o.updated_at)
 				li.save!
 			end
-		end			
+			o.user_id = Account.find(o.account_id).user_id
+			o.save!
+		end	
+
 		
 		LineItem.all.each do |li|
 	  	#			if it is cancelled, 

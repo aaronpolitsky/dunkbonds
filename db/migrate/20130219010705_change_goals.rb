@@ -10,6 +10,13 @@ class ChangeGoals < ActiveRecord::Migration
     rename_column :goals, :feed_url, :blog_url
 
     add_index :goals, [:goalsetter_id]
+
+    Goal.reset_column_information
+    g = Goal.find 1
+    g.title = "Aaron DUNKs"
+    g.description = "Aaron DUNKs an NBA-size basketball on a regulation hoop by March 1st, 2013.  No trampolines."
+    g.goalsetter_id = 2
+    g.save!
   end
 
 
