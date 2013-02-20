@@ -2,6 +2,7 @@ class ChangeGoals < ActiveRecord::Migration
 
   def change
     add_column :goals, :title, :string
+    add_column :goals, :period, :string
     add_column :goals, :blog_service_provider, :string
     
     rename_column :goals, :creator_id, :goalsetter_id
@@ -16,6 +17,7 @@ class ChangeGoals < ActiveRecord::Migration
     g.title = "Aaron DUNKs"
     g.description = "Aaron DUNKs an NBA-size basketball on a regulation hoop by March 1st, 2013.  No trampolines."
     g.goalsetter_id = 2
+    g.period = '1 month'
     g.save!
   end
 
