@@ -1,0 +1,61 @@
+<h3>Welcome to the All New DUNKbonds!</h3>
+<hr class="space">
+<div class="span-11 border">	
+
+	First thing's first, learn about a goal.  Here's how this whole thing started:
+	<p>
+		<ul class="blocklink">
+			<%= render 'shared/narrowgoal', :goal => @dunkgoal %>
+		</ul>
+		<hr>
+		DUNKbonds is now open for others to set goals, each with its own market and DUNKbonds.  <%= link_to 'Get in touch', about_contact_path %> and we'll see if DUNKbonds is <%= link_to "is right for you.", about_why_set_a_goal_path %>  <p>
+		<p>Meanwhile, check out some example goals:</p>
+		<ul class="blocklink">
+			<% @othergoals.each do |g| %>
+			<%= render 'shared/narrowgoal', :goal => g %>
+			<% end %>
+		</ul>
+
+		<hr>
+		<h3>Latest from  the <%= link_to "DUNKblog", goal_posts_path(@dunkgoal) %></h3>
+		<% unless @latest_posts.empty? %>
+		<%= render :partial => 'shared/shortpost', :collection => @latest_posts %>
+		<h4>Older posts on the <%= link_to "DUNKblog", goal_posts_path(@dunkgoal) %></h4>
+		<% else %>
+		<p>
+			<em>No blog posts to show.</em>
+		</p>
+		<% end %>
+	</div>
+	<div class="span-5 last">
+		<div class="sidebar round">
+			<h4><b>It's good to have goals</b></h4>
+			<p>
+				DUNKbonds is about using prediction markets to encourage (or challenge) people to meet their goals.
+			</p>	
+
+			<b>For Goalsetters:</b>
+			<p>
+				DUNKbonds provides motivation and accountability to goalsetters by allowing them to tap into how everyone feels about whether or not they'll succeed.  
+			</p>
+
+			<p>
+				If you love to prove people wrong, you probably already get it.<br>
+				<%= link_to "more about setting goals...", about_why_set_a_goal_path %>
+			</p>
+
+			<b>For Everyone Else</b>
+			<p>
+				Remember how much you donated to your friend's triathlon?  Didn't think so. 
+
+				<p>DUNKbonds puts you in on the action.  </p>
+					<p>
+						With DUNKbonds, you'll <i>want</i> to follow a goal because your donation amount is tied to whether or not the goal is met.
+						<br>
+						<%= link_to "Read more...", about_why_set_a_goal_path %>
+					</p>
+				</div>
+			</div>
+			<hr class="nospace">
+
+

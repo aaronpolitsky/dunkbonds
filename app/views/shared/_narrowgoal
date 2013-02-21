@@ -1,0 +1,24 @@
+  <div class="goal span-11 last">
+    <li class="blocklink">
+      <%= link_to goal do %>
+      <div class="goalbox">
+        <div class="title span-11 last ">        
+          <h3><%= goal.title %></h3>
+          by <%= goal.goalsetter.name %>
+        </div>
+        <hr class="space">
+
+        <div class="title span-5 ">
+          <%= goal.description %>
+        </div>
+        <div class="span-5 last">
+         <b>Start Date:</b> <%= goal.starts_at %><br>
+         <b>Deadline:</b> <%= goal.ends_at.to_date  %><br>
+         <b>Bonds Pay:</b> <%= number_to_currency(goal.bond_face_value) %>
+       </div>
+       <hr class="space">
+       <% end %>
+     </div>
+   </li>
+ </div>
+ <hr class="space">

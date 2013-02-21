@@ -1,5 +1,28 @@
 TwoODunkbonds::Application.routes.draw do
 
+  get "about/index"
+  get "about/credits"
+  get "about/rules"
+  get "about/howitworks"
+  get "about/faq"
+  get "about/contact"
+  get "about/why_set_a_goal"
+  get "about/why_trade_dunkbonds"
+
+  get "story/story1"
+  get "story/story2"
+  get "story/story3"
+  get "story/story4"
+  get "story/story5"
+  get "story/story6"
+  get "story/story7"
+  get "story/storyend"
+  get "story/kill_story_notice"
+  
+  get "outside/landing"
+
+  get "home/index"
+
   devise_for :users
 
   resources :carts, :only => :show
@@ -63,7 +86,7 @@ TwoODunkbonds::Application.routes.draw do
 
   # You can have the root of your site routed with "root"
   # just remember to delete public/index.html.
-  root :to => "goals#index"
+  root :to => "outside#landing"
 
   # See how all your routes lay out with "rake routes"
 

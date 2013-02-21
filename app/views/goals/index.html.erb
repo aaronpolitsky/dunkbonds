@@ -10,7 +10,8 @@
 	<ul class="blocklink">
 		<%= render @unfollowed_goals %>
 	</ul>	
-<% else %>
+<% end %>
+<% unless @unfollowed_goals.empty? %>
 <h3>Check out some of the Goals people have set</h3>
 	<ul class="blocklink">
 		<%= render @goals %>

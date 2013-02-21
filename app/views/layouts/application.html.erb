@@ -11,7 +11,9 @@
 	<div class="container">
 		<%= render 'layouts/header' %>		
 			<section class="round">			
+			<% unless outside? %>
 			<%= render 'layouts/gentabnav' %>
+			<% end %>
 			<%- flash.each do |name, msg| -%>
 			<%= content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String) %>
 			<%- end -%>
@@ -21,6 +23,7 @@
 				<%= yield %>
 				<hr class="space">
 			</div>
+
 			<% else %>
 			<%= yield %>
 			<% end %>

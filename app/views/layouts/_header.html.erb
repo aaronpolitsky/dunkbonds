@@ -1,5 +1,5 @@
 <header>
-  <%= link_to logo, root_path %>
+  <%= outside? ? link_to(logo, root_path) : link_to(logo, home_index_path) %>
   <nav class="round">
     <ul class="span">
       <%= render 'shared/navigation' %>

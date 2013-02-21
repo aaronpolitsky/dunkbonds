@@ -1,5 +1,18 @@
 module ApplicationHelper
 
+	def outside?
+		case params[:controller]
+		when "outside"
+			return true
+		when "story"
+			return true
+		when "about"
+			return true			
+		else
+			return false
+		end
+	end
+
 	def within_a_goal?
 		return false if current_page?(root_path)
 		
@@ -30,7 +43,7 @@ module ApplicationHelper
 
   #tab styling
   def selected?(page)
-  	if current_page?(page)
+  	if current_page?(page) 
   		"selected"
   	else
 	  	""

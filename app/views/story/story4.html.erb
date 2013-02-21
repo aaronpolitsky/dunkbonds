@@ -1,0 +1,32 @@
+<% birthday = Date.civil(1978, 5, 18) %>
+<% age = Date.today.year - birthday.year %>
+<% age -= 1 if Date.today < birthday + age.years %>
+
+<h3>
+Reasons why this is ridiculous:<br>
+</h3>
+<h4>
+<ol>
+  <li>I'm <%= age %> years old.</li>
+  <li>I'm barely 6 feet tall</li>
+  <li>I sit at a computer all day.</li>
+  <li>They made a <a href="http://www.imdb.com/title/tt0105812" target="_blank">movie</a> about it.</li>
+  <li>I never even made the middle school basketball team.</li>
+</ol>
+
+My entire involvement with organized basketball was playing "The Hey Song" on trumpet from the nosebleeds.  (I wasn't even 1st chair.)<br>
+<br>
+
+Take a moment to ponder the odds of someone like me being able to dunk.  <br>
+<br>
+<%= image_tag "story/chrisbotti.jpg" %>
+<br>
+<br>
+Not good.  <br>
+</h4>
+<sub>In this analogy, Chris Botti and I are similar.  Also not good. </sub>
+<br>
+<br>
+<h3>
+Now, consider my <%= link_to "track record of setting and achieving goals.", story_story5_path %>
+</h3>

@@ -39,6 +39,8 @@
 </div>
 */
 
+hr.nospace {visibility:hidden;margin: 0 0 0px}
+
 /* box shadows */
 
 header img, header nav, section, footer nav {
@@ -62,6 +64,10 @@ header img {
 .goalbox {
   padding: 1em;
   box-shadow:  0px 0px 0.5em rgba(0,0,0,.15);  
+}
+
+.goalbox a {
+  text-decoration: none;
 }
 
 section {
@@ -210,11 +216,12 @@ td.sidebar {
   box-shadow: 2px 5px 10px 0px #ddd;
 }
 
-sidebar {
-  width: 30%;
+.sidebar {
+  width: 100%;
   padding: 1em;
   vertical-align: top;
   background: #cdc;
+  box-shadow: 2px 5px 10px 0px #ddd;  
 }
 
 .profile img.gravatar {
