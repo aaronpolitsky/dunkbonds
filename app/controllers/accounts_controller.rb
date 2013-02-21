@@ -5,7 +5,7 @@ class AccountsController < ApplicationController
   #before_filter :authenticate_user!, :except => [:index, :new]
 
   before_filter :load_goal
-  before_filter :correct_user
+  before_filter :user_following_goal?, :only => [:show, :destroy]
 
   def index
     @accounts = current_or_guest_user.accounts.order("created_at DESC")
@@ -25,7 +25,7 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.xml
   def show
-    @account = @goal.accounts.find(params[:id])
+    @account = current_or_guest_user.accounts.find_by_goal_id(@goal.id)
     @line_items = @account.line_items.where("order_id IS NOT NULL")
     @pledged = @account.pledged
     @current_investment = @account.current_investment
@@ -89,7 +89,7 @@ class AccountsController < ApplicationController
   # DELETE /accounts/1
   # DELETE /accounts/1.xml
   def destroy
-    @account = @goal.accounts.find(params[:id])
+    @account = current_or_guest_user.accounts.find_by_goal_id(@goal)
     
     respond_to do |format|
       if @account.destroy
@@ -110,8 +110,12 @@ class AccountsController < ApplicationController
     @goal = Goal.find(params[:goal_id]) unless params[:goal_id].nil?
   end
 
-  def correct_user
-    true
-  end
-
+  def user_following_goal?
+    load_goal
+    unless current_or_guest_user.following?(@goal)
+      flash[:warning] = "No funny stuff."
+      redirect_to @goal
+    end
+  end  
+  
 end

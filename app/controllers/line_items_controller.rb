@@ -1,6 +1,7 @@
 class LineItemsController < ApplicationController
 #  before_filter :authenticate_user!
   before_filter :load_account_and_goal
+  before_filter :line_item_exists?, :except => [:index, :new, :create]
 
   def index
     @line_items = @account.line_items
@@ -121,6 +122,17 @@ class LineItemsController < ApplicationController
     @account = Account.find(params[:account_id]) 
     @goal = @account.goal
   end
+
+  def line_item_exists?
+    load_account_and_goal
+    @line_item = @account.line_item.find(params[:id])
+  rescue NoMethodError
+
+    flash[:error] = "That Trade Request does not exist."
+    redirect_to [@goal, @account]
+  end
+
+
 
 end
 

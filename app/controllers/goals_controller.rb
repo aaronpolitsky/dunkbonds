@@ -3,6 +3,8 @@ class GoalsController < ApplicationController
 
   before_filter :authenticate_user!, :except => [:index, :show]
   
+  before_filter :can_create_goal, :except  => [:index, :show]
+
   # GET /goals
   # GET /goals.xml
   def index
@@ -96,6 +98,13 @@ class GoalsController < ApplicationController
 
   def load_account
     @account = current_or_guest_user.accounts.find_by_goal_id(params[:id])
+  end
+
+  def can_create_goal
+    unless current_or_guest_user.email == "aaron.politsky@gmail.com" || current_user.is_admin?
+      flash[:warning] = "nice try."
+      redirect_to goals_path  
+    end
   end
 end
 

@@ -23,13 +23,18 @@ TwoODunkbonds::Application.routes.draw do
 
   get "home/index"
 
+
+  authenticated :user do
+    root :to => 'home#index'
+  end
+
   devise_for :users
 
   resources :carts, :only => :show
   resources :orders, :except => [:edit, :update, :destroy]
 
   resources :goals do
-    resources :accounts
+    resources :accounts, :except => [:edit, :update]
     resources :posts
   end
 

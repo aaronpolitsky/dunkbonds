@@ -4,7 +4,6 @@
 	<td><%= line_item.qty %></td>
 	<td><%= line_item.max_bid_min_ask %></td>
 	<td><%= line_item_total(line_item) %></td>
-	<td><%= link_to 'Destroy', [line_item.account, line_item], :method => :delete, :confirm => 'Are you sure?'  %></td>
 	<% if (line_item.buys.exists? || line_item.sells.exists?) %>
 	<!-- trades -->
   <div class="trades">
