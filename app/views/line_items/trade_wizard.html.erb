@@ -1,0 +1,22 @@
+<div class="span-16 last">
+<%= form_for(@trade_survey, :url => review_line_item_account_line_items_path(@account)) do |f| %>
+
+  <h4>
+ 	Do you think the goalsetter will meet this goal?
+	Yes<%= f.radio_button :is_optimistic, true %>
+	No<%= f.radio_button :is_optimistic, false %>  
+	<p>
+  How likely do you think the goalsetter is to meet this goal?
+  <%= f.text_field :likelihood_pct, :size => 1 %>%? (0-100)
+	<p>
+  How many? 
+  <%= f.text_field :qty, :size => 1 %>
+  </h4>
+
+	<div class="actions">
+		<%= f.submit "Review Trade Request" %>
+	</div>
+
+<% end %>
+</div>
+

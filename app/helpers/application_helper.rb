@@ -7,7 +7,7 @@ module ApplicationHelper
 		when "story"
 			return true
 		when "about"
-			return true			
+			return false
 		else
 			return false
 		end
@@ -25,8 +25,11 @@ module ApplicationHelper
 			return true
 		when "line_items"
 			return true
+		when "tradewizard"
+			return true			
+		else 
+			return false		
 		end
-
 	end
 
 	def logo

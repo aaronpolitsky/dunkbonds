@@ -26,7 +26,15 @@ class LineItemsController < ApplicationController
   # GET /line_items/new
   # GET /line_items/new.xml
   def new
-    @line_item = @account.line_items.new
+    if liparams = session[:liparams] 
+      if liparams[:type_of] == "swap bid"
+        @line_item = @account.line_items.new(liparams.merge(:max_bid_min_ask => @goal.bond_face_value))
+      else
+        @line_item = @account.line_items.new(liparams)
+      end      
+    else
+      @line_item = @account.line_items.new
+    end
 
     respond_to do |format|
       format.html # new.html.erb
@@ -35,10 +43,12 @@ class LineItemsController < ApplicationController
   end
 
   # GET /line_items/1/edit
-  def edit
+  def edit    
     @line_item = @account.line_items.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    redirect_to [@account.goal, @account]
+    if liparams = session[:liparams]
+      @line_item.max_bid_min_ask = liparams[:max_bid_min_ask]
+      @line_item.save!
+    end
   end
 
   # POST /line_items
@@ -54,9 +64,10 @@ class LineItemsController < ApplicationController
         if @line_item.type_of == "swap bid"
           @bond_ask = @line_item.child
           @cart.line_items << @bond_ask
-          format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "We added the request to your cart.  Now please fill in the details of how you'd like to sell these bonds." }
-        else
-          format.html { redirect_to(@cart, :notice => 'We added the item to your cart.') }
+          format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "Now please fill in the details of how you'd like to sell these bonds." }
+        else         
+          session[:liparams] = nil
+          format.html { redirect_to(@cart, :notice => 'Trade Request added to cart.') }
           format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
         end
         # end
@@ -82,7 +93,8 @@ class LineItemsController < ApplicationController
             @cart.line_items << @bond_ask
             format.html {redirect_to edit_account_line_item_path(@account, @bond_ask), :notice => "We added the request to your cart.  Now please fill in the details of how you'd like to sell these bonds." }
           else
-            format.html { redirect_to(@cart, :notice => 'Line item was successfully updated.') }
+            session[:liparams] = nil
+            format.html { redirect_to(@cart, :notice => 'Trade Request updated.') }
             format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
           end
         else
@@ -119,20 +131,25 @@ class LineItemsController < ApplicationController
   private
 
   def load_account_and_goal
-    @account = Account.find(params[:account_id]) 
-    @goal = @account.goal
+    if current_or_guest_user.accounts.exists?(params[:account_id])
+      @account = current_or_guest_user.accounts.find(params[:account_id])  
+      @goal = @account.goal
+    else
+      flash[:warning] = "Cut it out."
+      redirect_to accounts_path
+    end
   end
 
   def line_item_exists?
     load_account_and_goal
-    @line_item = @account.line_item.find(params[:id])
-  rescue NoMethodError
-
+    @line_item = @account.line_items.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
     flash[:error] = "That Trade Request does not exist."
     redirect_to [@goal, @account]
   end
 
-
-
 end
+
+
+
 

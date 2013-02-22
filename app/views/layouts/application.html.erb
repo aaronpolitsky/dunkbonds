@@ -14,12 +14,20 @@
 			<% unless outside? %>
 			<%= render 'layouts/gentabnav' %>
 			<% end %>
-			<%- flash.each do |name, msg| -%>
-			<%= content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String) %>
+			<% unless within_a_goal? %>
+				<%- flash.each do |name, msg| -%>
+				<%= content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String) %>
+				<%- end -%>
 			<%- end -%>
 			<% if within_a_goal? %>
 			<div class="goalbox">
 				<%= render 'layouts/goaltabnav' %>
+				<% if within_a_goal? %>
+					<hr class="nospace">
+					<%- flash.each do |name, msg| -%>
+					<%= content_tag :div, msg, :id => "flash_#{name}" if msg.is_a?(String) %>
+					<%- end -%>
+				<% end %>
 				<%= yield %>
 				<hr class="space">
 			</div>

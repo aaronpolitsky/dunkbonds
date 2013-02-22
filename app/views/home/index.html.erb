@@ -17,15 +17,22 @@
 		</ul>
 
 		<hr>
-		<h3>Latest from  the <%= link_to "DUNKblog", goal_posts_path(@dunkgoal) %></h3>
+		<h3>Latest GoalPosts</h3>
+		<small>This is the goal newsfeed</small><p>
+		<hr class="nospace">
 		<% unless @latest_posts.empty? %>
+		<div class="goalbox">
+			<h4><%= link_to "DUNKblog", goal_posts_path(@dunkgoal) %></h4>
+			<hr class="nospace">
 		<%= render :partial => 'shared/shortpost', :collection => @latest_posts %>
 		<h4>Older posts on the <%= link_to "DUNKblog", goal_posts_path(@dunkgoal) %></h4>
+		</div>
 		<% else %>
 		<p>
 			<em>No blog posts to show.</em>
 		</p>
 		<% end %>
+		<hr class="nospace">
 	</div>
 	<div class="span-5 last">
 		<div class="sidebar round">
@@ -36,7 +43,7 @@
 
 			<b>For Goalsetters:</b>
 			<p>
-				DUNKbonds provides motivation and accountability to goalsetters by allowing them to tap into how everyone feels about whether or not they'll succeed.  
+				DUNKbonds provides motivation and accountability for goalsetters by allowing them to tap the how everyone feels about whether or not they'll succeed.  
 			</p>
 
 			<p>

@@ -12,7 +12,10 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :type_of %><br />
+    <%= link_to "Help me understand", about_howitworks_path %>
+  </div>        
+  <div class="field">
+    <%= f.label "Type" %><br />
     <%= f.select :type_of, LineItem::UI_TYPES %>
   </div>
   <div class="field">

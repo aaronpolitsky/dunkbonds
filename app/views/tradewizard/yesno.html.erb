@@ -1,0 +1,17 @@
+<%= form_for(@trade_survey, :url => goal_account_tradewizard_new_path(@goal, @account)) do |f| %>
+
+  <h4>
+  Do you think the <%= @goal.goalsetter.first_name %> will meet this goal?
+  Yes<%= f.radio_button :is_optimistic, true %>
+  No<%= f.radio_button :is_optimistic, false %>  
+  <p>
+  How confident are you of that?
+  <%= f.text_field :likelihood_pct, :size => 1 %>%? (0-100)
+ 
+  </h4>
+
+  <div class="actions">
+    <%= f.submit "Next" %>
+  </div>
+
+<% end %>

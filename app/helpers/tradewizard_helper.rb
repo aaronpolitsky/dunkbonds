@@ -1,0 +1,2 @@
+module TradewizardHelper
+end

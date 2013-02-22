@@ -1,5 +1,18 @@
-<h3>Do you want to support this goal?</h3>
+<h3>How would you like to support this goal?</h3>
 
-<%= render 'form' %>
+<div class="span-8 ">
+	<h4><center>If you know what you're doing:</center></h4>
+	<%= render 'form' %>
+</div>
+<div class="span-8 last">
+	<h4><center>Or...</center></h4>
+	<ul class="blocklink">
+		<li class="blocklink"><center>
+			<h3>
+	<%= link_to '<br><br>Use the Wizard<br><br><br>'.html_safe, new_goal_account_tradewizard_path(@goal, @account),  :class => "goalbox" %>
+</div>
+</li>
+</ul>
 
-<%= link_to 'Back', account_line_items_path %>
+<hr class="nospace">
+</div>

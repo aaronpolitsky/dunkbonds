@@ -34,12 +34,14 @@ TwoODunkbonds::Application.routes.draw do
   resources :orders, :except => [:edit, :update, :destroy]
 
   resources :goals do
-    resources :accounts, :except => [:edit, :update]
+    resources :accounts, :except => [:edit, :update] do
+      resources :tradewizard, :only => [:new, :create] 
+    end
     resources :posts
   end
 
   resources :accounts do
-    resources :line_items
+    resources :line_items       
   end 
 
   # The priority is based upon order of creation:
