@@ -1,12 +1,15 @@
 <%= form_for(@trade_survey, :url => goal_account_tradewizard_index_path(@goal, @account)) do |f| %>
 
   <h4>
+  <p>
   Do you think the <%= @goal.goalsetter.first_name %> will meet this goal?
   Yes<%= f.radio_button :is_optimistic, true %>
   No<%= f.radio_button :is_optimistic, false %>  
+  </p>
   <p>
   How confident are you of this?
   <%= f.text_field :likelihood_pct, :size => 1 %>%? (0-100)
+  </p>
   <p>
   About how much would you like to donate?
   $<%= f.text_field :donation, :size => 1 %><br>

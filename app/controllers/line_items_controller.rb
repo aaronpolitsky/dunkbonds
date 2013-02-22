@@ -43,12 +43,8 @@ class LineItemsController < ApplicationController
   end
 
   # GET /line_items/1/edit
-  def edit    
+  def edit 
     @line_item = @account.line_items.find(params[:id])
-    if liparams = session[:liparams]
-      @line_item.max_bid_min_ask = liparams[:max_bid_min_ask]
-      @line_item.save!
-    end
   end
 
   # POST /line_items
@@ -121,7 +117,7 @@ class LineItemsController < ApplicationController
       relative = @line_item.parent if @line_item.parent_id
       @line_item.destroy
       relative.destroy if relative
-      redirect_to(cart, :notice => 'Trade request removed from cart.') 
+      redirect_to(new_account_line_item_path, :notice => 'Trade request removed from cart.') 
     else #the line_item is already part of an order
       @line_item.cancel! if @line_item.status == "pending"
       redirect_to(:back, :notice => 'Trade request canceled.')
@@ -149,7 +145,3 @@ class LineItemsController < ApplicationController
   end
 
 end
-
-
-
-

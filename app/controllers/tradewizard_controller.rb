@@ -8,10 +8,46 @@ class TradewizardController < ApplicationController
 
   def create
   	@trade_survey = TradeSurvey.new(params[:trade_survey])
-    session[:liparams] = @trade_survey.line_item_params(@goal.bond_face_value)
-    flash[:notice] = "Based on those questions, I've filled in the form on the left with what you want to add to your cart."
-    redirect_to (new_account_line_item_path) 
- end
+
+    unless @trade_survey.valid?
+      flash[:error] = "Please answer each question.  <br>Yes/No<br>0-100 %<br> donation >= 0 $".html_safe
+      redirect_to new_goal_account_tradewizard_path(@goal, @account)
+    else  
+      liparams = @trade_survey.line_item_params(@goal.bond_face_value)
+      flash[:notice] = "Based on those questions, I've filled in the form on the left with what you want to add to your cart."
+
+      @cart = current_or_guest_user.cart
+      @line_item = @account.line_items.new(liparams)
+      @line_item.max_bid_min_ask = @goal.bond_face_value  if liparams[:type_of] == "swap bid"
+
+      respond_to do |format|
+        if @line_item.save
+          @cart.line_items << @line_item
+
+          if @line_item.type_of == "swap bid"
+            @bond_ask = @line_item.child
+            @bond_ask.qty = liparams[:qty]
+            @bond_ask.max_bid_min_ask = liparams[:max_bid_min_ask]
+            
+            debugger
+            if @bond_ask.save
+              @cart.line_items << @bond_ask
+              format.html {redirect_to @cart, :notice => "Based on your answers, you want to buy a swap and sell a bond.  I've added these to your cart." }
+            else
+              format.html { render :action => "new" }
+              format.xml  { render :xml => @line_item.errors, :status => :unprocessable_entity }
+            end
+          else         
+            format.html { redirect_to(@cart, :notice => 'Based on your answers, I added a bond bid to your cart.') }
+            format.xml  { render :xml => @line_item.cart, :location => @line_item.cart }
+          end
+        else  
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @line_item.errors, :status => :unprocessable_entity }
+        end
+      end
+    end
+  end
 
   private 
 
@@ -34,9 +70,9 @@ class TradeSurvey
 
   attr_accessor :is_optimistic, :likelihood_pct, :donation
 
-  validates :is_optimistic, :presence => true, :inclusion => [true, false]
-  validates :likelihood_pct, :presence => true, :numericality => {:greater_than => 0, :less_than_or_equal_to => 100}
-  validates :donation, :presence => true, :numericality => {:greater_than => 0, :less_than_or_equal_to => 100}
+  validates :is_optimistic, :presence => true, :inclusion => ["true", "false"]
+  validates :likelihood_pct, :presence => true, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
+  validates :donation, :presence => true, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}
 
   def initialize(hsh = {})
     hsh.each do |key, value|
