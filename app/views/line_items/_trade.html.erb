@@ -2,6 +2,6 @@
 	<td></td>
 	<td>Trade</td>	
 	<td><%= trade.qty %></td>
-	<td><%= trade.price %></td>
-	<td><%= trade.total %></td>  
+	<td><%= number_to_currency(trade.price) %></td>
+	<td><%= number_to_currency trade.total %></td>  
 </tr>

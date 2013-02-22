@@ -210,6 +210,30 @@ class LineItem < ActiveRecord::Base
     self
   end
 
+  def best_case_pledge
+    case self.type_of
+    when "swap bid"
+      return -self.qty * self.max_bid_min_ask
+    when "bond bid"
+      return (self.account.goal.bond_face_value - self.max_bid_min_ask) * self.qty
+    when "bond ask"
+      return self.qty * self.max_bid_min_ask
+    end
+  end
+
+  def worst_case_pledge
+    case self.type_of
+    when "swap bid"
+      return -self.qty * 2 * self.max_bid_min_ask 
+    when "bond bid"
+      return -self.qty * self.max_bid_min_ask
+    when "bond ask"
+      return self.qty * self.max_bid_min_ask
+    end
+  end
+
+
+
   private
 
   def create_bond_ask_for_swap_bid

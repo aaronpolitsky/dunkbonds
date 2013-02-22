@@ -2,8 +2,8 @@
 	<td><%= line_item.status %></td>
 	<td><%= line_item.type_of %></td>
 	<td><%= line_item.qty %></td>
-	<td><%= line_item.max_bid_min_ask %></td>
-	<td><%= line_item_total(line_item) %></td>
+	<td><%= number_to_currency(line_item.max_bid_min_ask) %></td>
+	<td><%= number_to_currency(line_item_total(line_item)) unless line_item.status == "pending" %></td>
 	<% if (line_item.buys.exists? || line_item.sells.exists?) %>
 	<!-- trades -->
   <div class="trades">

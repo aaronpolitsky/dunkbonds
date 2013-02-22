@@ -36,6 +36,15 @@ module ApplicationHelper
     logo = image_tag("logo.png", :alt => "DUNKbonds", :class => "round")
   end
 
+  def posneg_currency(value)
+ 	  return "$0.00" if value == 0
+ 	  if value > 0
+ 	  	return '+' + number_to_currency(value)
+ 	  else
+ 	  	return number_to_currency(value)
+ 	  end
+  end
+
   def negate_currency(value)
   	unless value == 0 
   		number_to_currency(-value)

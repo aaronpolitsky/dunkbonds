@@ -7,13 +7,22 @@
       <%= link_to goal.title, goal %>
       <table>
           <tr>
-            <th>Trade Request Type</th>
-            <th>Quantity</th>
-            <th>Asking Price</th>
+            <th>Request</th>
+            <th>Qty</th>
+            <th>Requested Price</th>
+            <th>Best Case Pledge</th>
+            <th>Worst-Case Pledge</th>            
             <th></th>
         </tr>
-
         <%= render :partial => "carts/cart_line_item", :collection => line_items %>
+        <tr>
+            <td>Goal Total</td>
+            <td></td>
+            <td></td>
+            <td><%= number_to_currency(line_items.inject(0){|sum, e| sum += e.best_case_pledge})%></td>
+            <td><%= number_to_currency(line_items.inject(0){|sum, e| sum += e.worst_case_pledge})%></td>
+            <td></td>
+        </tr>
     </table>
     </div>
     <hr class="space">
