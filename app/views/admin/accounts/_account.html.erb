@@ -1,0 +1,6 @@
+	Account #:<%= link_to account.id, admin_account_path(account) %><br>
+		balance: <%= number_to_currency(account.balance) %><br>
+		pledged: <%= account.pledged %><br>
+		current_investment: <%= account.current_investment %><br>	
+		pending_investment: <%= account.pending_investment %><br>	
+		<hr class='nospace'><br>

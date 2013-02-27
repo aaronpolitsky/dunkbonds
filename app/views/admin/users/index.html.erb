@@ -1,0 +1,31 @@
+<h3>Real Users</h3>
+<% @real_users.each do |u| %>
+	<%= link_to u.name, admin_user_path(u) %> <br>
+<hr class="nospace">
+	<%= u.email %><br><br>
+	  <% u.accounts.each do |a| %>
+    <%= link_to a.goal.title, admin_account_path(a) %> <br>
+		balance: <%= number_to_currency(a.balance) %><br>
+		pledged: <%= a.pledged %><br>
+		current_investment: <%= a.current_investment %><br>	
+		pending_investment: <%= a.pending_investment %><br>	
+		<hr class="nospace">
+	<% end %>	
+	<hr>
+<% end %>
+
+<h3>Guest Users</h3>
+<% @guests.each do |u| %>
+	<%= link_to u.name, admin_user_path(u) %> <br>
+<hr class="nospace">
+	<%= u.email %><br><br>
+	  <% u.accounts.each do |a| %>
+    <%= link_to a.goal.title, admin_account_path(a) %> <br>
+		balance: <%= number_to_currency(a.balance) %><br>
+		pledged: <%= a.pledged %><br>
+		current_investment: <%= a.current_investment %><br>	
+		pending_investment: <%= a.pending_investment %><br>	
+		<hr class="nospace">
+	<% end %>	
+	<hr>
+<% end %>

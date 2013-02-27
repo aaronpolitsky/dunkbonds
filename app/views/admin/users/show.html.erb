@@ -1,0 +1,14 @@
+<%= link_to @user.name, admin_user_path(@user) %> <br>
+<%= @user.email %><br>
+
+<hr class="nospace">
+<h3>Accounts</h3>
+<% @accounts.each do |a| %>
+	<%= a.goal.title %><br>
+	balance: <%= number_to_currency(a.balance) %><br>
+	pledged: <%= a.pledged %><br>
+	current_investment: <%= a.current_investment %><br>	
+	pending_investment: <%= a.pending_investment %><br>	
+	<hr class="nospace">
+<% end %>
+

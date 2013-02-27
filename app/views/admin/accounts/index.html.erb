@@ -1,0 +1,6 @@
+<%= @goal_accounts.each do |g, accounts| %>
+  <%= link_to g.title, goal_path(g) %> <br>
+	<%= render accounts %>
+	<hr>
+<% end %>
+
