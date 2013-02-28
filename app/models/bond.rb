@@ -7,13 +7,9 @@ class Bond < ActiveRecord::Base
   validate :creditor_or_debtor_present?
 
   def pay_coupons
-    #create receipts, see dunkbonds 1.0
-    Account.transaction do
-      creditor.balance += qty
-      debtor.balance -= qty
-      creditor.save!
-      debtor.save!
-    end
+    #this assumes that today we pay the bonds based on yesterday's face value
+    self.debtor.payments.create!(:recipient => self.creditor,
+                                 :amount => self.qty) if self.creditor.goal.period == '1 month'
   end
 
   def decrement!
