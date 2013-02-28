@@ -97,7 +97,7 @@ class TradeSurvey
       #set qty to nearest donation/face, so that qty*face ~= donation, then 
       # set price to qty*face*likelihood, so that we have a range of QF*(1-%) to QF*(1+(1-%))      
       liparams[:qty] = (self.donation.to_d / face).round
-      liparams[:max_bid_min_ask] = face * (self.likelihood_pct.to_d/100)
+      liparams[:max_bid_min_ask] = face * (1 - self.likelihood_pct.to_d/100)
       # liparams[:qty] = (self.donation.to_i / (face * ((self.likelihood_pct.to_d/100.0) * (self.likelihood_pct.to_d/100.0)))).to_i
     else
       liparams[:type_of] = "bond bid"

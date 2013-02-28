@@ -32,7 +32,7 @@
     <li><%= link_to "Trade Bonds", new_account_line_item_path(@account), :class => selected?(new_account_line_item_path(@account)) %></li>  
     <% else %>
     <li><%= link_to "Account", new_goal_account_path(@goal), :class => selected?(new_goal_account_path(@goal)) %></li>
-    <li><%= link_to "Bonds", new_goal_account_path(@goal) %></li>  
+    <li><%= link_to "Trade Bonds", new_goal_account_path(@goal) %></li>  
     <% end %>
   </ul>
 </div>
