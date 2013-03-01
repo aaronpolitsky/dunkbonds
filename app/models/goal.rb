@@ -8,7 +8,7 @@ class Goal < ActiveRecord::Base
     
   PERIODS = ['none', '1 day', '1 week', '1 month']
   BLOG_SERVICES = ['other', 'Blogger (blogspot)']
-  STATUSES = ['incomplete', 'expired', 'achieved']
+  STATUSES = ['Incomplete', 'Expired', 'Achieved']
 
   validates :period, :inclusion => PERIODS
   validates :title, :description, :presence => true

@@ -2,6 +2,7 @@ class LineItemsController < ApplicationController
 #  before_filter :authenticate_user!
   before_filter :load_account_and_goal
   before_filter :line_item_exists?, :except => [:index, :new, :create]
+  before_filter :goal_market_open?, :except => [:index, :show]
 
   def index
     @line_items = @account.line_items
@@ -125,6 +126,14 @@ class LineItemsController < ApplicationController
   end
 
   private
+
+  def goal_market_open?
+    load_account_and_goal
+    if @goal.status != 'Achieved'
+      flash[:warning] = "This goal has been achieved, and its market is now closed."
+      redirect_to @goal
+    end
+  end
 
   def load_account_and_goal
     if current_or_guest_user.accounts.exists?(params[:account_id])
