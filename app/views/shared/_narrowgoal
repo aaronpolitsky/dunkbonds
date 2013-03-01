@@ -14,7 +14,8 @@
         <div class="span-5 last">
          <b>Start Date:</b> <%= goal.starts_at %><br>
          <b>Deadline:</b> <%= goal.ends_at.to_date  %><br>
-         <b>Bonds Pay:</b> <%= number_to_currency(goal.bond_face_value) %>
+         <b>Bonds Pay:</b> <%= number_to_currency(goal.bond_face_value) %><br>
+         <b>Status:</b> <%= goal.status %>
        </div>
        <hr class="space">
        <% end %>
