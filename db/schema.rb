@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130220171345) do
+ActiveRecord::Schema.define(:version => 20130301064720) do
 
   create_table "accounts", :force => true do |t|
     t.integer  "user_id"
@@ -60,6 +60,7 @@ ActiveRecord::Schema.define(:version => 20130220171345) do
     t.string   "title"
     t.string   "blog_service_provider"
     t.string   "period"
+    t.string   "status",                :default => "incomplete"
   end
 
   add_index "goals", ["goalsetter_id"], :name => "index_goals_on_goalsetter_id"
