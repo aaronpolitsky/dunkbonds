@@ -129,8 +129,11 @@ class LineItemsController < ApplicationController
 
   def goal_market_open?
     load_account_and_goal
-    if @goal.status != 'Achieved'
+    if @goal.status == 'Achieved'
       flash[:warning] = "This goal has been achieved, and its market is now closed."
+      redirect_to @goal
+    elsif @goal.status == 'Expired'
+      flash[:warning] = "This goal has expired, and its market is now closed."
       redirect_to @goal
     end
   end
