@@ -5,16 +5,19 @@
 			<%= render @followed_goals %>
 		</ul>	
 	</div>
-	<hr class="space">
-	<h3>Check out some of the other Goals people have set</h3>
-	<ul class="blocklink">
-		<%= render @unfollowed_goals %>
-	</ul>	
-<% end %>
-<% unless @unfollowed_goals.empty? %>
-<h3>Check out some of the Goals people have set</h3>
-	<ul class="blocklink">
-		<%= render @goals %>
-	</ul>	
-<% end %>
+	<hr class="space">	
+	<% unless @unfollowed_goals.empty? %>
+		<h3>Check out some of the other Goals people have set</h3>
+		<div class="unfollowed_goals">		
+			<ul class="blocklink">
+				<%= render @unfollowed_goals %>
+			</ul>	
+		</div>
+	<% end %>
+<% else %>
+	<h3>Check out some of the Goals people have set</h3>
+		<ul class="blocklink">
+			<%= render @goals %>
+		</ul>	
+	<% end %>
 <br />
