@@ -1,0 +1,6 @@
+<% unless goal.status == "Incomplete" %>
+  <div class="status_banner <%= goal.status.downcase %>">
+    <b>Status:</b>  <%= goal.status %>
+  </div>
+	<hr class="nospace">       
+<% end %>

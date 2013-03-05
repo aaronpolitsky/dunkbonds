@@ -2,6 +2,7 @@
     <li class="blocklink">
       <%= link_to goal do %>
       <div class="goalbox">
+        <%= render 'shared/status_banner', :goal => goal %>      
         <div class="title span-11 last ">        
           <h3><%= goal.title %></h3>
           by <%= goal.goalsetter.name %>

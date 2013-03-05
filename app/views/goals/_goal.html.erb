@@ -2,6 +2,7 @@
     <li class="blocklink">
       <%= link_to goal do %>
       <div class="goalbox">
+        <%= render 'shared/status_banner', :goal => goal %>
         <div class="title span-11 ">
           <h3><%= goal.title %></h3>
           by <%= goal.goalsetter.name %>
@@ -12,7 +13,6 @@
          <b>Start Date:</b> <%= goal.starts_at %><br>
          <b>Deadline:</b> <%= goal.ends_at.to_date  %><br>
          <b>Bonds Pay:</b> <%= number_to_currency(goal.bond_face_value) %><br>
-        <b>Status: </b><%= goal.status %><br>
        </div>
        <hr class="space">
        <% end %>
