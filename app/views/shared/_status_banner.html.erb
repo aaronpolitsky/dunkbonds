@@ -1,4 +1,4 @@
-<% unless goal.status == "Incomplete" %>
+<% unless goal.status.downcase == "incomplete" %>
   <div class="status_banner <%= goal.status.downcase %>">
     <%= goal.status %>
   </div>
