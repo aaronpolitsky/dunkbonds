@@ -1,3 +1,4 @@
+<%= render 'shared/status_banner', :goal => @goal %>
 <div class="span-10">
 <!-- <div class="goalheader round"> -->
   <small>Selected Goal</small>
@@ -19,8 +20,7 @@
     <%= link_to 'Follow This Goal', new_goal_account_path(@goal) %>
   <% end %>
 </small>
-<hr class="nospace">
-  Status: <b><%=@goal.status%>  </b>
+
 
 
 </div>

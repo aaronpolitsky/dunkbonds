@@ -70,6 +70,10 @@ header img {
   text-decoration: none;
 }
 
+.goalbox a:hover {
+  text-decoration: none;
+}
+
 .status_banner {
   padding: 5px 1em;
   margin-left: -20px;
@@ -77,20 +81,27 @@ header img {
   margin-top: 0;
   margin-bottom: 1em;
   color: none;
+  font-size: 125%; 
 } 
+
+.status_banner a:hover {
+  text-decoration: none;
+}
 
 .achieved {
   background-color: #efe;
   border-top:  solid 1px #cfc;
   border-bottom:  solid 1px #cfc;
-  box-shadow:  0px 0px 0.5em rgba(0,10,0,.15);    
+  box-shadow:  0px 0px 0.5em rgba(0,10,0,.15);
+  color: green;    
 }
 
 .expired {
   background-color: #fee;
   border-top:  solid 1px #fcc;
   border-bottom:  solid 1px #fcc;
-  box-shadow:  0px 0px 0.5em rgba(10,0,0,.15);    
+  box-shadow:  0px 0px 0.5em rgba(10,0,0,.15); 
+  color: red;   
 }
 
 
