@@ -17,6 +17,7 @@ class PostsController < ApplicationController
   # GET /posts/1.xml
   def show
     @post = @goal.posts.find(params[:id])
+    @title = @post.title
 
     respond_to do |format|
       format.html # show.html.erb
