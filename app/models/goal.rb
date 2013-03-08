@@ -20,11 +20,13 @@ class Goal < ActiveRecord::Base
 
   after_create :create_treasury_and_escrow
   
-  before_update :purge_old_posts_and_update_feed_on_blog_changes
+#  before_update :purge_old_posts_and_update_feed_on_blog_changes
 
   def to_param
     "#{id}-#{title.parameterize}"
   end
+  
+  
   
   def get_sticky_posts
     unless self.blog_url.nil? || self.blog_url.empty?
@@ -32,6 +34,13 @@ class Goal < ActiveRecord::Base
       add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
     end
   end
+
+  def get_labeled_posts(label)
+    unless self.blog_url.nil? || self.blog_url.empty?
+      feed = Feedzirra::Feed.fetch_and_parse(self.blog_url+"/-/"+label)
+      add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
+    end
+  end  
   
   def update_from_feed()
     unless self.blog_url.nil? || self.blog_url.empty?

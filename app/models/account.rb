@@ -8,6 +8,9 @@ class Account < ActiveRecord::Base
   has_many :bonds, :foreign_key => :creditor_id # a creditor owns bonds and collects payments from debtors
   has_many :swaps, :class_name => "Bond", :foreign_key => :debtor_id # a debtor pays a creditor periodically, also the same as a swap
   has_many :line_items
+  has_many :buys, :through => :line_items
+  has_many :sells, :through => :line_items  
+  has_many :cancellations, :through => :line_items
   has_many :payments, :foreign_key => :payer_id
   has_many :receipts, :class_name => "Payment", :foreign_key => :recipient_id
 
@@ -182,11 +185,80 @@ class Account < ActiveRecord::Base
   end
 
   def histories
+    histories = []
     # get placed line_items from orders
+    self.orders.each do |o|
+      o.line_items.each do |li|
+        item = {
+          :description     => "Placed" + li.type_of.capitalize,
+          :date            => o.updated_at,
+          :price           => li.max_bid_min_ask,
+          :qty             => li.qty          
+        }
+        histories.push item
+      end
+    end
+
     # get cancelled line_items from cancellations
-    # get executed line_items from trades
+    self.cancellations.each do |c|
+      item = {
+        :description     => "Cancelled" + c.li.type_of.capitalize,
+        :date            => c.created_at,
+        :qty             => li.qty,
+      }
+      histories.push item
+    end
+
+    # get executed line_items from buys and sells
+    self.buys.each do |b|
+      item = {
+        :description     => b.li.type_of.first.capitalize + "Buy",
+        :date            => b.created_at,
+        :price           => b.price,
+        :qty             => b.qty,
+        :subtotal        => b.price * b.qty
+      }
+      histories.push item
+    end
+    
+    self.sells.each do |s|
+      item = {
+        :description     => s.li.type_of.first.capitalize + "Sale",
+        :date            => s.created_at,
+        :price           => -s.price,
+        :qty             => s.qty,
+        :subtotal        => s.price * s.qty
+      }
+      histories.push item
+    end
+
     # get payments and receipts
+    self.payments.each do |p|
+      item = {
+        :description     => "Swap Payout",
+        :date            => p.created_at,
+        :subtotal        => p.amount
+      }
+      histories.push item
+    end
+
+    self.receipts.each do |r|
+      item = {
+        :description     => "Bond Payout",
+        :date            => r.created_at,
+        :subtotal        => -r.amount
+      }
+      histories.push item
+    end
+    
     # sort by date
+    histories.sort! {|a, b| a[:date] <=> b[:date]}
+
+    if histories.empty?
+      return histories
+    end
+
+
   end
 
   private
