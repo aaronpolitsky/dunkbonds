@@ -44,6 +44,13 @@ task :daily_bond_task => :environment do
 
 end
 
+task :sweep_guest_users => :environment do
+  puts "sweep of guests"
+  guests = User.where(:is_guest => true).where(:name => "guest")
+  guests.each do |g|
+    g.destroy
+  end
+end
 
 task :update_feed => :environment do 
   puts "Updating feed...."
