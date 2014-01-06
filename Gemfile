@@ -39,4 +39,4 @@ group :development, :test do
 end
 
 gem 'feedzirra', :git => 'https://github.com/pauldix/feedzirra.git'
-gem 'nokogiri', '1.5.6'
+#gem 'nokogiri', '1.5.6'
