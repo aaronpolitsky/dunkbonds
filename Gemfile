@@ -4,6 +4,9 @@ gem 'rails', '3.1.0'
 gem 'devise'
 gem 'will_paginate'
 
+# for heroku
+gem 'rails_12factor'
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
