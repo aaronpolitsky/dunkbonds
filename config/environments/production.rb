@@ -32,6 +32,8 @@ TwoODunkbonds::Application.configure do
   config.serve_static_assets = false
 
   config.assets.initialize_on_precompile = false
+  config.assets.precompile += %w( modernizr.js rails_admin/rails_admin.js rails_admin/rails_admin.css )
+
     
   # Enable serving of images, stylesheets, and javascripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
