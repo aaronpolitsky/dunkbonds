@@ -37,3 +37,11 @@ test:
 #   database: db/production.sqlite3
 #   pool: 5
 #   timeout: 5000
+
+# production:
+#   adapter: postgresql
+#   encoding: unicode
+#   database: two_o_dunkbonds_fake_production
+#   pool: 5
+#   username: Aaron
+#   password:
