@@ -1,0 +1,11 @@
+.goals {
+	#status_banner {
+		margin: 10px 0;
+		background-color: #FFC;
+		border:  solid 1px #DDA;
+		border:  solid 1px;
+		font-size: 125%;
+	}
+}
+
+
