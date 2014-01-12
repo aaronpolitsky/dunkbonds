@@ -11,16 +11,18 @@ development:
   encoding: unicode
   database: two_o_dunkbonds_development
   pool: 5
-  username: Aaron
+  username: apoli
   password:
+  host: localhost
 
 test:
   adapter: postgresql
   encoding: unicode
   database: two_o_dunkbonds_test
   pool: 5
-  username: Aaron
+  username: apoli
   password:
+  host: localhost
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -43,5 +45,5 @@ test:
 #   encoding: unicode
 #   database: two_o_dunkbonds_fake_production
 #   pool: 5
-#   username: Aaron
+#   username: apoli
 #   password:
