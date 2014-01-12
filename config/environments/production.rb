@@ -33,8 +33,7 @@ TwoODunkbonds::Application.configure do
 
   config.assets.initialize_on_precompile = false
   #config.assets.precompile += %w( modernizr.js rails_admin/rails_admin.js rails_admin/rails_admin.css )
-  config.assets.precompile += %w( blueprint/screen.css blueprint/print.css blueprint/ie.css tabsplugin/screen.css)
-
+  config.assets.precompile += %w( blueprint/screen.css blueprint/print.css blueprint/ie.css tabsplugin/screen.css custom.css)
 
   # Compress JavaScript and CSS
   config.assets.compress = true
