@@ -48,7 +48,7 @@ task :sweep_guest_users => :environment do
   puts "sweep of guests"
   guests = User.where(is_guest: true).where(name: "guest")
   guests.each do |g|
-    if g.updated_at < (Time.now - 2.hours)
+    if g.updated_at < (Time.now - 30.minutes)
       g.destroy
     end
   end
