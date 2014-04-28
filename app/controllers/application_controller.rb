@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_referrer_request
-    puts "hi " + request.referrer
+    puts "hi " 
   end
   
 end
