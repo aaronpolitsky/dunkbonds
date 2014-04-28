@@ -76,6 +76,7 @@ class ApplicationController < ActionController::Base
       puts "referrer is blank"
     elsif request.referrer
       puts "the request is: " + request.referrer
+    end
   end
   
 end
