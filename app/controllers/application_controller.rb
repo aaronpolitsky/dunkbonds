@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
+  before_filter: log_referrer_request
+
   helper_method :current_cart
   def current_cart
   	current_or_guest_user.cart
@@ -65,6 +67,10 @@ class ApplicationController < ActionController::Base
     u.is_guest = true
     u.save!
     u
+  end
+
+  def log_referrer_request
+    logger.info "request referrer is:  " + request.referrer    
   end
   
 end
