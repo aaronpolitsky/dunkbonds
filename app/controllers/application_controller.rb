@@ -70,7 +70,12 @@ class ApplicationController < ActionController::Base
   end
 
   def log_referrer_request
-    puts "the request is: " + request.referrer
+    if request.referrer.nil?
+      puts "referrer is nil"
+    elsif request.referrer.blank?
+      puts "referrer is blank"
+    elsif request.referrer
+      puts "the request is: " + request.referrer
   end
   
 end
