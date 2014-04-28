@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_referrer_request
-    logger.info "request referrer is:  " + request.referrer    
+    logger.info "hi"
   end
   
 end
