@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  before_filter: log_referrer_request
+  before_filter :log_referrer_request
 
   helper_method :current_cart
   def current_cart
@@ -70,7 +70,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_referrer_request
-    puts "hi " 
+    puts "the request is: " + request.referrer
   end
   
 end
