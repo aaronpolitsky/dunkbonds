@@ -1,5 +1,7 @@
 class CartsController < ApplicationController
 
+  before_filter :redirect_spiders
+
   # GET /carts/1
   # GET /carts/1.xml
   def show
@@ -13,6 +15,11 @@ class CartsController < ApplicationController
     end
   end
 
-  
+  private
+
+  def redirect_spiders
+    if request.referrer.nil? || request.referrer.blank?
+      redirect_to root_path    
+  end
 
 end

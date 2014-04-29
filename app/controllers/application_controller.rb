@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
-  before_filter :log_referrer_request
+  # disable this for now.
+  # before_filter :log_referrer_request
 
   helper_method :current_cart
   def current_cart
@@ -75,7 +76,7 @@ class ApplicationController < ActionController::Base
     elsif request.referrer.blank?
       puts "referrer is blank"
     elsif request.referrer
-      puts "the request is: " + request.referrer
+      puts "the referrer is: " + request.referrer
     end
   end
   
