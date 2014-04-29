@@ -20,6 +20,7 @@ class CartsController < ApplicationController
   def redirect_spiders
     if request.referrer.nil? || request.referrer.blank?
       redirect_to root_path    
+    end
   end
 
 end
