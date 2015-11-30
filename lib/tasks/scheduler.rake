@@ -45,13 +45,14 @@ task :daily_bond_task => :environment do
 end
 
 task :sweep_guest_users => :environment do
-  puts "sweep of guests"
   guests = User.where(is_guest: true).where(name: "guest")
+  puts "sweeping " + guests.length + " guests."
   guests.each do |g|
     if g.updated_at < (Time.now - 30.minutes)
       g.destroy
     end
   end
+  puts "done."
 end
 
 task :update_feed => :environment do 
