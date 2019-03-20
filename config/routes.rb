@@ -28,8 +28,10 @@ TwoODunkbonds::Application.routes.draw do
     root :to => 'home#index'
   end
 
-  devise_for :users
-
+  devise_for :users do
+    get '/users/sign_out' => 'devise/sessions#destroy'
+  end
+  
   resources :carts, :only => :show
   resources :orders, :except => [:edit, :update, :destroy]
 
