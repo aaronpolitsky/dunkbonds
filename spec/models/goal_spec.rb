@@ -84,7 +84,7 @@ describe Goal do
     
     pending "fetches the new posts from new blog feed" do
       assert @goal.posts != @posts
-      feed = Feedzirra::Feed.fetch_and_parse(@goal.blog_url)
+      feed = feedjira::Feed.fetch_and_parse(@goal.blog_url)
       gs = @goal.posts.all
       fs = feed.entries
       gs.zip(fs).each do |pair|

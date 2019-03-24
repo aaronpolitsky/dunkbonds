@@ -51,5 +51,5 @@ group :development, :test do
 	#gem 'ruby-debug19', :require => 'ruby-debug'
 end
 
-gem 'feedzirra', :git => 'https://github.com/pauldix/feedzirra.git'
+gem 'feedjira' #, :git => 'https://github.com/pauldix/feedzirra.git'
 #gem 'nokogiri', '1.5.6'

@@ -30,21 +30,21 @@ class Goal < ActiveRecord::Base
   
   def get_sticky_posts
     unless self.blog_url.nil? || self.blog_url.empty?
-      feed = Feedzirra::Feed.fetch_and_parse(self.blog_url+"/-/sticky")
+      feed = feedjira::Feed.fetch_and_parse(self.blog_url+"/-/sticky")
       add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
     end
   end
 
   def get_labeled_posts(label)
     unless self.blog_url.nil? || self.blog_url.empty?
-      feed = Feedzirra::Feed.fetch_and_parse(self.blog_url+"/-/"+label)
+      feed = feedjira::Feed.fetch_and_parse(self.blog_url+"/-/"+label)
       add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
     end
   end  
   
   def update_from_feed()
     unless self.blog_url.nil? || self.blog_url.empty?
-      feed = Feedzirra::Feed.fetch_and_parse(self.blog_url)
+      feed = feedjira::Feed.fetch_and_parse(self.blog_url)
       add_or_update_entries(feed.entries) unless (feed == 0 || feed.entries.empty?)
     end
   end
@@ -144,7 +144,7 @@ class Goal < ActiveRecord::Base
   
   def blog_url_is_valid
     unless self.blog_url.nil? || self.blog_url.empty? #blog CAN be empty
-      Feedzirra::Feed.fetch_and_parse(self.blog_url, :on_failure => lambda { self.errors.add(:blog_url, "Double check that blog url.") } )
+      feedjira::Feed.fetch_and_parse(self.blog_url, :on_failure => lambda { self.errors.add(:blog_url, "Double check that blog url.") } )
     end
     errors.blank?
   end
