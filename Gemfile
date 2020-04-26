@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 ruby "2.0.0"
 
-gem 'rails', '~> 4.1.0'
+gem 'rails', '~> 4.2.0'
 gem 'devise'
 gem 'will_paginate'
 
@@ -42,6 +42,7 @@ group :development, :test do
 	# To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 	#gem 'ruby-debug19'
 	#gem 'ruby-debug19', :require => 'ruby-debug'
+  gem 'web-console', '~> 2.0'
 end
 
 gem 'feedjira' #, :git => 'https://github.com/pauldix/feedzirra.git'
