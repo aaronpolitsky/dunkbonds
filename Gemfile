@@ -43,7 +43,6 @@ gem 'jquery-rails'
 
 group :development, :test do
   gem 'rspec-rails'
-  gem 'autotest-rails'
   gem 'webrat'
   gem 'factory_girl_rails', '1.0'
 	# To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
