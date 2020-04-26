@@ -11,7 +11,7 @@ gem 'rails_12factor'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 #gem 'sqlite3'
-gem 'pg'
+gem 'pg', '~> 0.18'
 
 # Gems used only for assets and not required
 # in production environments by default.
