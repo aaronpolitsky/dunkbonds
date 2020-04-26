@@ -1,5 +1,4 @@
 source 'http://rubygems.org'
-ruby "2.6.5"
 
 gem 'rails', '3.2.21'
 gem 'devise'
@@ -47,7 +46,6 @@ group :development, :test do
   gem 'factory_girl_rails', '1.0'
 	# To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 	#gem 'ruby-debug19'
-	gem 'pry-byebug'
 	#gem 'ruby-debug19', :require => 'ruby-debug'
 end
 
