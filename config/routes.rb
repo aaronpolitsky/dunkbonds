@@ -25,7 +25,7 @@ TwoODunkbonds::Application.routes.draw do
 
 
   authenticated :user do
-    root :to => 'home#index'
+    root :to => 'home#index', as: :authenticated_root
   end
 
   devise_for :users do

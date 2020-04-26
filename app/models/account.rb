@@ -52,7 +52,7 @@ class Account < ActiveRecord::Base
   
   def transfer_swap_to!(buyer)
     if self.is_treasury?
-      buyer_swap = Bond.find_or_create_by_creditor_id_and_debtor_id(buyer.id, buyer.id)
+      buyer_swap = Bond.find_or_create_by(creditor_id: buyer.id, debtor_id: buyer.id)
       buyer_swap.qty += 1
       buyer_swap.save!
     else  #do we need an else?  treasury may be the only one who can do this. 
@@ -85,14 +85,14 @@ class Account < ActiveRecord::Base
   def transfer_bond_to!(buyer)
     if self.is_treasury?
       #find or create unique bond and increment
-      buyer_bond = Bond.find_or_create_by_creditor_id_and_debtor_id(buyer.id, self.id)
+      buyer_bond = Bond.find_or_create_by(creditor_id: buyer.id, debtor_id: self.id)
       buyer_bond.qty += 1 
       buyer_bond.save!
     else #regular accounts, secondary market
     #these sell their bond end of the bond-swap relationship, if they have any to sell
       if (self.bonds.sum(:qty) > 0)
         bond = self.bonds.first #any will do
-        buyer_bond = buyer.bonds.find_or_create_by_debtor_id(bond.debtor_id)            
+        buyer_bond = buyer.bonds.find_or_create_by(debtor_id: bond.debtor_id)            
         buyer_bond.qty += 1            
         buyer_bond.save!
 

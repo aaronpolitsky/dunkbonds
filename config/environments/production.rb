@@ -43,6 +43,8 @@ TwoODunkbonds::Application.configure do
 
   # Generate digests for assets URLs
   config.assets.digest = true
+
+  config.eager_load = true
     
   # Enable serving of images, stylesheets, and javascripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"

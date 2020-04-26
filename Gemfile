@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 ruby "2.6.5"
 
-gem 'rails', '3.2.21'
+gem 'rails', '~> 4.0.0'
 gem 'devise'
 gem 'will_paginate'
 
@@ -14,15 +14,9 @@ gem 'rails_12factor'
 #gem 'sqlite3'
 gem 'pg', '~> 0.18'
 
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~> 3.2.6'
-  gem 'coffee-rails', '~> 3.2.2'
-  gem 'uglifier',     '>= 1.0.3'
-end
-
 gem 'jquery-rails'
+
+gem 'protected_attributes'
 
 # Use unicorn as the web server
 # gem 'unicorn'
