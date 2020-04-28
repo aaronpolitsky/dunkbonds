@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '5.0.0'
+gem 'rails', '5.2.0'
 gem 'devise'
 gem 'will_paginate'
 
