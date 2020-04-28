@@ -14,7 +14,7 @@ class Account < ApplicationRecord
   has_many :payments, :foreign_key => :payer_id
   has_many :receipts, :class_name => "Payment", :foreign_key => :recipient_id
 
-  before_destroy :empty_account?, :order => :first
+  before_destroy :empty_account?, prepend: true
 
   def credit!(amt)
     self.reload

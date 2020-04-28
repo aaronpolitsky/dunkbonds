@@ -1,6 +1,6 @@
 class CartsController < ApplicationController
 
-  before_filter :redirect_spiders
+  before_action :redirect_spiders
 
   # GET /carts/1
   # GET /carts/1.xml

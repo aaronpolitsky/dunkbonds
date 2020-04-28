@@ -2,10 +2,10 @@ class AccountsController < ApplicationController
   # GET /goals/1/accounts
   # GET /goals/1/accounts.xml
 
-  #before_filter :authenticate_user!, :except => [:index, :new]
+  #before_action :authenticate_user!, :except => [:index, :new]
 
-  before_filter :load_goal
-  before_filter :user_following_goal?, :only => [:show, :destroy]
+  before_action :load_goal
+  before_action :user_following_goal?, :only => [:show, :destroy]
 
   def index
     @accounts = current_or_guest_user.accounts.order("created_at DESC")

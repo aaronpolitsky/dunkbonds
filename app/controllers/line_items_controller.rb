@@ -1,8 +1,8 @@
 class LineItemsController < ApplicationController
-#  before_filter :authenticate_user!
-  before_filter :load_account_and_goal
-  before_filter :line_item_exists?, :except => [:index, :new, :create]
-  before_filter :goal_market_open?, :except => [:index, :show]
+#  before_action :authenticate_user!
+  before_action :load_account_and_goal
+  before_action :line_item_exists?, :except => [:index, :new, :create]
+  before_action :goal_market_open?, :except => [:index, :show]
 
   def index
     @line_items = @account.line_items

@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
 
-  before_filter :load_stuff
+  before_action :load_stuff
 
   # GET /posts
   # GET /posts.xml

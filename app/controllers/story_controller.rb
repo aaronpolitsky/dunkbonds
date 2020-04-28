@@ -1,5 +1,5 @@
 class StoryController < ApplicationController
-  before_filter :display_notice, :except => :story5
+  before_action :display_notice, :except => :story5
 
   def story1
   end

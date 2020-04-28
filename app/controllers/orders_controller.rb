@@ -1,6 +1,6 @@
 class OrdersController < ApplicationController
 
-  before_filter :authenticate_user!, :except => [:new]
+  before_action :authenticate_user!, :except => [:new]
 
   # GET /orders
   # GET /orders.xml

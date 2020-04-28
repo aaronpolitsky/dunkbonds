@@ -1,9 +1,9 @@
 class GoalsController < ApplicationController
-  before_filter :load_account, :except => [:index, :new, :create]
+  before_action :load_account, :except => [:index, :new, :create]
 
-  before_filter :authenticate_user!, :except => [:index, :show]
+  before_action :authenticate_user!, :except => [:index, :show]
   
-  before_filter :can_create_goal, :except  => [:index, :show]
+  before_action :can_create_goal, :except  => [:index, :show]
 
   # GET /goals
   # GET /goals.xml

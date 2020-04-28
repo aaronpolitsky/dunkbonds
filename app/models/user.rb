@@ -5,9 +5,6 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me, :name
-
   has_many :accounts, :dependent => :destroy
   has_many :line_items, :through => :accounts
   has_many :followed_goals, :through => :accounts, :source => :goal #class_name => "Goal"
@@ -22,9 +19,6 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  # Setup accessible (or protected) attributes for your model
-  attr_accessible :email, :password, :password_confirmation, :remember_me
-  
   # def full_name
   #   self.first_name + ' ' + self.last_name
   # end

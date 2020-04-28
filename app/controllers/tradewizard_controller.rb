@@ -1,6 +1,6 @@
 class TradewizardController < ApplicationController
 
-  before_filter :load_account_and_goal 
+  before_action :load_account_and_goal 
 
   def new
   	@trade_survey = TradeSurvey.new

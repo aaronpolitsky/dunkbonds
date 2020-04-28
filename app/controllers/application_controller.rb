@@ -2,7 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   # disable this for now.
-  # before_filter :log_referrer_request
+  # before_action :log_referrer_request
 
   helper_method :current_cart
   def current_cart
