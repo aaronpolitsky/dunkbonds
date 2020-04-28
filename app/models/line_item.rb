@@ -17,7 +17,7 @@ class LineItem < ApplicationRecord
   validates :max_bid_min_ask, :presence => true, :numericality => {:greater_than => 0}
   validates :account, :presence => true
 
-  validate :enough_bonds_to_cover_cart_asks, :only => [:create, :update]
+  validate :enough_bonds_to_cover_cart_asks, :if => [:create, :update]
   validate :children_rules
   validate :swap_bids_must_bid_face
   

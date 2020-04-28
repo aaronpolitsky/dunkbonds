@@ -40,6 +40,7 @@ group :development, :test do
 	#gem 'ruby-debug19'
 	#gem 'ruby-debug19', :require => 'ruby-debug'
   gem 'web-console', '~> 2.0'
+  gem 'listen'
 end
 
 gem 'feedjira' #, :git => 'https://github.com/pauldix/feedzirra.git'
