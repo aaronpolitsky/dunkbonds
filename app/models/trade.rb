@@ -1,4 +1,4 @@
-class Trade < ActiveRecord::Base
+class Trade < ApplicationRecord
   belongs_to :bid, :class_name => "LineItem", :foreign_key => "bid_id"
   belongs_to :ask, :class_name => "LineItem", :foreign_key => "ask_id"
 

@@ -1,4 +1,4 @@
-class Bond < ActiveRecord::Base
+class Bond < ApplicationRecord
   # belongs_to :goal
   belongs_to :creditor, :class_name => "Account", :foreign_key => "creditor_id"
   belongs_to :debtor,   :class_name => "Account", :foreign_key => "debtor_id"

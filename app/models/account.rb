@@ -1,4 +1,4 @@
-class Account < ActiveRecord::Base
+class Account < ApplicationRecord
   # A bond is just a link between two accounts establishing a payment flow
   # A swap is the same link seen from the other perspective.  
 

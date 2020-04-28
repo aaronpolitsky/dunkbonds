@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
-#ruby "2.0.0"
 
-gem 'rails', '~> 4.2.0'
+gem 'rails', '5.0.0'
 gem 'devise'
 gem 'will_paginate'
 
@@ -15,8 +14,6 @@ gem 'rails_12factor'
 gem 'pg', '~> 0.18'
 
 gem 'jquery-rails'
-
-gem 'protected_attributes'
 
 # Use unicorn as the web server
 # gem 'unicorn'

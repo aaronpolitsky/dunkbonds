@@ -1,4 +1,4 @@
-class Goal < ActiveRecord::Base
+class Goal < ApplicationRecord
   has_many :accounts
   has_many :posts
   has_many :followers, :through => :accounts, :class_name => "User"

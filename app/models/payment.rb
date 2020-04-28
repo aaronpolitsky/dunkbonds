@@ -1,4 +1,4 @@
-class Payment < ActiveRecord::Base
+class Payment < ApplicationRecord
 	belongs_to :payer, :class_name => "Account", :foreign_key => "payer_id"
   belongs_to :recipient, :class_name => "Account", :foreign_key => "recipient_id"
 
