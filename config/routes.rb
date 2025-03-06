@@ -10,15 +10,6 @@ Rails.application.routes.draw do
   get "about/why_set_a_goal"
   get "about/why_trade_dunkbonds"
 
-  get "story/story1"
-  get "story/story2"
-  get "story/story3"
-  get "story/story4"
-  get "story/story5"
-  get "story/story6"
-  get "story/story7"
-  get "story/storyend"
-  get "story/kill_story_notice"
   
   get "outside/landing"
 
