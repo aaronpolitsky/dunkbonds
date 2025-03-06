@@ -1,21 +1,22 @@
-source 'http://rubygems.org'
-ruby '2.6.5'
+source 'https://rubygems.org'
+ruby '3.1.6'
 
-gem 'rails', '6.0.0'
+gem 'rails', '6.0.6.1'
 gem 'devise'
 gem 'will_paginate'
 
 # for heroku
-gem 'rails_12factor'
+#gem 'rails_12factor'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 #gem 'sqlite3'
-gem 'pg', '~> 0.18'
+gem 'pg'#, '~> 0.18'
 
 gem 'jquery-rails'
 
+gem 'concurrent-ruby', '~> 1.1.8'
 # Use unicorn as the web server
 # gem 'unicorn'
 
@@ -43,5 +44,5 @@ group :development, :test do
   gem 'listen'
 end
 
-gem 'feedjira' #, :git => 'https://github.com/pauldix/feedzirra.git'
+#gem 'feedjira' #, :git => 'https://github.com/pauldix/feedzirra.git'
 #gem 'nokogiri', '1.5.6'
