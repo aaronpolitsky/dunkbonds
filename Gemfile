@@ -5,6 +5,8 @@ gem 'rails', '6.0.6.1'
 gem 'devise'
 gem 'will_paginate'
 
+gem 'puma'
+
 # for heroku
 #gem 'rails_12factor'
 
