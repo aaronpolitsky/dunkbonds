@@ -2,6 +2,9 @@
   width: 710px;
 }
 
+.full_width_banner {
+  width: 100%;
+}
 /**
 * A couple of CSS rules to achieve equal-height columns in Blueprint CSS
 */
@@ -103,8 +106,6 @@ header img {
   box-shadow:  0px 0px 0.5em rgba(10,0,0,.15); 
   color: red;   
 }
-
-
 
 section {
   margin-top: 1em;
@@ -284,7 +285,7 @@ ul.hmenu li {
   font-size: 125%;
 }
 
-#flash_notice, #flash_alert, #flash_error, #flash_warning, #flash_success{
+#flash_notice, #flash_alert, #flash_error, #flash_warning, #flash_success, #flash_info{
   padding: 5px 8px;
   margin: 10px 0;
 }
@@ -292,6 +293,12 @@ ul.hmenu li {
 #flash_notice, #flash_success {
   background-color: #CFC;
   border: solid 1px #6C6;
+  color: #c00;
+}
+
+#flash_info {
+  background-color: rgba(242, 243, 230, 0.958);
+  border: solid 1px rgb(16, 55, 132);
 }
 
 #flash_error, #flash_alert {
