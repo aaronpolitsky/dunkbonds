@@ -1,4 +1,4 @@
-class OneBigMigration < ActiveRecord::Migration
+class OneBigMigration < ActiveRecord::Migration[6.0]
 	def up
 		# create_table "accounts", :force => true do |t|
 		# 	t.integer  "user_id"

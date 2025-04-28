@@ -11,15 +11,15 @@ development:
   encoding: unicode
   database: two_o_dunkbonds_development
   pool: 5
-  username: Aaron
-  password:
+  username: aaron
+  #password:
 
 test:
   adapter: postgresql
   encoding: unicode
   database: two_o_dunkbonds_test
   pool: 5
-  username: Aaron
+  username: aaron
   password:
 
 # Warning: The database defined as "test" will be erased and

@@ -44,6 +44,7 @@ group :development, :test do
 	#gem 'ruby-debug19'
 	#gem 'ruby-debug19', :require => 'ruby-debug'
   gem 'listen'
+  gem 'rails-erd'
 end
 
 #gem 'feedjira' #, :git => 'https://github.com/pauldix/feedzirra.git'
