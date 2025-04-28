@@ -128,6 +128,9 @@ class LineItemsController < ApplicationController
   private
 
   def goal_market_open?
+    flash[:warning] = "DUNKbonds goals are closed for trading." 
+    redirect_to @goal 
+
     load_account_and_goal
     if @goal.status == 'Achieved'
       flash[:warning] = "This goal has been achieved, and its market is now closed."
