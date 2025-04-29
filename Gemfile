@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 ruby '3.1.6'
 
-gem 'rails', '6.1.7'
+gem 'rails', '6.1.7.1'
 gem 'devise'
 gem 'will_paginate'
 
