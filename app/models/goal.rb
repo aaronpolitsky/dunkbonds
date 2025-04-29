@@ -1,7 +1,7 @@
 class Goal < ApplicationRecord
   has_many :accounts
   has_many :posts
-  has_many :followers, :through => :accounts, :class_name => "User"
+  has_many :followers, :through => :accounts, source: :user
   has_many :line_items, :through => :accounts
   has_many :bonds, :through => :accounts
   belongs_to :goalsetter, :class_name => "User", :foreign_key => "goalsetter_id"
